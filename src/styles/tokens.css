@@ -1,0 +1,11 @@
+:root {
+  --color-canvas: #f7f1e8;
+  --color-canvas-soft: #efe3d2;
+  --color-ink: #1d1a18;
+  --color-muted: #5f584f;
+  --color-accent: #2b5fa8;
+  --color-accent-soft: #bfd3ea;
+
+  --radius-card: 1rem;
+  --shadow-card: 0 20px 45px rgba(43, 30, 18, 0.14);
+}

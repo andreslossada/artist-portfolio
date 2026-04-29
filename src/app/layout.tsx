@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { SiteFooter } from "@/components/sections/site-footer";
+import { SiteHeader } from "@/components/sections/site-header";
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -26,10 +28,14 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+          lang="es"
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-canvas text-ink">{children}</body>
+          <body className="min-h-full flex flex-col bg-canvas text-ink">
+              <SiteHeader />
+              {children}
+              <SiteFooter />
+          </body>
     </html>
   );
 }
