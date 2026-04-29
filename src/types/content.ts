@@ -7,6 +7,7 @@ export type Artwork = {
   dimensions: string;
   imageUrl: string;
   excerpt: string;
+  category: string;
 };
 
 export type Product = {

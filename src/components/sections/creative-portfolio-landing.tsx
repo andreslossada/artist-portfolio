@@ -9,6 +9,30 @@ import { landingGalleryItems } from "@/lib/content/landing-gallery";
 
 const progressSegments = Math.min(12, landingGalleryItems.length);
 const defaultLandingTagline = "The soul of the 911";
+const sliderLoopCopies = 5;
+const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
+const dragActivationThreshold = 14;
+const landingSplashSeenStorageKey = "irina-landing-splash-seen";
+
+let hasSeenLandingSplashInRuntime = false;
+
+const loopedLandingGalleryItems = Array.from(
+  { length: sliderLoopCopies },
+  (_, copyIndex) =>
+    landingGalleryItems.map((item) => ({
+      ...item,
+      copyIndex,
+      loopKey: `${copyIndex}-${item.id}`,
+    })),
+).flat();
+
+const getSingleLoopWidth = (rail: HTMLDivElement) => {
+  if (rail.scrollWidth <= rail.clientWidth) {
+    return 0;
+  }
+
+  return rail.scrollWidth / sliderLoopCopies;
+};
 
 export function CreativePortfolioLanding() {
   const railRef = useRef<HTMLDivElement>(null);
@@ -17,9 +41,64 @@ export function CreativePortfolioLanding() {
   const [hoveredArtworkTitle, setHoveredArtworkTitle] = useState<string | null>(
     null,
   );
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(!hasSeenLandingSplashInRuntime);
   const handleSplashComplete = useCallback(() => {
+    hasSeenLandingSplashInRuntime = true;
+
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(landingSplashSeenStorageKey, "1");
+    }
+
     setShowSplash(false);
+  }, []);
+
+  useEffect(() => {
+    if (hasSeenLandingSplashInRuntime) {
+      return;
+    }
+
+    const hasSeenSplashInSession =
+      window.sessionStorage.getItem(landingSplashSeenStorageKey) === "1";
+
+    if (!hasSeenSplashInSession) {
+      return;
+    }
+
+    hasSeenLandingSplashInRuntime = true;
+    // Defer setState to avoid cascading render warning
+    Promise.resolve().then(() => setShowSplash(false));
+  }, []);
+
+  const syncRailLoopState = useCallback(() => {
+    const rail = railRef.current;
+
+    if (!rail) {
+      return;
+    }
+
+    const singleLoopWidth = getSingleLoopWidth(rail);
+
+    if (singleLoopWidth <= 0) {
+      setActiveSegment(0);
+      return;
+    }
+
+    const minBoundary = singleLoopWidth * (centerLoopCopyIndex - 0.5);
+    const maxBoundary = singleLoopWidth * (centerLoopCopyIndex + 0.5);
+
+    while (rail.scrollLeft < minBoundary) {
+      rail.scrollLeft += singleLoopWidth;
+    }
+
+    while (rail.scrollLeft > maxBoundary) {
+      rail.scrollLeft -= singleLoopWidth;
+    }
+
+    const loopOffset =
+      ((rail.scrollLeft % singleLoopWidth) + singleLoopWidth) % singleLoopWidth;
+    const progress = loopOffset / singleLoopWidth;
+    const nextSegment = Math.round(progress * (progressSegments - 1));
+    setActiveSegment(nextSegment);
   }, []);
 
   useEffect(() => {
@@ -29,28 +108,31 @@ export function CreativePortfolioLanding() {
       return;
     }
 
-    const updateProgress = () => {
-      const maxScroll = rail.scrollWidth - rail.clientWidth;
+    const initializeLoop = () => {
+      const singleLoopWidth = getSingleLoopWidth(rail);
 
-      if (maxScroll <= 0) {
+      if (singleLoopWidth <= 0) {
         setActiveSegment(0);
         return;
       }
 
-      const progress = rail.scrollLeft / maxScroll;
-      const nextSegment = Math.round(progress * (progressSegments - 1));
-      setActiveSegment(nextSegment);
+      const loopOffset =
+        ((rail.scrollLeft % singleLoopWidth) + singleLoopWidth) %
+        singleLoopWidth;
+      rail.scrollLeft = singleLoopWidth * centerLoopCopyIndex + loopOffset;
+      syncRailLoopState();
     };
 
-    updateProgress();
-    rail.addEventListener("scroll", updateProgress, { passive: true });
-    window.addEventListener("resize", updateProgress);
+    const frameId = window.requestAnimationFrame(initializeLoop);
+    rail.addEventListener("scroll", syncRailLoopState, { passive: true });
+    window.addEventListener("resize", initializeLoop);
 
     return () => {
-      rail.removeEventListener("scroll", updateProgress);
-      window.removeEventListener("resize", updateProgress);
+      window.cancelAnimationFrame(frameId);
+      rail.removeEventListener("scroll", syncRailLoopState);
+      window.removeEventListener("resize", initializeLoop);
     };
-  }, []);
+  }, [syncRailLoopState]);
 
   useEffect(() => {
     const rail = railRef.current;
@@ -70,28 +152,17 @@ export function CreativePortfolioLanding() {
       wheelMultiplier: 0.9,
       autoRaf: true,
       overscroll: false,
+      infinite: true,
     });
 
-    const syncProgress = () => {
-      const maxScroll = rail.scrollWidth - rail.clientWidth;
-
-      if (maxScroll <= 0) {
-        setActiveSegment(0);
-        return;
-      }
-
-      const progress = rail.scrollLeft / maxScroll;
-      setActiveSegment(Math.round(progress * (progressSegments - 1)));
-    };
-
-    lenis.on("scroll", syncProgress);
-    syncProgress();
+    lenis.on("scroll", syncRailLoopState);
+    syncRailLoopState();
 
     return () => {
-      lenis.off("scroll", syncProgress);
+      lenis.off("scroll", syncRailLoopState);
       lenis.destroy();
     };
-  }, []);
+  }, [syncRailLoopState]);
 
   useEffect(() => {
     const rail = railRef.current;
@@ -100,48 +171,98 @@ export function CreativePortfolioLanding() {
       return;
     }
 
+    let isPointerDown = false;
     let isDragging = false;
+    let activePointerId: number | null = null;
     let startX = 0;
     let startScrollLeft = 0;
+    let dragDistance = 0;
+    let cancelClickUntil = 0;
 
     const startDragging = (event: PointerEvent) => {
       if (event.pointerType === "mouse" && event.button !== 0) {
         return;
       }
 
-      isDragging = true;
+      isPointerDown = true;
+      isDragging = false;
+      activePointerId = event.pointerId;
       startX = event.clientX;
       startScrollLeft = rail.scrollLeft;
-      rail.classList.add("cursor-grabbing");
-      rail.setPointerCapture(event.pointerId);
+      dragDistance = 0;
+
+      try {
+        rail.setPointerCapture(event.pointerId);
+      } catch {
+        // Some synthetic pointer sequences or browsers can reject capture.
+      }
+
+      event.preventDefault();
     };
 
     const dragRail = (event: PointerEvent) => {
+      if (!isPointerDown || activePointerId !== event.pointerId) {
+        return;
+      }
+
+      const deltaX = event.clientX - startX;
+
+      if (!isDragging && Math.abs(deltaX) > dragActivationThreshold) {
+        isDragging = true;
+        rail.classList.add("cursor-grabbing");
+      }
+
       if (!isDragging) {
         return;
       }
 
       event.preventDefault();
-      const deltaX = event.clientX - startX;
+      dragDistance = Math.abs(deltaX);
       rail.scrollLeft = startScrollLeft - deltaX;
+      syncRailLoopState();
     };
 
     const stopDragging = (event: PointerEvent) => {
-      if (!isDragging) {
+      if (!isPointerDown || activePointerId !== event.pointerId) {
         return;
       }
 
+      isPointerDown = false;
+
+      if (dragDistance > dragActivationThreshold) {
+        cancelClickUntil = window.performance.now() + 180;
+      }
+
       isDragging = false;
       rail.classList.remove("cursor-grabbing");
 
-      if (rail.hasPointerCapture(event.pointerId)) {
-        rail.releasePointerCapture(event.pointerId);
+      try {
+        if (rail.hasPointerCapture(event.pointerId)) {
+          rail.releasePointerCapture(event.pointerId);
+        }
+      } catch {
+        // Ignore release errors when pointer capture was never acquired.
       }
+
+      activePointerId = null;
     };
 
     const resetDragging = () => {
+      isPointerDown = false;
       isDragging = false;
+      activePointerId = null;
       rail.classList.remove("cursor-grabbing");
+    };
+
+    const handleClickCapture = (event: MouseEvent) => {
+      if (window.performance.now() < cancelClickUntil) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
+    const preventNativeDrag = (event: DragEvent) => {
+      event.preventDefault();
     };
 
     rail.addEventListener("pointerdown", startDragging);
@@ -149,6 +270,8 @@ export function CreativePortfolioLanding() {
     rail.addEventListener("pointerup", stopDragging);
     rail.addEventListener("pointercancel", stopDragging);
     rail.addEventListener("lostpointercapture", resetDragging);
+    rail.addEventListener("click", handleClickCapture, { capture: true });
+    rail.addEventListener("dragstart", preventNativeDrag);
 
     return () => {
       rail.removeEventListener("pointerdown", startDragging);
@@ -156,8 +279,10 @@ export function CreativePortfolioLanding() {
       rail.removeEventListener("pointerup", stopDragging);
       rail.removeEventListener("pointercancel", stopDragging);
       rail.removeEventListener("lostpointercapture", resetDragging);
+      rail.removeEventListener("click", handleClickCapture, { capture: true });
+      rail.removeEventListener("dragstart", preventNativeDrag);
     };
-  }, []);
+  }, [syncRailLoopState]);
 
   return (
     <div className="h-screen overflow-hidden bg-white text-black">
@@ -213,28 +338,38 @@ export function CreativePortfolioLanding() {
         >
           <div
             ref={railRef}
-            className="flex h-full w-full cursor-grab overflow-x-auto overflow-y-hidden py-3 [-ms-overflow-style:none] [scrollbar-width:none] [touch-action:pan-y] md:py-4 [&::-webkit-scrollbar]:hidden"
+            className="flex h-full w-full cursor-grab touch-none select-none overflow-x-auto overflow-y-hidden py-3 [-ms-overflow-style:none] [scrollbar-width:none] md:py-4 [&::-webkit-scrollbar]:hidden"
           >
             <div
               ref={railContentRef}
               className="flex h-full w-max gap-3 md:gap-4"
             >
-              {landingGalleryItems.map((item) => (
+              {loopedLandingGalleryItems.map((item) => (
                 <article
-                  key={item.id}
-                  className="relative aspect-2/3 h-full min-w-56 shrink-0 overflow-hidden border border-black/9 bg-neutral-100 md:min-w-88"
+                  key={item.loopKey}
+                  className="group relative aspect-2/3 h-full min-w-56 shrink-0 overflow-hidden border border-black/9 bg-neutral-100 md:min-w-88"
                   onMouseEnter={() => setHoveredArtworkTitle(item.title)}
                   onMouseLeave={() => setHoveredArtworkTitle(null)}
                 >
-                  <Image
-                    src={item.imageUrl}
-                    alt={`${item.title} - ${item.category}`}
-                    fill
-                    draggable={false}
-                    sizes="(max-width: 768px) 62vw, 22vw"
-                    className="object-cover contrast-105 saturate-105"
-                    priority={item.id === "g1" || item.id === "g2"}
-                  />
+                  <Link
+                    href={`/artwork/${item.slug}`}
+                    className="block h-full w-full outline-none"
+                  >
+                    <div className="relative h-full w-full">
+                      <Image
+                        src={item.imageUrl}
+                        alt={`${item.title} - ${item.category}`}
+                        fill
+                        draggable={false}
+                        sizes="(max-width: 768px) 62vw, 22vw"
+                        className="object-cover contrast-105 saturate-105 transition-transform duration-500 will-change-transform motion-safe:group-hover:scale-[1.02]"
+                        priority={
+                          (item.id === "g1" || item.id === "g2") &&
+                          item.copyIndex === centerLoopCopyIndex
+                        }
+                      />
+                    </div>
+                  </Link>
                 </article>
               ))}
             </div>
@@ -242,14 +377,7 @@ export function CreativePortfolioLanding() {
         </section>
 
         <footer className="grid grid-cols-1 gap-5 py-4 md:grid-cols-[1fr_auto_1fr] md:items-end md:pb-6">
-          <p
-            id="about"
-            className="text-xl leading-[1.2] tracking-[-0.03em] italic md:text-[2.7rem] md:leading-[1.1]"
-          >
-            Irina
-            <br />
-            Artista pintora
-          </p>
+          <div id="about" aria-hidden="true" className="h-0 overflow-hidden" />
 
           <div className="order-3 flex justify-center md:order-2">
             <div className="flex items-center gap-2 md:gap-3">
@@ -264,10 +392,10 @@ export function CreativePortfolioLanding() {
 
           <div
             id="contact"
-            className="order-2 flex justify-start md:order-3 md:justify-end"
+            className="order-2 flex h-16 items-end justify-start overflow-hidden md:order-3 md:h-32 md:justify-end"
           >
             <p
-              className="inline-block text-[2rem] leading-[0.95] font-black tracking-[-0.03em] md:text-[4rem]"
+              className="overflow-hidden text-[1.35rem] leading-[0.95] font-black tracking-[-0.03em] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] md:text-[2.4rem]"
               style={{
                 transform: "scaleX(1.08)",
                 transformOrigin: "right center",

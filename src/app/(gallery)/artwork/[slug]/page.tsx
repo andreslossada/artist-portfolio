@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { artworks, getArtworkBySlug } from "@/lib/content/catalog";
 
@@ -55,6 +56,15 @@ export default async function ArtworkDetailPage({
               <dd className="inline">{artwork.year}</dd>
             </div>
           </dl>
+
+          <div className="mt-10 border-t border-ink/10 pt-8">
+            <Link
+              href={`/shop?fromArtwork=${artwork.slug}`}
+              className="bg-accent inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition hover:brightness-110"
+            >
+              Adquirir prints o catalogo
+            </Link>
+          </div>
         </div>
       </article>
     </main>

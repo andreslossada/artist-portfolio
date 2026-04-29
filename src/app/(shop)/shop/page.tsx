@@ -1,6 +1,12 @@
 import { products } from "@/lib/content/catalog";
 
-export default function ShopPage() {
+export default async function ShopPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { fromArtwork } = await searchParams;
+
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
       <header className="mb-10">
@@ -8,6 +14,11 @@ export default function ShopPage() {
         <h1 className="font-display mt-2 text-5xl leading-tight">
           Ediciones y publicaciones
         </h1>
+        {fromArtwork && (
+          <p className="mt-4 text-sm font-medium text-accent">
+            Estás explorando opciones para adquirir piezas relacionadas.
+          </p>
+        )}
       </header>
 
       <div className="grid gap-5 md:grid-cols-2">

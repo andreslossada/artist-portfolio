@@ -1,103 +1,230 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
 
 type SplashScreenProps = {
   onComplete: () => void;
 };
 
-const signaturePaths = [
-  "M110 306L110 150",
-  "M182 306L182 204C182 186 196 172 216 172C235 172 248 184 248 200C248 215 236 226 218 232",
-  "M294 306L294 210",
-  "M294 176m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0",
-  "M344 306L344 218C344 192 364 172 391 172C418 172 438 192 438 218L438 306",
-  "M488 252C488 220 513 194 544 194C575 194 600 220 600 252C600 284 575 310 544 310C513 310 488 284 488 252M600 306L600 228",
-] as const;
+const SPLASH_FADE_MS = 450;
+const SPLASH_MAX_DURATION_MS = 9000;
+const IRINA_SVG_URL = "/Irina.svg";
+
+function splitCompoundPathData(d: string) {
+  const subpaths = d.match(/[Mm][^Mm]*/g);
+
+  if (!subpaths || subpaths.length <= 1) {
+    return null;
+  }
+
+  return subpaths.map((segment) => segment.trim()).filter(Boolean);
+}
+
+function expandCompoundSvgPaths(markup: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(markup, "image/svg+xml");
+  const svg = doc.querySelector("svg");
+
+  if (!svg) {
+    return markup;
+  }
+
+  const paths = Array.from(svg.querySelectorAll("path"));
+
+  paths.forEach((path) => {
+    const d = path.getAttribute("d");
+
+    if (!d) {
+      return;
+    }
+
+    const splitSegments = splitCompoundPathData(d);
+
+    if (!splitSegments) {
+      return;
+    }
+
+    const parent = path.parentNode;
+
+    if (!parent) {
+      return;
+    }
+
+    splitSegments.forEach((segment) => {
+      const nextPath = path.cloneNode(true) as SVGPathElement;
+      nextPath.setAttribute("d", segment);
+      parent.insertBefore(nextPath, path);
+    });
+
+    parent.removeChild(path);
+  });
+
+  return new XMLSerializer().serializeToString(svg);
+}
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
+  const [isFading, setIsFading] = useState(false);
+  const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
+  const hasCompletedRef = useRef(false);
+  const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const finishSplash = useCallback(() => {
+    if (hasCompletedRef.current) {
+      return;
+    }
+
+    hasCompletedRef.current = true;
+    setIsFading(true);
+
+    fadeTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+      onComplete();
+    }, SPLASH_FADE_MS);
+  }, [onComplete]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch(IRINA_SVG_URL, { cache: "force-cache" })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to load splash SVG");
+        }
+
+        return response.text();
+      })
+      .then((markup) => {
+        if (!cancelled) {
+          setSvgMarkup(expandCompoundSvgPaths(markup));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          finishSplash();
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [finishSplash]);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion) {
+      finishSplash();
+    }
+  }, [finishSplash]);
 
   const scopeRef = useGsapContext<HTMLDivElement>(
     (scope, gsap) => {
-      if (!isVisible) {
+      if (!isVisible || !svgMarkup || hasCompletedRef.current) {
         return;
       }
 
-      const paths = scope.querySelectorAll<SVGPathElement>(
-        "[data-signature-path]",
+      const paths = Array.from(
+        scope.querySelectorAll<SVGPathElement>("svg path"),
       );
 
-      if (paths.length === 0) {
-        setIsVisible(false);
-        onComplete();
+      const orderedPaths = [...paths].sort((a, b) => {
+        try {
+          return a.getBBox().x - b.getBBox().x;
+        } catch {
+          return 0;
+        }
+      });
+
+      if (orderedPaths.length === 0) {
+        finishSplash();
         return;
       }
 
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
+      orderedPaths.forEach((path) => {
+        let length = 900;
 
-      if (prefersReducedMotion) {
-        setIsVisible(false);
-        onComplete();
-        return;
-      }
-
-      paths.forEach((path) => {
-        const length =
-          "getTotalLength" in path && typeof path.getTotalLength === "function"
-            ? path.getTotalLength()
-            : Math.max(
-                600,
-                "getBBox" in path && typeof path.getBBox === "function"
-                  ? path.getBBox().width * 2.2
-                  : 1200,
-              );
+        if (typeof path.getTotalLength === "function") {
+          try {
+            length = path.getTotalLength();
+          } catch {
+            length = 900;
+          }
+        }
 
         gsap.set(path, {
           strokeDasharray: length,
           strokeDashoffset: length,
-          strokeOpacity: 0,
+          stroke: "#111111",
+          strokeWidth: 2.35,
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+          strokeOpacity: 1,
+          fillOpacity: 0,
         });
       });
 
       const timeline = gsap.timeline({
-        onComplete: () => {
-          setIsVisible(false);
-          onComplete();
-        },
+        defaults: { ease: "power2.out" },
+        onComplete: finishSplash,
       });
 
-      timeline.to(paths, {
+      timeline.to(orderedPaths, {
         strokeDashoffset: 0,
-        duration: 1.1,
-        ease: "power1.inOut",
-        stagger: 0.28,
+        duration: (_index, target) => {
+          const path = target as SVGPathElement;
+
+          try {
+            return Math.max(0.28, Math.min(0.76, path.getTotalLength() / 520));
+          } catch {
+            return 0.5;
+          }
+        },
+        stagger: 0.14,
       });
 
       timeline.to(
-        paths,
+        orderedPaths,
         {
-          strokeOpacity: 1,
-          duration: 0.05,
-          ease: "none",
-          stagger: 0.28,
+          fillOpacity: 1,
+          duration: 0.28,
+          stagger: 0.08,
         },
-        0.04,
+        ">-0.22",
       );
 
-      timeline.to({}, { duration: 1 });
+      timeline.to(
+        orderedPaths,
+        {
+          strokeOpacity: 0.45,
+          duration: 0.2,
+          stagger: 0.05,
+        },
+        "<",
+      );
 
-      timeline.to(scope, {
-        autoAlpha: 0,
-        duration: 0.8,
-        ease: "power1.out",
-      });
+      timeline.to({}, { duration: 0.45 });
     },
-    [isVisible, onComplete],
+    [finishSplash, isVisible, svgMarkup],
   );
+
+  useEffect(() => {
+    const failSafeTimeout = setTimeout(
+      finishSplash,
+      SPLASH_MAX_DURATION_MS,
+    );
+
+    return () => {
+      window.clearTimeout(failSafeTimeout);
+
+      if (fadeTimeoutRef.current) {
+        window.clearTimeout(fadeTimeoutRef.current);
+      }
+    };
+  }, [finishSplash]);
 
   if (!isVisible) {
     return null;
@@ -106,28 +233,17 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   return (
     <div
       ref={scopeRef}
-      className="fixed inset-0 z-9999 flex h-screen w-screen items-center justify-center bg-white"
+      className={`pointer-events-none fixed inset-0 z-9999 flex h-screen w-screen items-center justify-center bg-white transition-opacity duration-500 ${isFading ? "opacity-0" : "opacity-100"}`}
       role="presentation"
       aria-hidden="true"
     >
-      <svg
-        viewBox="0 0 760 420"
-        className="w-[min(94vw,980px)]"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {signaturePaths.map((path, index) => (
-          <path
-            key={`signature-path-${index}`}
-            data-signature-path
-            d={path}
-            className="stroke-accent"
-            strokeWidth="12"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        ))}
-      </svg>
+      {svgMarkup ? (
+        <div
+          className="w-[min(92vw,900px)] [&>svg]:h-auto [&>svg]:w-full"
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{ __html: svgMarkup }}
+        />
+      ) : null}
     </div>
   );
 }
