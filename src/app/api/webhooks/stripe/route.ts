@@ -16,7 +16,11 @@ export async function POST(request: Request) {
   const payload = await request.text();
 
   try {
-    const event = stripe.webhooks.constructEvent(payload, signature, signingSecret);
+    const event = stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      signingSecret,
+    );
 
     if (event.type === "checkout.session.completed") {
       console.info("Stripe checkout.session.completed", event.data.object.id);
@@ -24,7 +28,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Webhook signature error";
+    const message =
+      error instanceof Error ? error.message : "Webhook signature error";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

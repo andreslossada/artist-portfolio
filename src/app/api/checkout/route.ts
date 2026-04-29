@@ -30,7 +30,8 @@ export async function POST(request: Request) {
     }
 
     const stripe = getStripeServerClient();
-    const origin = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin;
+    const origin =
+      process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin;
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -45,7 +46,10 @@ export async function POST(request: Request) {
     });
 
     if (!session.url) {
-      return NextResponse.json({ error: "Stripe did not return a checkout URL" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Stripe did not return a checkout URL" },
+        { status: 500 },
+      );
     }
 
     const requestContentType = request.headers.get("content-type") ?? "";
@@ -56,7 +60,8 @@ export async function POST(request: Request) {
 
     return NextResponse.redirect(session.url, { status: 303 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown checkout error";
+    const message =
+      error instanceof Error ? error.message : "Unknown checkout error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

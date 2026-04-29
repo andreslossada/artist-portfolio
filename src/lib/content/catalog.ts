@@ -32,7 +32,8 @@ export const artworks: Artwork[] = [
     dimensions: "140 x 80 cm",
     imageUrl:
       "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=1200&q=80",
-    excerpt: "Texturas de erosion y gesto rapido en superposicion de pigmentos.",
+    excerpt:
+      "Texturas de erosion y gesto rapido en superposicion de pigmentos.",
   },
 ];
 
