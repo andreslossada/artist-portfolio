@@ -12,9 +12,6 @@ const defaultLandingTagline = "The soul of the 911";
 const sliderLoopCopies = 5;
 const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 14;
-const landingSplashSeenStorageKey = "irina-landing-splash-seen";
-
-let hasSeenLandingSplashInRuntime = false;
 
 const loopedLandingGalleryItems = Array.from(
   { length: sliderLoopCopies },
@@ -41,32 +38,9 @@ export function CreativePortfolioLanding() {
   const [hoveredArtworkTitle, setHoveredArtworkTitle] = useState<string | null>(
     null,
   );
-  const [showSplash, setShowSplash] = useState(!hasSeenLandingSplashInRuntime);
+  const [showSplash, setShowSplash] = useState(true);
   const handleSplashComplete = useCallback(() => {
-    hasSeenLandingSplashInRuntime = true;
-
-    if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(landingSplashSeenStorageKey, "1");
-    }
-
     setShowSplash(false);
-  }, []);
-
-  useEffect(() => {
-    if (hasSeenLandingSplashInRuntime) {
-      return;
-    }
-
-    const hasSeenSplashInSession =
-      window.sessionStorage.getItem(landingSplashSeenStorageKey) === "1";
-
-    if (!hasSeenSplashInSession) {
-      return;
-    }
-
-    hasSeenLandingSplashInRuntime = true;
-    // Defer setState to avoid cascading render warning
-    Promise.resolve().then(() => setShowSplash(false));
   }, []);
 
   const syncRailLoopState = useCallback(() => {

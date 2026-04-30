@@ -4,6 +4,8 @@ const links = [
   { href: "/", label: "Inicio" },
   { href: "/gallery", label: "Galeria" },
   { href: "/shop", label: "Tienda" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function SiteHeader() {
