@@ -167,13 +167,6 @@ export function CreativePortfolioLanding() {
       startScrollLeft = rail.scrollLeft;
       dragDistance = 0;
 
-      try {
-        rail.setPointerCapture(event.pointerId);
-      } catch {
-        // Some synthetic pointer sequences or browsers can reject capture.
-      }
-
-      event.preventDefault();
     };
 
     const dragRail = (event: PointerEvent) => {
@@ -186,6 +179,12 @@ export function CreativePortfolioLanding() {
       if (!isDragging && Math.abs(deltaX) > dragActivationThreshold) {
         isDragging = true;
         rail.classList.add("cursor-grabbing");
+
+        try {
+          rail.setPointerCapture(event.pointerId);
+        } catch {
+          // Some synthetic pointer sequences or browsers can reject capture.
+        }
       }
 
       if (!isDragging) {
@@ -288,17 +287,17 @@ export function CreativePortfolioLanding() {
           </div>
 
           <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
-            <Link href="#projects" className="font-semibold text-black">
+            <Link href="/projects" className="font-semibold text-black">
               Projects
             </Link>
             <Link
-              href="#about"
+              href="/about"
               className="text-black/40 transition hover:text-black"
             >
               About
             </Link>
             <Link
-              href="#contact"
+              href="/contact"
               className="text-black/40 transition hover:text-black"
             >
               Contact
