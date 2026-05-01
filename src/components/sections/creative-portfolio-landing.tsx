@@ -12,6 +12,7 @@ const defaultLandingTagline = "The soul of the 911";
 const sliderLoopCopies = 5;
 const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 14;
+let hasShownLandingSplash = false;
 
 const loopedLandingGalleryItems = Array.from(
   { length: sliderLoopCopies },
@@ -38,8 +39,9 @@ export function CreativePortfolioLanding() {
   const [hoveredArtworkTitle, setHoveredArtworkTitle] = useState<string | null>(
     null,
   );
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => !hasShownLandingSplash);
   const handleSplashComplete = useCallback(() => {
+    hasShownLandingSplash = true;
     setShowSplash(false);
   }, []);
 
