@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ViewTransition } from "react";
 import { artworks, getArtworkBySlug } from "@/lib/content/catalog";
 
 type ArtworkDetailPageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ vt?: string }>;
 };
 
 export function generateStaticParams() {
@@ -13,25 +15,32 @@ export function generateStaticParams() {
 
 export default async function ArtworkDetailPage({
   params,
+  searchParams,
 }: ArtworkDetailPageProps) {
   const { slug } = await params;
+  const { vt } = await searchParams;
   const artwork = getArtworkBySlug(slug);
 
   if (!artwork) {
     notFound();
   }
 
+  const transitionName = `artwork-image-${vt ?? artwork.slug}`;
+
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
-      <article className="border-ink/10 shadow-card grid gap-8 rounded-4xl border bg-white/70 p-5 md:grid-cols-2 md:p-8">
-        <div className="relative aspect-4/5 overflow-hidden rounded-xl">
-          <Image
-            src={artwork.imageUrl}
-            alt={artwork.title}
-            fill
-            className="object-cover"
-          />
-        </div>
+    <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-6 md:px-10 md:py-8">
+      <article className="border-ink/10 shadow-card grid gap-8 rounded-4xl border bg-white/70 p-5 md:grid-cols-2 md:items-start md:gap-10 md:p-8">
+        <ViewTransition name={transitionName} share="artwork-morph">
+          <div className="relative mx-auto aspect-2/3 w-full max-w-sm overflow-hidden rounded-xl md:mx-0 md:max-w-md">
+            <Image
+              src={artwork.imageUrl}
+              alt={artwork.title}
+              fill
+              className="object-cover object-center"
+              sizes="(max-width: 768px) 88vw, 30rem"
+            />
+          </div>
+        </ViewTransition>
 
         <div>
           <p className="text-muted text-xs tracking-[0.3em] uppercase">

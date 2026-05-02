@@ -3,12 +3,12 @@
 import Lenis from "lenis";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ViewTransition, useCallback, useEffect, useRef, useState } from "react";
 import { SplashScreen } from "@/components/animations/splash-screen";
 import { landingGalleryItems } from "@/lib/content/landing-gallery";
 
 const progressSegments = Math.min(12, landingGalleryItems.length);
-const defaultLandingTagline = "The soul of the 911";
 const sliderLoopCopies = 5;
 const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 14;
@@ -40,6 +40,7 @@ export function CreativePortfolioLanding() {
     null,
   );
   const [showSplash, setShowSplash] = useState(() => !hasShownLandingSplash);
+  const [isSliderIntroReady, setIsSliderIntroReady] = useState(false);
   const handleSplashComplete = useCallback(() => {
     hasShownLandingSplash = true;
     setShowSplash(false);
@@ -259,22 +260,179 @@ export function CreativePortfolioLanding() {
     };
   }, [syncRailLoopState]);
 
+  useEffect(() => {
+    if (showSplash) {
+      setIsSliderIntroReady(false);
+      return;
+    }
+
+    const rail = railRef.current;
+    const railContent = railContentRef.current;
+
+    if (!rail || !railContent) {
+      return;
+    }
+
+    const cards = Array.from(
+      railContent.querySelectorAll<HTMLElement>("[data-slider-card]"),
+    );
+    const cardMedia = cards
+      .map((card) => card.querySelector<HTMLElement>("[data-slider-media]"))
+      .filter((media): media is HTMLElement => media !== null);
+    const maxAnimatedCards = 5;
+
+    if (cards.length === 0) {
+      setIsSliderIntroReady(true);
+      return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.set(cards, {
+        autoAlpha: 1,
+        x: 0,
+        scale: 1,
+        clearProps: "x,scale,opacity,visibility,zIndex,willChange",
+      });
+      gsap.set(cardMedia, { clearProps: "clipPath,willChange" });
+      setIsSliderIntroReady(true);
+      return;
+    }
+
+    let timeline: gsap.core.Timeline | null = null;
+    const frameId = window.requestAnimationFrame(() => {
+      const railRect = rail.getBoundingClientRect();
+      const viewportCenterX = railRect.left + railRect.width / 2;
+      const cardEntries = cards.map((card, index) => {
+        const cardRect = card.getBoundingClientRect();
+        const centerX = cardRect.left + cardRect.width / 2;
+
+        return {
+          card,
+          index,
+          centerX,
+          distanceToCenter: Math.abs(centerX - viewportCenterX),
+        };
+      });
+
+      const animatedEntries = [...cardEntries]
+        .sort((a, b) => a.distanceToCenter - b.distanceToCenter)
+        .slice(0, Math.min(maxAnimatedCards, cardEntries.length))
+        .sort((a, b) => a.index - b.index);
+
+      if (animatedEntries.length === 0) {
+        setIsSliderIntroReady(true);
+        return;
+      }
+
+      const centerEntry = animatedEntries.reduce((closest, entry) =>
+        entry.distanceToCenter < closest.distanceToCenter ? entry : closest,
+      );
+      const animatedCards = animatedEntries.map(({ card }) => card);
+      const animatedMedia = animatedCards
+        .map((card) => card.querySelector<HTMLElement>("[data-slider-media]"))
+        .filter((media): media is HTMLElement => media !== null);
+      const centerMedia = centerEntry.card.querySelector<HTMLElement>(
+        "[data-slider-media]",
+      );
+      const sideCards = animatedEntries
+        .filter(({ index }) => index !== centerEntry.index)
+        .map(({ card }) => card);
+
+      gsap.set(animatedCards, {
+        autoAlpha: 0,
+        scale: 0.94,
+        willChange: "transform, opacity",
+      });
+
+      const maxLayer = animatedEntries.length * 2;
+
+      animatedEntries.forEach((entry) => {
+        const distance = Math.abs(entry.index - centerEntry.index);
+        const sideBias = entry.index < centerEntry.index ? 1 : 0;
+
+        gsap.set(entry.card, {
+          x: viewportCenterX - entry.centerX,
+          zIndex: Math.max(1, maxLayer - distance * 2 + sideBias),
+        });
+      });
+
+      gsap.set(centerEntry.card, {
+        autoAlpha: 1,
+        scale: 0.97,
+        zIndex: maxLayer + 2,
+      });
+
+      if (centerMedia) {
+        gsap.set(centerMedia, {
+          clipPath: "inset(0 0 100% 0)",
+          willChange: "clip-path",
+        });
+      }
+
+      setIsSliderIntroReady(true);
+
+      timeline = gsap
+        .timeline({
+          defaults: { ease: "power3.out" },
+          onComplete: () => {
+            gsap.set(animatedCards, {
+              clearProps: "x,scale,opacity,visibility,zIndex,willChange",
+            });
+            gsap.set(animatedMedia, { clearProps: "clipPath,willChange" });
+          },
+        })
+        .to(centerEntry.card, {
+          scale: 1,
+          duration: 0.8,
+          ease: "power2.out",
+        });
+
+      if (centerMedia) {
+        timeline.to(
+          centerMedia,
+          {
+            clipPath: "inset(0 0% 0 0)",
+            duration: 0.8,
+            ease: "power2.out",
+          },
+          0,
+        );
+      }
+
+      timeline
+        .to(
+          sideCards,
+          {
+            x: 0,
+            autoAlpha: 1,
+            scale: 1,
+            duration: 1.2,
+            stagger: { each: 0.08, from: "center" },
+            ease: "power3.out",
+          },
+          ">",
+        );
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      timeline?.kill();
+    };
+  }, [showSplash]);
+
   return (
     <div className="h-screen overflow-hidden bg-white text-black">
       {showSplash ? <SplashScreen onComplete={handleSplashComplete} /> : null}
 
       <header className="fixed inset-x-0 top-0 z-30 border-b border-black/10 bg-white/95">
         <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
-          <div className="flex items-center gap-4 md:gap-9">
+          <div className="flex items-center">
             <Link
               href="/"
               className="text-[2rem] leading-none font-semibold tracking-[-0.06em]"
             >
               IRINA
             </Link>
-            <p className="text-xs font-medium tracking-[-0.01em] md:text-[1.85rem] md:leading-none md:tracking-[-0.03em]">
-              Available July 2026
-            </p>
           </div>
 
           <div className="flex justify-center">
@@ -309,7 +467,7 @@ export function CreativePortfolioLanding() {
       <main className="mx-auto flex h-screen w-full max-w-425 flex-col overflow-hidden px-5 pt-22 md:px-10 md:pt-[8.7rem]">
         <section
           id="projects"
-          className="flex min-h-0 flex-1 items-center overflow-hidden"
+          className="-mx-5 flex min-h-0 flex-1 items-center overflow-hidden md:-mx-10"
         >
           <div
             ref={railRef}
@@ -317,33 +475,42 @@ export function CreativePortfolioLanding() {
           >
             <div
               ref={railContentRef}
-              className="flex h-full w-max gap-3 md:gap-4"
+              className={`flex h-full w-full gap-3 transition-opacity duration-150 md:gap-4 ${isSliderIntroReady ? "opacity-100" : "opacity-0"}`}
             >
               {loopedLandingGalleryItems.map((item) => (
                 <article
                   key={item.loopKey}
-                  className="group relative aspect-2/3 h-full min-w-56 shrink-0 overflow-hidden border border-black/9 bg-neutral-100 md:min-w-88"
+                  data-slider-card
+                  className="group relative aspect-2/3 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden border border-black/9 bg-neutral-100 md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
                   onMouseEnter={() => setHoveredArtworkTitle(item.title)}
                   onMouseLeave={() => setHoveredArtworkTitle(null)}
                 >
                   <Link
-                    href={`/artwork/${item.slug}`}
+                    href={`/artwork/${item.slug}?vt=${item.loopKey}`}
                     className="block h-full w-full outline-none"
                   >
-                    <div className="relative h-full w-full">
-                      <Image
-                        src={item.imageUrl}
-                        alt={`${item.title} - ${item.category}`}
-                        fill
-                        draggable={false}
-                        sizes="(max-width: 768px) 62vw, 22vw"
-                        className="object-cover contrast-105 saturate-105 transition-transform duration-500 will-change-transform motion-safe:group-hover:scale-[1.02]"
-                        priority={
-                          (item.id === "g1" || item.id === "g2") &&
-                          item.copyIndex === centerLoopCopyIndex
-                        }
-                      />
-                    </div>
+                    <ViewTransition
+                      name={`artwork-image-${item.loopKey}`}
+                      share="artwork-morph"
+                    >
+                      <div
+                        data-slider-media
+                        className="relative h-full w-full overflow-hidden"
+                      >
+                        <Image
+                          src={item.imageUrl}
+                          alt={`${item.title} - ${item.category}`}
+                          fill
+                          draggable={false}
+                          sizes="(max-width: 768px) 62vw, 22vw"
+                          className="object-cover object-center contrast-105 saturate-105"
+                          priority={
+                            (item.id === "g1" || item.id === "g2") &&
+                            item.copyIndex === centerLoopCopyIndex
+                          }
+                        />
+                      </div>
+                    </ViewTransition>
                   </Link>
                 </article>
               ))}
@@ -351,10 +518,24 @@ export function CreativePortfolioLanding() {
           </div>
         </section>
 
-        <footer className="grid grid-cols-1 gap-5 py-4 md:grid-cols-[1fr_auto_1fr] md:items-end md:pb-6">
+        <footer className="flex flex-col items-center gap-4 py-4 md:gap-5 md:pb-6">
           <div id="about" aria-hidden="true" className="h-0 overflow-hidden" />
 
-          <div className="order-3 flex justify-center md:order-2">
+          <div
+            id="contact"
+            className="flex h-16 w-full items-end justify-center overflow-hidden pb-1 md:h-24 md:pb-2"
+          >
+            {hoveredArtworkTitle ? (
+              <p
+                key={hoveredArtworkTitle}
+                className="max-w-[88vw] text-center text-[1.2rem] leading-[1.08] font-black tracking-[-0.025em] text-balance motion-safe:animate-[landing-title-fade-in_220ms_ease-out] md:max-w-[48rem] md:text-[1.9rem]"
+              >
+                {hoveredArtworkTitle}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex justify-center">
             <div className="flex items-center gap-2 md:gap-3">
               {Array.from({ length: progressSegments }).map((_, index) => (
                 <span
@@ -363,21 +544,6 @@ export function CreativePortfolioLanding() {
                 />
               ))}
             </div>
-          </div>
-
-          <div
-            id="contact"
-            className="order-2 flex h-16 items-end justify-start overflow-hidden md:order-3 md:h-32 md:justify-end"
-          >
-            <p
-              className="overflow-hidden text-[1.35rem] leading-[0.95] font-black tracking-[-0.03em] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] md:text-[2.4rem]"
-              style={{
-                transform: "scaleX(1.08)",
-                transformOrigin: "right center",
-              }}
-            >
-              {hoveredArtworkTitle ?? defaultLandingTagline}
-            </p>
           </div>
         </footer>
       </main>

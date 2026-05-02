@@ -10,6 +10,7 @@ type SplashScreenProps = {
 const SPLASH_FADE_MS = 500;
 const SPLASH_MAX_DURATION_MS = 9000;
 const IRINA_SVG_URL = "/Irina.svg";
+const SWEEP_DURATION = .5;
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
@@ -92,8 +93,9 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         return;
       }
 
-      orderedPaths.forEach((path) => {
+      const pathMetrics = orderedPaths.map((path, index) => {
         let length = 900;
+        let x = index;
 
         if (typeof path.getTotalLength === "function") {
           try {
@@ -103,17 +105,30 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           }
         }
 
+        try {
+          x = path.getBBox().x;
+        } catch {
+          x = index;
+        }
+
         gsap.set(path, {
-          strokeDasharray: length,
-          strokeDashoffset: length,
+          strokeDasharray: length + 2,
+          strokeDashoffset: length + 2,
           stroke: "#161616",
           strokeWidth: 1.7,
-          strokeLinecap: "round",
+          strokeLinecap: "butt",
           strokeLinejoin: "round",
-          strokeOpacity: 1,
+          strokeOpacity: 0,
           fillOpacity: 0,
+          opacity: 0,
         });
+
+        return { path, length, x };
       });
+
+      const minX = Math.min(...pathMetrics.map((metric) => metric.x));
+      const maxX = Math.max(...pathMetrics.map((metric) => metric.x));
+      const xSpan = Math.max(1, maxX - minX);
 
       const timeline = gsap.timeline({
         defaults: { ease: "power2.out" },
@@ -135,41 +150,65 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         },
       );
 
-      timeline.to(orderedPaths, {
-        strokeDashoffset: 0,
-        duration: (_index, target) => {
-          const path = target as SVGPathElement;
-
-          try {
-            return Math.max(0.28, Math.min(0.76, path.getTotalLength() / 520));
-          } catch {
-            return 0.5;
-          }
+      timeline.fromTo(
+        "[data-splash-reveal]",
+        {
+          clipPath: "inset(0 100% 0 0)",
         },
-        stagger: 0.12,
+        {
+          clipPath: "inset(0 0% 0 0)",
+          duration: SWEEP_DURATION,
+          ease: "power2.inOut",
+        },
+        0.08,
+      );
+
+      let latestPathEnd = 0;
+
+      pathMetrics.forEach(({ path, length, x }) => {
+        const progress = (x - minX) / xSpan;
+        const startAt = 0.12 + progress * (SWEEP_DURATION - 0.3);
+        const drawDuration = Math.max(0.28, Math.min(0.76, length / 520));
+        const fillAt = startAt + drawDuration * 0.64;
+        const strokeFadeAt = startAt + drawDuration * 0.82;
+        const pathEnd = fillAt + 0.22;
+
+        latestPathEnd = Math.max(latestPathEnd, pathEnd);
+
+        timeline.to(
+          path,
+          {
+            strokeDashoffset: 0,
+            strokeOpacity: 1,
+            opacity: 1,
+            duration: drawDuration,
+            ease: "power2.out",
+          },
+          startAt,
+        );
+
+        timeline.to(
+          path,
+          {
+            fillOpacity: 1,
+            duration: 0.22,
+            ease: "power1.out",
+          },
+          fillAt,
+        );
+
+        timeline.to(
+          path,
+          {
+            strokeOpacity: 0.38,
+            duration: 0.18,
+            ease: "power1.out",
+          },
+          strokeFadeAt,
+        );
       });
 
-      timeline.to(
-        orderedPaths,
-        {
-          fillOpacity: 1,
-          duration: 0.24,
-          stagger: 0.06,
-        },
-        ">-0.22",
-      );
-
-      timeline.to(
-        orderedPaths,
-        {
-          strokeOpacity: 0.38,
-          duration: 0.2,
-          stagger: 0.05,
-        },
-        "<",
-      );
-
-      timeline.to({}, { duration: 0.45 });
+      timeline.to({}, { duration: 0.4 }, latestPathEnd + 0.05);
     },
     [finishSplash, isVisible, svgMarkup],
   );
@@ -201,9 +240,10 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       aria-hidden="true"
     >
       {svgMarkup ? (
-        <div className="w-[min(90vw,760px)] px-4" data-splash-logo>
+        <div className="w-[min(90vw,760px)] px-4 opacity-0" data-splash-logo>
           <div
             className="[&>svg]:h-auto [&>svg]:w-full"
+            data-splash-reveal
             aria-hidden="true"
             dangerouslySetInnerHTML={{ __html: svgMarkup }}
           />
