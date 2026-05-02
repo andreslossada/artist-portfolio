@@ -1,12 +1,12 @@
 # Artist Portfolio
 
-Base premium para portfolio artistico con Next.js App Router, GSAP, Sanity y Stripe.
+Base premium para portfolio artístico con Next.js App Router, GSAP, Sanity y Stripe.
 
 ## Stack
 
 - Next.js 16 + React 19 + TypeScript
 - Tailwind CSS v4 con tokens en `src/styles/tokens.css`
-- GSAP para capas de animacion
+- GSAP para capas de animación
 - Sanity para contenido editorial
 - Stripe Checkout para flujo de compra MVP
 
@@ -30,20 +30,20 @@ cp .env.example .env.local
 npm run dev
 ```
 
-## Scripts utiles
+## Scripts útiles
 
 - `npm run dev`: servidor local.
-- `npm run lint`: validacion ESLint.
-- `npm run typecheck`: validacion TypeScript.
-- `npm run build`: compilacion de produccion.
+- `npm run lint`: validación ESLint.
+- `npm run typecheck`: validación TypeScript.
+- `npm run build`: compilación de producción.
 - `npm run format`: formatea con Prettier.
 
 ## Estructura inicial
 
 - `src/app/(marketing)/page.tsx`: landing principal.
-- `src/app/(gallery)/gallery/page.tsx`: galeria.
+- `src/app/(gallery)/gallery/page.tsx`: galería.
 - `src/app/(gallery)/artwork/[slug]/page.tsx`: detalle de obra.
-- `src/app/api/checkout/route.ts`: creacion de sesion Stripe Checkout.
+- `src/app/api/checkout/route.ts`: creación de sesión Stripe Checkout.
 - `src/app/api/webhooks/stripe/route.ts`: webhook de Stripe.
 - `src/core/gsap/*`: registro, timelines y triggers.
 - `src/lib/sanity/*`: cliente y queries de Sanity.
@@ -52,4 +52,4 @@ npm run dev
 ## Estado actual
 
 - Etapa 1 iniciada: foundations y arquitectura base listas.
-- Datos de galeria/tienda usan mocks en `src/lib/content/catalog.ts` hasta conectar Sanity/Stripe reales.
+- Datos de galería/tienda usan mocks en `src/lib/content/catalog.ts` hasta conectar Sanity/Stripe reales.

@@ -9,44 +9,44 @@ const dictionaries = {
     metadata: {
       siteTitle: "Irina | Artista pintora",
       siteDescription: "Landing portfolio minimalista para artista pintora",
-      aboutTitle: "Sobre mi | Estudio Irina",
+      aboutTitle: "Sobre mí | Estudio Irina",
       aboutDescription:
-        "Conoce la vision, proceso y trayectoria de la artista detras de Estudio Irina.",
+        "Conoce la visión, proceso y trayectoria de la artista detrás de Estudio Irina.",
       contactTitle: "Contacto | Estudio Irina",
       contactDescription:
         "Contacta al estudio para adquisiciones, comisiones, exposiciones o prensa.",
     },
     header: {
       home: "Inicio",
-      gallery: "Galeria",
+      gallery: "Galería",
       shop: "Tienda",
-      about: "Sobre mi",
+      about: "Sobre mí",
       contact: "Contacto",
     },
     footer: {
-      copyright: "Portfolio artistico 2026. Todos los derechos reservados.",
+      copyright: "Portfolio artístico 2026. Todos los derechos reservados.",
     },
     landing: {
-      list: "Lista",
+      list: "Galería",
       projects: "Proyectos",
-      about: "Sobre mi",
+      about: "Sobre mí",
       contact: "Contacto",
     },
     galleryPage: {
-      eyebrow: "Galeria",
+      eyebrow: "Galería",
       title: "Archivo de obra",
     },
     shopPage: {
       eyebrow: "Tienda",
       title: "Ediciones y publicaciones",
-      fromArtworkHint: "Estas explorando opciones para adquirir piezas relacionadas.",
+      fromArtworkHint: "Estás explorando opciones para adquirir piezas relacionadas.",
       buyWithStripe: "Comprar con Stripe",
     },
     aboutPage: {
-      eyebrow: "Sobre mi",
-      title: "Pintura contemporanea desde el borde del mar",
+      eyebrow: "Sobre mí",
+      title: "Pintura contemporánea desde el borde del mar",
       description:
-        "Estudio Irina desarrolla obra pictorica en tecnica mixta con enfoque en materialidad, ritmo y memoria del paisaje costero. Cada serie explora la tension entre estructura y accidente.",
+        "Estudio Irina desarrolla obra pictórica en técnica mixta con enfoque en materialidad, ritmo y memoria del paisaje costero. Cada serie explora la tensión entre estructura y accidente.",
       processPillars: [
         {
           title: "Materia y gesto",
@@ -56,25 +56,25 @@ const dictionaries = {
         {
           title: "Archivo costero",
           description:
-            "La coleccion nace de caminatas frente al mar y del registro de texturas en muros erosionados.",
+            "La colección nace de caminatas frente al mar y del registro de texturas en muros erosionados.",
         },
         {
           title: "Serie limitada",
           description:
-            "Cada obra y edicion se desarrolla en lotes pequenos para mantener una narrativa curatorial consistente.",
+            "Cada obra y edición se desarrolla en lotes pequeños para mantener una narrativa curatorial consistente.",
         },
       ],
       trajectoryEyebrow: "Trayectoria",
       trajectoryDescription:
-        "Desde 2020, la artista ha presentado obra en residencias y muestras de estudio en Buenos Aires, Montevideo y Barcelona, colaborando con talleres de conservacion para investigar soportes minerales y materiales de larga duracion.",
-      viewGallery: "Ver galeria",
+        "Desde 2020, la artista ha presentado obra en residencias y muestras de estudio en Buenos Aires, Montevideo y Barcelona, colaborando con talleres de conservación para investigar soportes minerales y materiales de larga duración.",
+      viewGallery: "Ver galería",
       contact: "Contactar",
     },
     contactPage: {
       eyebrow: "Contacto",
-      title: "Hablemos de tu proximo proyecto",
+      title: "Hablemos de tu próximo proyecto",
       description:
-        "El estudio responde consultas sobre obra disponible, comisiones, colaboraciones curatoriales y prensa. Tiempo estimado de respuesta: 24-48 horas habiles.",
+        "El estudio responde consultas sobre obra disponible, comisiones, colaboraciones curatoriales y prensa. Tiempo estimado de respuesta: 24-48 horas hábiles.",
       channels: {
         email: "Correo",
         whatsapp: "WhatsApp",
@@ -82,17 +82,17 @@ const dictionaries = {
       },
       acquisitionsTitle: "Adquisiciones",
       acquisitionsDescription:
-        "Si te interesa adquirir una pieza o una edicion limitada, puedes explorar la tienda y escribirnos para recibir ficha tecnica completa, disponibilidad y opciones de entrega local.",
+        "Si te interesa adquirir una pieza o una edición limitada, puedes explorar la tienda y escribirnos para recibir ficha técnica completa, disponibilidad y opciones de entrega local.",
       goToShop: "Ir a tienda",
       viewArtwork: "Ver obra",
     },
     artworkPage: {
-      backToGallery: "Volver a galeria",
+      backToGallery: "Volver a galería",
       detailEyebrow: "Detalle de obra",
-      technique: "Tecnica",
-      dimension: "Dimension",
-      year: "Ano",
-      shopCta: "Adquirir prints o catalogo",
+      technique: "Técnica",
+      dimension: "Dimensión",
+      year: "Año",
+      shopCta: "Adquirir prints o catálogo",
     },
   },
   en: {

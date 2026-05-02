@@ -25,17 +25,17 @@ const artworkTitlePool = [
   "Marea de Luz",
   "Ecos de Lienzo",
   "Pulso Terracota",
-  "Tension y Calma",
-  "Bruma Organica",
+  "Tensión y Calma",
+  "Bruma Orgánica",
 ] as const;
 
 const artworkDescriptionPool = [
-  "Capa sobre capa, esta pieza construye una atmosfera serena con contrastes suaves y una energia contenida.",
-  "Una composicion de trazo libre y color profundo que invita a observar los detalles del gesto.",
-  "La obra explora equilibrio entre textura y vacio, con un recorrido visual lento y contemplativo.",
-  "Superficies vivas y bordes difusos generan una lectura cambiante segun la distancia del espectador.",
+  "Capa sobre capa, esta pieza construye una atmósfera serena con contrastes suaves y una energía contenida.",
+  "Una composición de trazo libre y color profundo que invita a observar los detalles del gesto.",
+  "La obra explora equilibrio entre textura y vacío, con un recorrido visual lento y contemplativo.",
+  "Superficies vivas y bordes difusos generan una lectura cambiante según la distancia del espectador.",
   "Pinceladas amplias y ritmo irregular crean una narrativa abstracta enfocada en movimiento y silencio.",
-  "Tonos calidos y materia densa dialogan para producir una presencia intensa dentro del espacio.",
+  "Tonos cálidos y materia densa dialogan para producir una presencia intensa dentro del espacio.",
 ] as const;
 
 const artworkCategoryPool = [
@@ -82,7 +82,7 @@ export const artworks: Artwork[] = artworkImageFiles.map((fileName, index) => {
     slug,
     title,
     year: "2026",
-    medium: "Acrilico sobre lienzo",
+    medium: "Acrílico sobre lienzo",
     dimensions: "100 x 100 cm",
     imageUrl: `/arte/${fileName}`,
     description,
@@ -96,7 +96,7 @@ export const products: Product[] = [
   {
     id: "p1",
     name: "Print Fine Art - Mareas Ocre",
-    description: "Impresion giclee firmada, edicion limitada de 30 unidades.",
+    description: "Impresión giclee firmada, edición limitada de 30 unidades.",
     price: 240,
     currency: "usd",
     imageUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=900&q=80",
@@ -104,8 +104,8 @@ export const products: Product[] = [
   },
   {
     id: "p2",
-    name: "Catalogo de Estudio 2026",
-    description: "Publicacion de 96 paginas con proceso y archivo de obra.",
+    name: "Catálogo de Estudio 2026",
+    description: "Publicación de 96 páginas con proceso y archivo de obra.",
     price: 68,
     currency: "usd",
     imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80",

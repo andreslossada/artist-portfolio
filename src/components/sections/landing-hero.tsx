@@ -18,13 +18,13 @@ export function LandingHero() {
           data-hero-item
           className="font-display text-ink mt-4 max-w-3xl text-5xl leading-[0.94] md:text-7xl"
         >
-          Pintura contemporanea con una narrativa de luz, polvo y memoria.
+          Pintura contemporánea con una narrativa de luz, polvo y memoria.
         </h1>
         <p
           data-hero-item
           className="text-muted mt-6 max-w-xl text-base md:text-lg"
         >
-          Portfolio de obra original, piezas en coleccion privada y ediciones
+          Portfolio de obra original, piezas en colección privada y ediciones
           limitadas. Cada serie nace de recorridos urbanos y paisajes
           erosionados.
         </p>
@@ -34,7 +34,7 @@ export function LandingHero() {
             href="/gallery"
             className="bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
           >
-            Ver galeria
+            Ver galería
           </Link>
           <Link
             href="/contact"
