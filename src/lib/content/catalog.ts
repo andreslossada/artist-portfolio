@@ -1,128 +1,96 @@
 import type { Artwork, Product } from "@/types/content";
 
-export const artworks: Artwork[] = [
-  {
-    id: "g1",
-    slug: "pigmento-en-cal",
-    title: "Pigmento en Cal",
-    year: "2024",
-    medium: "Técnica mixta",
+const artworkImageFiles = [
+  "20260408_222545.jpg",
+  "20260408_222557.jpg",
+  "20260408_222605.jpg",
+  "20260408_222612.jpg",
+  "20260408_222639.jpg",
+  "20260408_222716.jpg",
+  "20260408_222724.jpg",
+  "20260408_222739.jpg",
+  "20260408_222750.jpg",
+  "IMG_20240630_101759_357.jpg",
+  "IMG_20250618_152651_189.jpg",
+  "IMG_20250621_131642_427.jpg",
+  "IMG_20250622_111728_398.jpg",
+  "IMG_20250622_111739_597.jpg",
+  "IMG_20250622_111834_071.jpg",
+] as const;
+
+const artworkTitlePool = [
+  "Resonancia de Taller",
+  "Materia Suspendida",
+  "Ritmo de Pigmento",
+  "Marea de Luz",
+  "Ecos de Lienzo",
+  "Pulso Terracota",
+  "Tension y Calma",
+  "Bruma Organica",
+] as const;
+
+const artworkDescriptionPool = [
+  "Capa sobre capa, esta pieza construye una atmosfera serena con contrastes suaves y una energia contenida.",
+  "Una composicion de trazo libre y color profundo que invita a observar los detalles del gesto.",
+  "La obra explora equilibrio entre textura y vacio, con un recorrido visual lento y contemplativo.",
+  "Superficies vivas y bordes difusos generan una lectura cambiante segun la distancia del espectador.",
+  "Pinceladas amplias y ritmo irregular crean una narrativa abstracta enfocada en movimiento y silencio.",
+  "Tonos calidos y materia densa dialogan para producir una presencia intensa dentro del espacio.",
+] as const;
+
+const artworkCategoryPool = [
+  "Serie Estudio",
+  "Paisaje Abstracto",
+  "Materia",
+  "Coleccion 2026",
+] as const;
+
+const artworkPricePool = [180, 220, 260, 320, 390, 460, 540, 680, 820, 950] as const;
+
+const hashString = (value: string) => {
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+
+  return hash;
+};
+
+const pickByHash = <T>(pool: readonly T[], seed: string, salt: string): T => {
+  const hash = hashString(`${seed}-${salt}`);
+  return pool[hash % pool.length];
+};
+
+const toArtworkSlug = (fileName: string, index: number) => {
+  const normalized = fileName
+    .replace(/\.jpg$/i, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return `obra-${String(index + 1).padStart(2, "0")}-${normalized}`;
+};
+
+export const artworks: Artwork[] = artworkImageFiles.map((fileName, index) => {
+  const slug = toArtworkSlug(fileName, index);
+  const title = `${pickByHash(artworkTitlePool, fileName, "title")} ${String(index + 1).padStart(2, "0")}`;
+  const description = pickByHash(artworkDescriptionPool, fileName, "description");
+
+  return {
+    id: `g${index + 1}`,
+    slug,
+    title,
+    year: "2026",
+    medium: "Acrilico sobre lienzo",
     dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "Exploración de texturas minerales y luz sobre superficies calcáreas.",
-    category: "Serie Estudio",
-  },
-  {
-    id: "g2",
-    slug: "aguada-nocturna",
-    title: "Aguada Nocturna",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "Estudio de profundidades y sombras en la oscuridad.",
-    category: "Paisaje",
-  },
-  {
-    id: "g3",
-    slug: "terracota-viva",
-    title: "Terracota Viva",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "Diálogo entre el color tierra y el movimiento orgánico.",
-    category: "Abstraccion",
-  },
-  {
-    id: "g4",
-    slug: "bruma-dorada",
-    title: "Bruma Dorada",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "Captura de la atmósfera cálida y difusa del litoral.",
-    category: "Serie Costa",
-  },
-  {
-    id: "g5",
-    slug: "muro-y-sal",
-    title: "Muro y Sal",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "La erosión del tiempo plasmada sobre el soporte artístico.",
-    category: "Materia",
-  },
-  {
-    id: "g6",
-    slug: "linea-de-viento",
-    title: "Linea de Viento",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "Gesto rápido que atraviesa la composición como una ráfaga.",
-    category: "Paisaje",
-  },
-  {
-    id: "g7",
-    slug: "polvo-azul",
-    title: "Polvo Azul",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "Pigmentos etéreos que flotan en un espacio de calma.",
-    category: "Abstraccion",
-  },
-  {
-    id: "g8",
-    slug: "naranja-de-taller",
-    title: "Naranja de Taller",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1577083165633-14ebcdb0f658?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "La cotidianidad del estudio transformada en vibración cromática.",
-    category: "Serie Estudio",
-  },
-  {
-    id: "g9",
-    slug: "silencio-mineral",
-    title: "Silencio Mineral",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1578926288207-a90a5366759d?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "Composición estática que invita a la contemplación táctil.",
-    category: "Materia",
-  },
-  {
-    id: "g10",
-    slug: "rastro-carmesi",
-    title: "Rastro Carmesi",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1579762593131-b8945254345c?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "Memoria de un gesto pasional en la orilla del mar.",
-    category: "Serie Costa",
-  },
-  {
-    id: "g11",
-    slug: "horizonte-de-yeso",
-    title: "Horizonte de Yeso",
-    year: "2024",
-    medium: "Técnica mixta",
-    dimensions: "100 x 100 cm",
-    imageUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1400&q=80",
-    excerpt: "Límite frágil entre la tierra y el cielo infinito.",
-    category: "Paisaje",
-  },
-];
+    imageUrl: `/arte/${fileName}`,
+    description,
+    excerpt: description,
+    price: pickByHash(artworkPricePool, fileName, "price"),
+    category: pickByHash(artworkCategoryPool, fileName, "category"),
+  };
+});
 
 export const products: Product[] = [
   {

@@ -33,6 +33,10 @@ export default function GalleryPage() {
                 {artwork.year} · {artwork.medium}
               </p>
               <p className="text-muted text-sm">{artwork.dimensions}</p>
+              <p className="text-muted pt-1 text-sm">{artwork.description}</p>
+              <p className="text-accent pt-2 text-sm font-semibold">
+                ${artwork.price.toFixed(2)} USD
+              </p>
             </div>
           </Link>
         ))}

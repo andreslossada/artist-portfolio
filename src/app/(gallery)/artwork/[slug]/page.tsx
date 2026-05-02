@@ -40,7 +40,11 @@ export default async function ArtworkDetailPage({
           <h1 className="font-display mt-3 text-5xl leading-tight">
             {artwork.title}
           </h1>
-          <p className="text-muted mt-4">{artwork.excerpt}</p>
+          <p className="text-muted mt-4">{artwork.description}</p>
+
+          <p className="text-accent mt-4 text-2xl font-semibold">
+            ${artwork.price.toFixed(2)} USD
+          </p>
 
           <dl className="text-muted mt-8 space-y-2 text-sm">
             <div>

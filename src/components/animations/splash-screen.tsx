@@ -7,61 +7,9 @@ type SplashScreenProps = {
   onComplete: () => void;
 };
 
-const SPLASH_FADE_MS = 450;
+const SPLASH_FADE_MS = 500;
 const SPLASH_MAX_DURATION_MS = 9000;
 const IRINA_SVG_URL = "/Irina.svg";
-
-function splitCompoundPathData(d: string) {
-  const subpaths = d.match(/[Mm][^Mm]*/g);
-
-  if (!subpaths || subpaths.length <= 1) {
-    return null;
-  }
-
-  return subpaths.map((segment) => segment.trim()).filter(Boolean);
-}
-
-function expandCompoundSvgPaths(markup: string) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(markup, "image/svg+xml");
-  const svg = doc.querySelector("svg");
-
-  if (!svg) {
-    return markup;
-  }
-
-  const paths = Array.from(svg.querySelectorAll("path"));
-
-  paths.forEach((path) => {
-    const d = path.getAttribute("d");
-
-    if (!d) {
-      return;
-    }
-
-    const splitSegments = splitCompoundPathData(d);
-
-    if (!splitSegments) {
-      return;
-    }
-
-    const parent = path.parentNode;
-
-    if (!parent) {
-      return;
-    }
-
-    splitSegments.forEach((segment) => {
-      const nextPath = path.cloneNode(true) as SVGPathElement;
-      nextPath.setAttribute("d", segment);
-      parent.insertBefore(nextPath, path);
-    });
-
-    parent.removeChild(path);
-  });
-
-  return new XMLSerializer().serializeToString(svg);
-}
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
@@ -97,7 +45,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       })
       .then((markup) => {
         if (!cancelled) {
-          setSvgMarkup(expandCompoundSvgPaths(markup));
+          setSvgMarkup(markup);
         }
       })
       .catch(() => {
@@ -158,8 +106,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         gsap.set(path, {
           strokeDasharray: length,
           strokeDashoffset: length,
-          stroke: "#111111",
-          strokeWidth: 2.35,
+          stroke: "#161616",
+          strokeWidth: 1.7,
           strokeLinecap: "round",
           strokeLinejoin: "round",
           strokeOpacity: 1,
@@ -172,6 +120,21 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         onComplete: finishSplash,
       });
 
+      timeline.fromTo(
+        "[data-splash-logo]",
+        {
+          opacity: 0,
+          y: 16,
+          scale: 0.985,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.45,
+        },
+      );
+
       timeline.to(orderedPaths, {
         strokeDashoffset: 0,
         duration: (_index, target) => {
@@ -183,15 +146,15 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             return 0.5;
           }
         },
-        stagger: 0.14,
+        stagger: 0.12,
       });
 
       timeline.to(
         orderedPaths,
         {
           fillOpacity: 1,
-          duration: 0.28,
-          stagger: 0.08,
+          duration: 0.24,
+          stagger: 0.06,
         },
         ">-0.22",
       );
@@ -199,7 +162,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       timeline.to(
         orderedPaths,
         {
-          strokeOpacity: 0.45,
+          strokeOpacity: 0.38,
           duration: 0.2,
           stagger: 0.05,
         },
@@ -233,16 +196,18 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   return (
     <div
       ref={scopeRef}
-      className={`pointer-events-none fixed inset-0 z-9999 flex h-screen w-screen items-center justify-center bg-white transition-opacity duration-500 ${isFading ? "opacity-0" : "opacity-100"}`}
+      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center bg-[radial-gradient(circle_at_20%_18%,#f4f2ec_0%,#ffffff_54%,#f5f7fb_100%)] transition-opacity duration-500 ${isFading ? "opacity-0" : "opacity-100"}`}
       role="presentation"
       aria-hidden="true"
     >
       {svgMarkup ? (
-        <div
-          className="w-[min(92vw,900px)] [&>svg]:h-auto [&>svg]:w-full"
-          aria-hidden="true"
-          dangerouslySetInnerHTML={{ __html: svgMarkup }}
-        />
+        <div className="w-[min(90vw,760px)] px-4" data-splash-logo>
+          <div
+            className="[&>svg]:h-auto [&>svg]:w-full"
+            aria-hidden="true"
+            dangerouslySetInnerHTML={{ __html: svgMarkup }}
+          />
+        </div>
       ) : null}
     </div>
   );

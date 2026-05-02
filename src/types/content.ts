@@ -6,7 +6,9 @@ export type Artwork = {
   medium: string;
   dimensions: string;
   imageUrl: string;
+  description: string;
   excerpt: string;
+  price: number;
   category: string;
 };
 
