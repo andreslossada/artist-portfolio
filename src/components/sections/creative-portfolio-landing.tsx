@@ -6,13 +6,29 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ViewTransition, useCallback, useEffect, useRef, useState } from "react";
 import { SplashScreen } from "@/components/animations/splash-screen";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { landingGalleryItems } from "@/lib/content/landing-gallery";
+import type { Locale } from "@/lib/i18n";
 
 const progressSegments = Math.min(12, landingGalleryItems.length);
 const sliderLoopCopies = 5;
 const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 14;
 let hasShownLandingSplash = false;
+
+type CreativePortfolioLandingProps = {
+  locale: Locale;
+  labels: {
+    list: string;
+    projects: string;
+    about: string;
+    contact: string;
+  };
+  languageLabels: {
+    spanish: string;
+    english: string;
+  };
+};
 
 const loopedLandingGalleryItems = Array.from(
   { length: sliderLoopCopies },
@@ -32,7 +48,11 @@ const getSingleLoopWidth = (rail: HTMLDivElement) => {
   return rail.scrollWidth / sliderLoopCopies;
 };
 
-export function CreativePortfolioLanding() {
+export function CreativePortfolioLanding({
+  locale,
+  labels,
+  languageLabels,
+}: CreativePortfolioLandingProps) {
   const railRef = useRef<HTMLDivElement>(null);
   const railContentRef = useRef<HTMLDivElement>(null);
   const [activeSegment, setActiveSegment] = useState(0);
@@ -41,6 +61,11 @@ export function CreativePortfolioLanding() {
   );
   const [showSplash, setShowSplash] = useState(() => !hasShownLandingSplash);
   const [isSliderIntroReady, setIsSliderIntroReady] = useState(false);
+  const markSliderIntroReady = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      setIsSliderIntroReady(true);
+    });
+  }, []);
   const handleSplashComplete = useCallback(() => {
     hasShownLandingSplash = true;
     setShowSplash(false);
@@ -262,7 +287,6 @@ export function CreativePortfolioLanding() {
 
   useEffect(() => {
     if (showSplash) {
-      setIsSliderIntroReady(false);
       return;
     }
 
@@ -276,13 +300,13 @@ export function CreativePortfolioLanding() {
     const cards = Array.from(
       railContent.querySelectorAll<HTMLElement>("[data-slider-card]"),
     );
-    const cardMedia = cards
-      .map((card) => card.querySelector<HTMLElement>("[data-slider-media]"))
-      .filter((media): media is HTMLElement => media !== null);
+    const cardCurtains = cards
+      .map((card) => card.querySelector<HTMLElement>("[data-slider-curtain]"))
+      .filter((curtain): curtain is HTMLElement => curtain !== null);
     const maxAnimatedCards = 5;
 
     if (cards.length === 0) {
-      setIsSliderIntroReady(true);
+      markSliderIntroReady();
       return;
     }
 
@@ -293,12 +317,15 @@ export function CreativePortfolioLanding() {
         scale: 1,
         clearProps: "x,scale,opacity,visibility,zIndex,willChange",
       });
-      gsap.set(cardMedia, { clearProps: "clipPath,willChange" });
-      setIsSliderIntroReady(true);
+      gsap.set(cardCurtains, {
+        clearProps: "yPercent,opacity,transform,willChange",
+      });
+      markSliderIntroReady();
       return;
     }
 
     let timeline: gsap.core.Timeline | null = null;
+    let removeCenterImageListener: (() => void) | null = null;
     const frameId = window.requestAnimationFrame(() => {
       const railRect = rail.getBoundingClientRect();
       const viewportCenterX = railRect.left + railRect.width / 2;
@@ -320,7 +347,7 @@ export function CreativePortfolioLanding() {
         .sort((a, b) => a.index - b.index);
 
       if (animatedEntries.length === 0) {
-        setIsSliderIntroReady(true);
+        markSliderIntroReady();
         return;
       }
 
@@ -328,18 +355,18 @@ export function CreativePortfolioLanding() {
         entry.distanceToCenter < closest.distanceToCenter ? entry : closest,
       );
       const animatedCards = animatedEntries.map(({ card }) => card);
-      const animatedMedia = animatedCards
-        .map((card) => card.querySelector<HTMLElement>("[data-slider-media]"))
-        .filter((media): media is HTMLElement => media !== null);
-      const centerMedia = centerEntry.card.querySelector<HTMLElement>(
-        "[data-slider-media]",
+      const animatedCurtains = animatedCards
+        .map((card) => card.querySelector<HTMLElement>("[data-slider-curtain]"))
+        .filter((curtain): curtain is HTMLElement => curtain !== null);
+      const centerCurtain = centerEntry.card.querySelector<HTMLElement>(
+        "[data-slider-curtain]",
       );
       const sideCards = animatedEntries
         .filter(({ index }) => index !== centerEntry.index)
         .map(({ card }) => card);
 
       gsap.set(animatedCards, {
-        autoAlpha: 0,
+        autoAlpha: 1,
         scale: 0.94,
         willChange: "transform, opacity",
       });
@@ -351,60 +378,61 @@ export function CreativePortfolioLanding() {
         const sideBias = entry.index < centerEntry.index ? 1 : 0;
 
         gsap.set(entry.card, {
-          x: viewportCenterX - entry.centerX,
+          x: Math.round(viewportCenterX - entry.centerX),
           zIndex: Math.max(1, maxLayer - distance * 2 + sideBias),
         });
       });
 
       gsap.set(centerEntry.card, {
         autoAlpha: 1,
-        scale: 0.97,
+        scale: 1,
         zIndex: maxLayer + 2,
       });
 
-      if (centerMedia) {
-        gsap.set(centerMedia, {
-          clipPath: "inset(0 0 100% 0)",
-          willChange: "clip-path",
+      if (centerCurtain) {
+        gsap.set(centerCurtain, {
+          yPercent: 0,
+          opacity: 1,
+          willChange: "transform, opacity",
         });
       }
 
-      setIsSliderIntroReady(true);
+      const playIntro = () => {
+        if (timeline) {
+          return;
+        }
 
-      timeline = gsap
-        .timeline({
-          defaults: { ease: "power3.out" },
-          onComplete: () => {
-            gsap.set(animatedCards, {
-              clearProps: "x,scale,opacity,visibility,zIndex,willChange",
-            });
-            gsap.set(animatedMedia, { clearProps: "clipPath,willChange" });
-          },
-        })
-        .to(centerEntry.card, {
-          scale: 1,
-          duration: 0.8,
-          ease: "power2.out",
-        });
+        markSliderIntroReady();
 
-      if (centerMedia) {
+        timeline = gsap
+          .timeline({
+            defaults: { ease: "power3.out" },
+            onComplete: () => {
+              gsap.set(animatedCards, {
+                clearProps: "x,scale,opacity,visibility,zIndex,willChange",
+              });
+              gsap.set(animatedCurtains, {
+                clearProps: "yPercent,opacity,transform,willChange",
+              });
+            },
+          });
+
+        if (centerCurtain) {
+          timeline.to(
+            centerCurtain,
+            {
+              yPercent: 100,
+              duration: 0.8,
+              ease: "power2.out",
+            },
+            0,
+          );
+        }
+
         timeline.to(
-          centerMedia,
-          {
-            clipPath: "inset(0 0% 0 0)",
-            duration: 0.8,
-            ease: "power2.out",
-          },
-          0,
-        );
-      }
-
-      timeline
-        .to(
           sideCards,
           {
             x: 0,
-            autoAlpha: 1,
             scale: 1,
             duration: 1.2,
             stagger: { each: 0.08, from: "center" },
@@ -412,13 +440,45 @@ export function CreativePortfolioLanding() {
           },
           ">",
         );
+
+        timeline.to(
+          centerEntry.card,
+          {
+            x: 0,
+            duration: 1.2,
+            ease: "power3.out",
+          },
+          "<",
+        );
+      };
+
+      const centerImage = centerEntry.card.querySelector<HTMLImageElement>("img");
+
+      if (centerImage && !centerImage.complete) {
+        const handleImageReady = () => {
+          playIntro();
+        };
+
+        centerImage.addEventListener("load", handleImageReady, { once: true });
+        centerImage.addEventListener("error", handleImageReady, { once: true });
+
+        removeCenterImageListener = () => {
+          centerImage.removeEventListener("load", handleImageReady);
+          centerImage.removeEventListener("error", handleImageReady);
+        };
+
+        return;
+      }
+
+      playIntro();
     });
 
     return () => {
       window.cancelAnimationFrame(frameId);
+      removeCenterImageListener?.();
       timeline?.kill();
     };
-  }, [showSplash]);
+  }, [markSliderIntroReady, showSplash]);
 
   return (
     <div className="h-screen overflow-hidden bg-white text-black">
@@ -440,25 +500,30 @@ export function CreativePortfolioLanding() {
               href="/gallery"
               className="text-xs text-black/55 transition hover:text-black md:text-[1.95rem] md:leading-none"
             >
-              List
+              {labels.list}
             </Link>
           </div>
 
           <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
+            <LanguageSwitcher
+              locale={locale}
+              labels={languageLabels}
+              className="mr-1 flex items-center gap-1 md:mr-2 md:gap-2"
+            />
             <Link href="/projects" className="font-semibold text-black">
-              Projects
+              {labels.projects}
             </Link>
             <Link
               href="/about"
               className="text-black/40 transition hover:text-black"
             >
-              About
+              {labels.about}
             </Link>
             <Link
               href="/contact"
               className="text-black/40 transition hover:text-black"
             >
-              Contact
+              {labels.contact}
             </Link>
           </nav>
         </div>
@@ -475,13 +540,13 @@ export function CreativePortfolioLanding() {
           >
             <div
               ref={railContentRef}
-              className={`flex h-full w-full gap-3 transition-opacity duration-150 md:gap-4 ${isSliderIntroReady ? "opacity-100" : "opacity-0"}`}
+              className={`flex h-full w-full gap-3 md:gap-4 ${isSliderIntroReady ? "opacity-100" : "opacity-0"}`}
             >
               {loopedLandingGalleryItems.map((item) => (
                 <article
                   key={item.loopKey}
                   data-slider-card
-                  className="group relative aspect-2/3 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden border border-black/9 bg-neutral-100 md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
+                  className="group relative aspect-2/3 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden bg-neutral-100 md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
                   onMouseEnter={() => setHoveredArtworkTitle(item.title)}
                   onMouseLeave={() => setHoveredArtworkTitle(null)}
                 >
@@ -508,6 +573,11 @@ export function CreativePortfolioLanding() {
                             (item.id === "g1" || item.id === "g2") &&
                             item.copyIndex === centerLoopCopyIndex
                           }
+                        />
+                        <div
+                          data-slider-curtain
+                          className="pointer-events-none absolute -inset-px z-10 bg-white opacity-0"
+                          aria-hidden="true"
                         />
                       </div>
                     </ViewTransition>

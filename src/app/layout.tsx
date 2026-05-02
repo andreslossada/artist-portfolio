@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { getDictionary } from "@/lib/dictionaries";
+import { getLocale } from "@/lib/i18n";
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -14,19 +16,26 @@ const sans = Manrope({
   weight: ["400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  title: "Irina | Artista pintora",
-  description: "Landing portfolio minimalista para artista pintora",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
 
-export default function RootLayout({
+  return {
+    title: dict.metadata.siteTitle,
+    description: dict.metadata.siteDescription,
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
     <html
-      lang="es"
+      lang={locale}
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
       <body className="bg-canvas text-ink flex min-h-full flex-col">

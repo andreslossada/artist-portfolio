@@ -3,9 +3,9 @@ import { HeroReveal } from "@/components/animations/hero-reveal";
 
 export function LandingHero() {
   return (
-    <section className="border-ink/10 shadow-card relative overflow-hidden rounded-4xl border bg-[radial-gradient(circle_at_top_right,#d7e5f6_0%,#e9eef3_42%,#f7f1e8_100%)] px-7 py-16 md:px-14">
-      <div className="bg-accent/20 pointer-events-none absolute -top-16 -right-10 h-56 w-56 rounded-full blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-12 left-8 h-48 w-48 rounded-full bg-white/50 blur-2xl" />
+    <section className="border-ink/10 shadow-card relative overflow-hidden border bg-[radial-gradient(circle_at_top_right,#d7e5f6_0%,#e9eef3_42%,#f7f1e8_100%)] px-7 py-16 md:px-14">
+      <div className="bg-accent/20 pointer-events-none absolute -top-16 -right-10 h-56 w-56 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-12 left-8 h-48 w-48 bg-white/50 blur-2xl" />
 
       <HeroReveal>
         <p
@@ -32,13 +32,13 @@ export function LandingHero() {
         <div data-hero-item className="mt-10 flex flex-wrap gap-3">
           <Link
             href="/gallery"
-            className="bg-accent rounded-full px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
+            className="bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
           >
             Ver galeria
           </Link>
           <Link
             href="/shop"
-            className="border-ink/20 text-ink hover:bg-canvas-soft rounded-full border px-6 py-3 text-sm font-semibold transition"
+            className="border-ink/20 text-ink hover:bg-canvas-soft border px-6 py-3 text-sm font-semibold transition"
           >
             Comprar prints
           </Link>

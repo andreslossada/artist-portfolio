@@ -1,14 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ViewTransition } from "react";
 import { artworks } from "@/lib/content/catalog";
+import { getDictionary } from "@/lib/dictionaries";
+import { getLocale } from "@/lib/i18n";
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
+
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
       <header className="mb-10">
-        <p className="text-muted text-xs tracking-[0.3em] uppercase">Galeria</p>
+        <p className="text-muted text-xs tracking-[0.3em] uppercase">
+          {dict.galleryPage.eyebrow}
+        </p>
         <h1 className="font-display mt-2 text-5xl leading-tight">
-          Archivo de obra
+          {dict.galleryPage.title}
         </h1>
       </header>
 
@@ -16,17 +24,22 @@ export default function GalleryPage() {
         {artworks.map((artwork) => (
           <Link
             key={artwork.id}
-            href={`/artwork/${artwork.slug}`}
-            className="group rounded-card border-ink/10 overflow-hidden border bg-white/70"
+            href={`/artwork/${artwork.slug}?vt=${artwork.slug}`}
+            className="group border-ink/10 overflow-hidden border bg-white/70"
           >
-            <div className="relative aspect-5/6 overflow-hidden">
-              <Image
-                src={artwork.imageUrl}
-                alt={artwork.title}
-                fill
-                className="object-cover transition duration-500 group-hover:scale-[1.03]"
-              />
-            </div>
+            <ViewTransition
+              name={`artwork-image-${artwork.slug}`}
+              share="artwork-morph"
+            >
+              <div className="relative aspect-5/6 overflow-hidden">
+                <Image
+                  src={artwork.imageUrl}
+                  alt={artwork.title}
+                  fill
+                  className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
+            </ViewTransition>
             <div className="space-y-1 p-4">
               <h2 className="font-display text-2xl">{artwork.title}</h2>
               <p className="text-muted text-sm">

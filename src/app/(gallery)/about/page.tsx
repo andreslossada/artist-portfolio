@@ -1,50 +1,41 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getDictionary } from "@/lib/dictionaries";
+import { getLocale } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "About | Estudio Irina",
-  description:
-    "Conoce la vision, proceso y trayectoria de la artista detras de Estudio Irina.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
 
-const processPillars = [
-  {
-    title: "Materia y gesto",
-    description:
-      "Capas de cal, pigmento y veladuras construyen una superficie viva que cambia con la luz.",
-  },
-  {
-    title: "Archivo costero",
-    description:
-      "La coleccion nace de caminatas frente al mar y del registro de texturas en muros erosionados.",
-  },
-  {
-    title: "Serie limitada",
-    description:
-      "Cada obra y edicion se desarrolla en lotes pequenos para mantener una narrativa curatorial consistente.",
-  },
-];
+  return {
+    title: dict.metadata.aboutTitle,
+    description: dict.metadata.aboutDescription,
+  };
+}
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
+
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
       <header className="max-w-3xl">
-        <p className="text-muted text-xs tracking-[0.3em] uppercase">About</p>
+        <p className="text-muted text-xs tracking-[0.3em] uppercase">
+          {dict.aboutPage.eyebrow}
+        </p>
         <h1 className="font-display mt-3 text-5xl leading-tight md:text-6xl">
-          Pintura contemporanea desde el borde del mar
+          {dict.aboutPage.title}
         </h1>
         <p className="text-muted mt-6 text-base leading-relaxed md:text-lg">
-          Estudio Irina desarrolla obra pictorica en tecnica mixta con enfoque
-          en materialidad, ritmo y memoria del paisaje costero. Cada serie
-          explora la tension entre estructura y accidente.
+          {dict.aboutPage.description}
         </p>
       </header>
 
       <section className="mt-10 grid gap-5 md:grid-cols-3">
-        {processPillars.map((pillar) => (
+        {dict.aboutPage.processPillars.map((pillar) => (
           <article
             key={pillar.title}
-            className="rounded-card border-ink/10 shadow-card border bg-white/70 p-6"
+            className="border-ink/10 shadow-card border bg-white/70 p-6"
           >
             <h2 className="font-display text-3xl leading-tight">{pillar.title}</h2>
             <p className="text-muted mt-3 text-sm leading-relaxed">
@@ -54,26 +45,25 @@ export default function AboutPage() {
         ))}
       </section>
 
-      <section className="rounded-card border-ink/10 mt-10 border bg-white/60 p-6 md:p-8">
-        <p className="text-muted text-xs tracking-[0.2em] uppercase">Trayectoria</p>
+      <section className="border-ink/10 mt-10 border bg-white/60 p-6 md:p-8">
+        <p className="text-muted text-xs tracking-[0.2em] uppercase">
+          {dict.aboutPage.trajectoryEyebrow}
+        </p>
         <p className="mt-4 max-w-3xl text-base leading-relaxed md:text-lg">
-          Desde 2020, la artista ha presentado obra en residencias y muestras de
-          estudio en Buenos Aires, Montevideo y Barcelona, colaborando con
-          talleres de conservacion para investigar soportes minerales y
-          materiales de larga duracion.
+          {dict.aboutPage.trajectoryDescription}
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/gallery"
-            className="bg-ink rounded-full px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            className="bg-ink px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
           >
-            Ver galeria
+            {dict.aboutPage.viewGallery}
           </Link>
           <Link
             href="/contact"
-            className="rounded-full border border-current px-5 py-2 text-sm font-semibold transition hover:bg-black/5"
+            className="border border-current px-5 py-2 text-sm font-semibold transition hover:bg-black/5"
           >
-            Contactar
+            {dict.aboutPage.contact}
           </Link>
         </div>
       </section>

@@ -1,42 +1,50 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getDictionary } from "@/lib/dictionaries";
+import { getLocale } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Contact | Estudio Irina",
-  description:
-    "Contacta al estudio para adquisiciones, comisiones, exposiciones o prensa.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
 
-const contactChannels = [
-  {
-    label: "Correo",
-    value: "hola@estudioirina.com",
-    href: "mailto:hola@estudioirina.com",
-  },
-  {
-    label: "WhatsApp",
-    value: "+54 9 11 5555 2026",
-    href: "https://wa.me/5491155552026",
-  },
-  {
-    label: "Instagram",
-    value: "@estudio.irina",
-    href: "https://instagram.com/estudio.irina",
-  },
-];
+  return {
+    title: dict.metadata.contactTitle,
+    description: dict.metadata.contactDescription,
+  };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
+  const contactChannels = [
+    {
+      label: dict.contactPage.channels.email,
+      value: "hola@estudioirina.com",
+      href: "mailto:hola@estudioirina.com",
+    },
+    {
+      label: dict.contactPage.channels.whatsapp,
+      value: "+54 9 11 5555 2026",
+      href: "https://wa.me/5491155552026",
+    },
+    {
+      label: dict.contactPage.channels.instagram,
+      value: "@estudio.irina",
+      href: "https://instagram.com/estudio.irina",
+    },
+  ];
+
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
       <header className="max-w-3xl">
-        <p className="text-muted text-xs tracking-[0.3em] uppercase">Contact</p>
+        <p className="text-muted text-xs tracking-[0.3em] uppercase">
+          {dict.contactPage.eyebrow}
+        </p>
         <h1 className="font-display mt-3 text-5xl leading-tight md:text-6xl">
-          Hablemos de tu proximo proyecto
+          {dict.contactPage.title}
         </h1>
         <p className="text-muted mt-6 text-base leading-relaxed md:text-lg">
-          El estudio responde consultas sobre obra disponible, comisiones,
-          colaboraciones curatoriales y prensa. Tiempo estimado de respuesta:
-          24-48 horas habiles.
+          {dict.contactPage.description}
         </p>
       </header>
 
@@ -47,7 +55,7 @@ export default function ContactPage() {
             href={channel.href}
             target={channel.href.startsWith("http") ? "_blank" : undefined}
             rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
-            className="rounded-card border-ink/10 shadow-card border bg-white/70 p-6 transition hover:-translate-y-0.5"
+            className="border-ink/10 shadow-card border bg-white/70 p-6 transition hover:-translate-y-0.5"
           >
             <p className="text-muted text-xs tracking-[0.2em] uppercase">
               {channel.label}
@@ -59,25 +67,25 @@ export default function ContactPage() {
         ))}
       </section>
 
-      <section className="rounded-card border-ink/10 mt-10 border bg-white/60 p-6 md:p-8">
-        <h2 className="font-display text-4xl leading-tight">Adquisiciones</h2>
+      <section className="border-ink/10 mt-10 border bg-white/60 p-6 md:p-8">
+        <h2 className="font-display text-4xl leading-tight">
+          {dict.contactPage.acquisitionsTitle}
+        </h2>
         <p className="text-muted mt-4 max-w-2xl text-base leading-relaxed md:text-lg">
-          Si te interesa adquirir una pieza o una edicion limitada, puedes
-          explorar la tienda y escribirnos para recibir ficha tecnica completa,
-          disponibilidad y opciones de entrega local.
+          {dict.contactPage.acquisitionsDescription}
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/shop"
-            className="bg-ink rounded-full px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            className="bg-ink px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
           >
-            Ir a tienda
+            {dict.contactPage.goToShop}
           </Link>
           <Link
             href="/gallery"
-            className="rounded-full border border-current px-5 py-2 text-sm font-semibold transition hover:bg-black/5"
+            className="border border-current px-5 py-2 text-sm font-semibold transition hover:bg-black/5"
           >
-            Ver obra
+            {dict.contactPage.viewArtwork}
           </Link>
         </div>
       </section>

@@ -13,7 +13,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold transition",
+        "inline-flex h-11 items-center justify-center px-5 text-sm font-semibold transition",
         variant === "solid"
           ? "bg-accent text-white hover:brightness-110"
           : "border-ink/20 text-ink hover:bg-canvas-soft border",

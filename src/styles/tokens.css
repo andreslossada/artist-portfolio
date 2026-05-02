@@ -6,6 +6,6 @@
   --color-accent: #2b5fa8;
   --color-accent-soft: #bfd3ea;
 
-  --radius-card: 1rem;
+  --radius-card: 0;
   --shadow-card: 0 20px 45px rgba(43, 30, 18, 0.14);
 }

@@ -1,8 +1,14 @@
-export function SiteFooter() {
+import { getDictionary } from "@/lib/dictionaries";
+import { getLocale } from "@/lib/i18n";
+
+export async function SiteFooter() {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
+
   return (
     <footer className="border-ink/10 bg-canvas-soft/80 mt-16 border-t">
       <div className="text-muted mx-auto w-full max-w-6xl px-5 py-8 text-sm md:px-10">
-        <p>Portfolio artistico 2026. Todos los derechos reservados.</p>
+        <p>{dict.footer.copyright}</p>
       </div>
     </footer>
   );

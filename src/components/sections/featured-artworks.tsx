@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ViewTransition } from "react";
 import { artworks } from "@/lib/content/catalog";
 
 export function FeaturedArtworks() {
@@ -23,17 +24,22 @@ export function FeaturedArtworks() {
         {artworks.map((artwork) => (
           <Link
             key={artwork.id}
-            href={`/artwork/${artwork.slug}`}
-            className="group rounded-card border-ink/10 bg-canvas-soft overflow-hidden border"
+            href={`/artwork/${artwork.slug}?vt=${artwork.slug}`}
+            className="group border-ink/10 bg-canvas-soft overflow-hidden border"
           >
-            <div className="relative aspect-4/5">
-              <Image
-                src={artwork.imageUrl}
-                alt={artwork.title}
-                fill
-                className="object-cover transition duration-500 group-hover:scale-[1.03]"
-              />
-            </div>
+            <ViewTransition
+              name={`artwork-image-${artwork.slug}`}
+              share="artwork-morph"
+            >
+              <div className="relative aspect-4/5">
+                <Image
+                  src={artwork.imageUrl}
+                  alt={artwork.title}
+                  fill
+                  className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
+            </ViewTransition>
             <div className="p-4">
               <h3 className="font-display text-2xl leading-tight">
                 {artwork.title}

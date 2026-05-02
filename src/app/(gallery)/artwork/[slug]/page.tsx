@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 import { artworks, getArtworkBySlug } from "@/lib/content/catalog";
+import { getDictionary } from "@/lib/dictionaries";
+import { getLocale } from "@/lib/i18n";
 
 type ArtworkDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -17,6 +19,8 @@ export default async function ArtworkDetailPage({
   params,
   searchParams,
 }: ArtworkDetailPageProps) {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
   const { slug } = await params;
   const { vt } = await searchParams;
   const artwork = getArtworkBySlug(slug);
@@ -28,54 +32,68 @@ export default async function ArtworkDetailPage({
   const transitionName = `artwork-image-${vt ?? artwork.slug}`;
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-6 md:px-10 md:py-8">
-      <article className="border-ink/10 shadow-card grid gap-8 rounded-4xl border bg-white/70 p-5 md:grid-cols-2 md:items-start md:gap-10 md:p-8">
+    <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-8 md:px-10 md:py-6">
+      <article className="border-ink/10 shadow-card grid gap-6 border bg-white/65 p-4 md:grid-cols-[22rem_minmax(0,1fr)] md:items-start md:gap-7 md:p-5">
         <ViewTransition name={transitionName} share="artwork-morph">
-          <div className="relative mx-auto aspect-2/3 w-full max-w-sm overflow-hidden rounded-xl md:mx-0 md:max-w-md">
+          <div className="relative mx-auto aspect-2/3 w-[min(92vw,22rem)] overflow-hidden bg-canvas-soft md:mx-0 md:w-88">
             <Image
               src={artwork.imageUrl}
               alt={artwork.title}
               fill
               className="object-cover object-center"
-              sizes="(max-width: 768px) 88vw, 30rem"
+              sizes="(max-width: 768px) 92vw, 22rem"
             />
           </div>
         </ViewTransition>
 
-        <div>
+        <div className="flex h-full flex-col">
+          <Link
+            href="/gallery"
+            className="text-muted hover:text-ink mb-5 inline-flex text-xs tracking-[0.2em] uppercase transition"
+          >
+            {dict.artworkPage.backToGallery}
+          </Link>
           <p className="text-muted text-xs tracking-[0.3em] uppercase">
-            Detalle de obra
+            {dict.artworkPage.detailEyebrow}
           </p>
-          <h1 className="font-display mt-3 text-5xl leading-tight">
+          <h1 className="font-display mt-4 text-5xl leading-[0.95] md:text-6xl">
             {artwork.title}
           </h1>
-          <p className="text-muted mt-4">{artwork.description}</p>
+          <p className="text-muted mt-6 max-w-xl text-base leading-relaxed md:text-lg">
+            {artwork.description}
+          </p>
 
-          <p className="text-accent mt-4 text-2xl font-semibold">
+          <p className="text-accent mt-7 text-3xl font-semibold">
             ${artwork.price.toFixed(2)} USD
           </p>
 
-          <dl className="text-muted mt-8 space-y-2 text-sm">
-            <div>
-              <dt className="text-ink inline">Tecnica:</dt>{" "}
-              <dd className="inline">{artwork.medium}</dd>
+          <dl className="border-ink/10 mt-8 grid grid-cols-[7rem_1fr] gap-x-4 gap-y-3 border-t pt-6 text-sm">
+            <div className="contents">
+              <dt className="text-muted tracking-[0.12em] uppercase">
+                {dict.artworkPage.technique}
+              </dt>
+              <dd className="text-ink">{artwork.medium}</dd>
             </div>
-            <div>
-              <dt className="text-ink inline">Dimension:</dt>{" "}
-              <dd className="inline">{artwork.dimensions}</dd>
+            <div className="contents">
+              <dt className="text-muted tracking-[0.12em] uppercase">
+                {dict.artworkPage.dimension}
+              </dt>
+              <dd className="text-ink">{artwork.dimensions}</dd>
             </div>
-            <div>
-              <dt className="text-ink inline">Ano:</dt>{" "}
-              <dd className="inline">{artwork.year}</dd>
+            <div className="contents">
+              <dt className="text-muted tracking-[0.12em] uppercase">
+                {dict.artworkPage.year}
+              </dt>
+              <dd className="text-ink">{artwork.year}</dd>
             </div>
           </dl>
 
-          <div className="mt-10 border-t border-ink/10 pt-8">
+          <div className="border-ink/10 mt-10 border-t pt-8 md:mt-auto">
             <Link
               href={`/shop?fromArtwork=${artwork.slug}`}
-              className="bg-accent inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold text-white transition hover:brightness-110"
+              className="bg-accent inline-flex h-11 items-center justify-center border border-accent px-5 text-sm font-semibold text-white transition hover:brightness-110"
             >
-              Adquirir prints o catalogo
+              {dict.artworkPage.shopCta}
             </Link>
           </div>
         </div>
