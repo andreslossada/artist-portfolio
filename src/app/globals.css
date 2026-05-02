@@ -29,6 +29,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   background: var(--color-canvas);
@@ -66,12 +70,20 @@ a {
 
 @keyframes landing-title-fade-in {
   from {
-    opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(24px);
   }
 
   to {
-    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes landing-header-reveal {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
     transform: translateY(0);
   }
 }

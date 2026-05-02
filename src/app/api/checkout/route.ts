@@ -41,8 +41,8 @@ export async function POST(request: Request) {
           quantity: Math.max(1, payload.quantity ?? 1),
         },
       ],
-      success_url: `${origin}/shop?checkout=success`,
-      cancel_url: `${origin}/shop?checkout=cancel`,
+      success_url: `${origin}/contact?checkout=success`,
+      cancel_url: `${origin}/contact?checkout=cancel`,
     });
 
     if (!session.url) {

@@ -76,10 +76,10 @@ export default async function ContactPage() {
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            href="/shop"
+            href="mailto:hola@estudioirina.com"
             className="bg-ink px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
           >
-            {dict.contactPage.goToShop}
+            {dict.contactPage.channels.email}
           </Link>
           <Link
             href="/gallery"

@@ -13,14 +13,14 @@ import type { Locale } from "@/lib/i18n";
 const progressSegments = Math.min(12, landingGalleryItems.length);
 const sliderLoopCopies = 5;
 const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
-const dragActivationThreshold = 14;
+const dragActivationThreshold = 10;
+const mouseDragScrollFactor = 0.5;
 let hasShownLandingSplash = false;
 
 type CreativePortfolioLandingProps = {
   locale: Locale;
   labels: {
     list: string;
-    projects: string;
     about: string;
     contact: string;
   };
@@ -40,9 +40,27 @@ const loopedLandingGalleryItems = Array.from(
     })),
 ).flat();
 
-const getSingleLoopWidth = (rail: HTMLDivElement) => {
+const getSingleLoopWidth = (
+  rail: HTMLDivElement,
+  railContent?: HTMLDivElement | null,
+) => {
   if (rail.scrollWidth <= rail.clientWidth) {
     return 0;
+  }
+
+  if (railContent) {
+    const cards = railContent.querySelectorAll<HTMLElement>("[data-slider-card]");
+    const itemsPerLoop = landingGalleryItems.length;
+    const firstCard = cards[0];
+    const nextLoopFirstCard = cards[itemsPerLoop];
+
+    if (firstCard && nextLoopFirstCard) {
+      const measuredLoopWidth = nextLoopFirstCard.offsetLeft - firstCard.offsetLeft;
+
+      if (measuredLoopWidth > 0) {
+        return measuredLoopWidth;
+      }
+    }
   }
 
   return rail.scrollWidth / sliderLoopCopies;
@@ -53,6 +71,8 @@ export function CreativePortfolioLanding({
   labels,
   languageLabels,
 }: CreativePortfolioLandingProps) {
+  const pageRef = useRef<HTMLDivElement>(null);
+  const lenisRef = useRef<Lenis | null>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const railContentRef = useRef<HTMLDivElement>(null);
   const [activeSegment, setActiveSegment] = useState(0);
@@ -73,12 +93,13 @@ export function CreativePortfolioLanding({
 
   const syncRailLoopState = useCallback(() => {
     const rail = railRef.current;
+    const lenis = lenisRef.current;
 
     if (!rail) {
       return;
     }
 
-    const singleLoopWidth = getSingleLoopWidth(rail);
+    const singleLoopWidth = getSingleLoopWidth(rail, railContentRef.current);
 
     if (singleLoopWidth <= 0) {
       setActiveSegment(0);
@@ -87,13 +108,23 @@ export function CreativePortfolioLanding({
 
     const minBoundary = singleLoopWidth * (centerLoopCopyIndex - 0.5);
     const maxBoundary = singleLoopWidth * (centerLoopCopyIndex + 0.5);
+    let didWrap = false;
 
-    while (rail.scrollLeft < minBoundary) {
+    if (rail.scrollLeft < minBoundary) {
       rail.scrollLeft += singleLoopWidth;
+      didWrap = true;
     }
 
-    while (rail.scrollLeft > maxBoundary) {
+    if (rail.scrollLeft > maxBoundary) {
       rail.scrollLeft -= singleLoopWidth;
+      didWrap = true;
+    }
+
+    if (didWrap && lenis) {
+      lenis.scrollTo(rail.scrollLeft, {
+        immediate: true,
+        force: true,
+      });
     }
 
     const loopOffset =
@@ -111,7 +142,7 @@ export function CreativePortfolioLanding({
     }
 
     const initializeLoop = () => {
-      const singleLoopWidth = getSingleLoopWidth(rail);
+      const singleLoopWidth = getSingleLoopWidth(rail, railContentRef.current);
 
       if (singleLoopWidth <= 0) {
         setActiveSegment(0);
@@ -126,36 +157,41 @@ export function CreativePortfolioLanding({
     };
 
     const frameId = window.requestAnimationFrame(initializeLoop);
-    rail.addEventListener("scroll", syncRailLoopState, { passive: true });
     window.addEventListener("resize", initializeLoop);
 
     return () => {
       window.cancelAnimationFrame(frameId);
-      rail.removeEventListener("scroll", syncRailLoopState);
       window.removeEventListener("resize", initializeLoop);
     };
   }, [syncRailLoopState]);
 
   useEffect(() => {
+    const page = pageRef.current;
     const rail = railRef.current;
     const railContent = railContentRef.current;
 
-    if (!rail || !railContent) {
+    if (!page || !rail || !railContent) {
       return;
     }
 
     const lenis = new Lenis({
       wrapper: rail,
       content: railContent,
+      eventsTarget: page,
       orientation: "horizontal",
-      gestureOrientation: "both",
+      gestureOrientation: "vertical",
       smoothWheel: true,
       syncTouch: true,
-      wheelMultiplier: 0.9,
+      lerp: 0.05,
+      syncTouchLerp: 0.065,
+      wheelMultiplier: 0.55,
+      touchMultiplier: 0.9,
       autoRaf: true,
       overscroll: false,
-      infinite: true,
+      virtualScroll: ({ deltaX, deltaY }) =>
+        Math.abs(deltaX) >= 0.5 || Math.abs(deltaY) >= 0.5,
     });
+    lenisRef.current = lenis;
 
     lenis.on("scroll", syncRailLoopState);
     syncRailLoopState();
@@ -163,6 +199,7 @@ export function CreativePortfolioLanding({
     return () => {
       lenis.off("scroll", syncRailLoopState);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, [syncRailLoopState]);
 
@@ -176,6 +213,7 @@ export function CreativePortfolioLanding({
     let isPointerDown = false;
     let isDragging = false;
     let activePointerId: number | null = null;
+    let activePointerType: PointerEvent["pointerType"] | null = null;
     let startX = 0;
     let startScrollLeft = 0;
     let dragDistance = 0;
@@ -189,6 +227,7 @@ export function CreativePortfolioLanding({
       isPointerDown = true;
       isDragging = false;
       activePointerId = event.pointerId;
+      activePointerType = event.pointerType;
       startX = event.clientX;
       startScrollLeft = rail.scrollLeft;
       dragDistance = 0;
@@ -219,7 +258,9 @@ export function CreativePortfolioLanding({
 
       event.preventDefault();
       dragDistance = Math.abs(deltaX);
-      rail.scrollLeft = startScrollLeft - deltaX;
+      const dragScrollFactor =
+        activePointerType === "mouse" ? mouseDragScrollFactor : 1;
+      rail.scrollLeft = startScrollLeft - deltaX * dragScrollFactor;
       syncRailLoopState();
     };
 
@@ -246,12 +287,14 @@ export function CreativePortfolioLanding({
       }
 
       activePointerId = null;
+      activePointerType = null;
     };
 
     const resetDragging = () => {
       isPointerDown = false;
       isDragging = false;
       activePointerId = null;
+      activePointerType = null;
       rail.classList.remove("cursor-grabbing");
     };
 
@@ -481,53 +524,54 @@ export function CreativePortfolioLanding({
   }, [markSliderIntroReady, showSplash]);
 
   return (
-    <div className="h-screen overflow-hidden bg-white text-black">
+    <div ref={pageRef} className="h-screen overflow-hidden bg-white text-black">
       {showSplash ? <SplashScreen onComplete={handleSplashComplete} /> : null}
 
-      <header className="fixed inset-x-0 top-0 z-30 border-b border-black/10 bg-white/95">
-        <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
-          <div className="flex items-center">
-            <Link
-              href="/"
-              className="text-[2rem] leading-none font-semibold tracking-[-0.06em]"
-            >
-              IRINA
-            </Link>
-          </div>
+      <div className="fixed inset-x-0 top-0 z-30 overflow-hidden">
+        <header
+          className={`border-b border-black/10 bg-white/95 motion-safe:will-change-transform ${showSplash ? "motion-safe:[transform:translateY(100%)]" : "motion-safe:animate-[landing-header-reveal_4000ms_cubic-bezier(0.22,1,0.36,1)_both]"}`}
+        >
+          <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
+            <div className="flex items-center">
+              <Link
+                href="/"
+                className="text-[2rem] leading-none font-semibold tracking-[-0.06em]"
+              >
+                IRINA
+              </Link>
+            </div>
 
-          <div className="flex justify-center">
-            <Link
-              href="/gallery"
-              className="text-xs text-black/55 transition hover:text-black md:text-[1.95rem] md:leading-none"
-            >
-              {labels.list}
-            </Link>
-          </div>
+            <div className="flex justify-center">
+              <Link
+                href="/gallery"
+                className="border-b border-transparent text-xs text-black/55 transition duration-200 hover:border-black/30 hover:text-black/80 md:text-[1.95rem] md:leading-none"
+              >
+                {labels.list}
+              </Link>
+            </div>
 
-          <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
-            <LanguageSwitcher
-              locale={locale}
-              labels={languageLabels}
-              className="mr-1 flex items-center gap-1 md:mr-2 md:gap-2"
-            />
-            <Link href="/projects" className="font-semibold text-black">
-              {labels.projects}
-            </Link>
-            <Link
-              href="/about"
-              className="text-black/40 transition hover:text-black"
-            >
-              {labels.about}
-            </Link>
-            <Link
-              href="/contact"
-              className="text-black/40 transition hover:text-black"
-            >
-              {labels.contact}
-            </Link>
-          </nav>
-        </div>
-      </header>
+            <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
+              <LanguageSwitcher
+                locale={locale}
+                labels={languageLabels}
+                className="mr-1 flex items-center gap-1 md:mr-2 md:gap-2"
+              />
+              <Link
+                href="/about"
+                className="border-b border-transparent text-black/40 transition duration-200 hover:border-black/25 hover:text-black/70"
+              >
+                {labels.about}
+              </Link>
+              <Link
+                href="/contact"
+                className="border-b border-transparent text-black/40 transition duration-200 hover:border-black/25 hover:text-black/70"
+              >
+                {labels.contact}
+              </Link>
+            </nav>
+          </div>
+        </header>
+      </div>
 
       <main className="mx-auto flex h-screen w-full max-w-425 flex-col overflow-hidden px-5 pt-22 md:px-10 md:pt-[8.7rem]">
         <section

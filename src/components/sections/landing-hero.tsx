@@ -37,10 +37,10 @@ export function LandingHero() {
             Ver galeria
           </Link>
           <Link
-            href="/shop"
+            href="/contact"
             className="border-ink/20 text-ink hover:bg-canvas-soft border px-6 py-3 text-sm font-semibold transition"
           >
-            Comprar prints
+            Encargar obra
           </Link>
         </div>
       </HeroReveal>

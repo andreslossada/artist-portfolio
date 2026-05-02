@@ -6,40 +6,47 @@ import { getLocale } from "@/lib/i18n";
 export async function SiteHeader() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
-  const links = [
-    { href: "/", label: dict.header.home },
-    { href: "/gallery", label: dict.header.gallery },
-    { href: "/shop", label: dict.header.shop },
-    { href: "/about", label: dict.header.about },
-    { href: "/contact", label: dict.header.contact },
-  ];
 
   return (
-    <header className="border-ink/10 bg-canvas/90 sticky top-0 z-20 border-b backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 py-3 md:px-10">
-        <Link href="/" className="font-display text-2xl tracking-wide">
-          Estudio Irina
-        </Link>
+    <header className="border-b border-black/10 bg-white/95">
+      <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
+        <div className="flex items-center">
+          <Link
+            href="/"
+            className="text-[2rem] leading-none font-semibold tracking-[-0.06em]"
+          >
+            IRINA
+          </Link>
+        </div>
 
-        <div className="flex items-center gap-4 md:gap-5">
+        <div className="flex justify-center">
+          <Link
+            href="/gallery"
+            className="border-b border-transparent text-xs text-black/55 transition duration-200 hover:border-black/30 hover:text-black/80 md:text-[1.95rem] md:leading-none"
+          >
+            {dict.landing.list}
+          </Link>
+        </div>
+
+        <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
           <LanguageSwitcher
             locale={locale}
             labels={dict.languageSwitcher}
-            className="flex items-center gap-1.5"
+            className="mr-1 flex items-center gap-1 md:mr-2 md:gap-2"
           />
-
-          <nav className="text-muted flex items-center gap-5 text-sm font-semibold">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="hover:text-ink transition"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
+          <Link
+            href="/about"
+            className="border-b border-transparent text-black/40 transition duration-200 hover:border-black/25 hover:text-black/70"
+          >
+            {dict.landing.about}
+          </Link>
+          <Link
+            href="/contact"
+            className="border-b border-transparent text-black/40 transition duration-200 hover:border-black/25 hover:text-black/70"
+          >
+            {dict.landing.contact}
+          </Link>
+        </nav>
       </div>
     </header>
   );

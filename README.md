@@ -43,7 +43,6 @@ npm run dev
 - `src/app/(marketing)/page.tsx`: landing principal.
 - `src/app/(gallery)/gallery/page.tsx`: galeria.
 - `src/app/(gallery)/artwork/[slug]/page.tsx`: detalle de obra.
-- `src/app/(shop)/shop/page.tsx`: tienda.
 - `src/app/api/checkout/route.ts`: creacion de sesion Stripe Checkout.
 - `src/app/api/webhooks/stripe/route.ts`: webhook de Stripe.
 - `src/core/gsap/*`: registro, timelines y triggers.
