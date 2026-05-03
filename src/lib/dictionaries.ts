@@ -48,29 +48,37 @@ const dictionaries = {
     },
     aboutPage: {
       eyebrow: "Sobre mí",
-      title: "Pintura contemporánea desde el borde del mar",
+      title: "Un universo marino entre sueño y calma",
       description:
-        "Estudio Irina desarrolla obra pictórica en técnica mixta con enfoque en materialidad, ritmo y memoria del paisaje costero. Cada serie explora la tensión entre estructura y accidente.",
+        "La obra de Irina es un viaje visual onírico e inmersivo, profundamente inspirado en la energía de la playa y el océano. Su estilo destaca por el uso de pinceladas texturizadas y fluidas que imitan el movimiento del agua, combinando tonos fríos y relajantes con destellos cálidos y vibrantes. A través de figuras etéreas, sirenas y elementos marinos, su arte captura la magia del mar, invitando al espectador a sumergirse en un mundo tranquilo y lleno de fantasía.",
+      visualTags: [
+        "Onírico",
+        "Inmersivo",
+        "Textura fluida",
+        "Magia marina",
+      ],
+      imagePlaceholderTitle: "Retrato de la artista",
+      imagePlaceholderHint: "Irina en su estudio.",
       processPillars: [
         {
-          title: "Materia y gesto",
+          title: "Energía oceánica",
           description:
-            "Capas de cal, pigmento y veladuras construyen una superficie viva que cambia con la luz.",
+            "Cada composición nace de la fuerza y la calma del mar, transformando su pulso en atmósferas pictóricas.",
         },
         {
-          title: "Archivo costero",
+          title: "Pincelada líquida",
           description:
-            "La colección nace de caminatas frente al mar y del registro de texturas en muros erosionados.",
+            "Las pinceladas texturizadas y fluidas evocan corrientes, espuma y reflejos para sugerir movimiento constante.",
         },
         {
-          title: "Serie limitada",
+          title: "Fantasía marina",
           description:
-            "Cada obra y edición se desarrolla en lotes pequeños para mantener una narrativa curatorial consistente.",
+            "Sirenas, figuras etéreas y símbolos del océano construyen un relato visual íntimo, sereno y envolvente.",
         },
       ],
-      trajectoryEyebrow: "Trayectoria",
+      trajectoryEyebrow: "Invitación",
       trajectoryDescription:
-        "Desde 2020, la artista ha presentado obra en residencias y muestras de estudio en Buenos Aires, Montevideo y Barcelona, colaborando con talleres de conservación para investigar soportes minerales y materiales de larga duración.",
+        "Cada obra invita a detener el ritmo cotidiano para entrar en una experiencia sensorial donde el mar, la luz y la imaginación dialogan en equilibrio.",
       viewGallery: "Ver galería",
       contact: "Contactar",
     },
@@ -146,29 +154,32 @@ const dictionaries = {
     },
     aboutPage: {
       eyebrow: "About",
-      title: "Contemporary painting from the edge of the sea",
+      title: "A marine universe between dream and calm",
       description:
-        "Estudio Irina develops mixed-media paintings focused on materiality, rhythm, and coastal memory. Each series explores the tension between structure and chance.",
+        "Irina's work is a dreamlike and immersive visual journey deeply inspired by the energy of the beach and the ocean. Her style stands out for textured, fluid brushstrokes that echo the movement of water, blending cool and soothing tones with warm, vibrant accents. Through ethereal figures, mermaids, and marine elements, her art captures the magic of the sea and invites the viewer to dive into a tranquil world full of fantasy.",
+      visualTags: ["Dreamlike", "Immersive", "Fluid texture", "Marine magic"],
+      imagePlaceholderTitle: "Artist portrait",
+      imagePlaceholderHint: "Irina in her studio.",
       processPillars: [
         {
-          title: "Matter and gesture",
+          title: "Ocean energy",
           description:
-            "Layers of lime, pigment, and glazes build a living surface that shifts with light.",
+            "Each composition emerges from the sea's force and calm, turning its pulse into pictorial atmospheres.",
         },
         {
-          title: "Coastal archive",
+          title: "Liquid brushwork",
           description:
-            "The collection grows from seaside walks and from recording textures on weathered walls.",
+            "Textured, fluid brushstrokes evoke currents, foam, and reflections to suggest constant movement.",
         },
         {
-          title: "Limited series",
+          title: "Marine fantasy",
           description:
-            "Each artwork and edition is produced in small runs to keep a consistent curatorial narrative.",
+            "Mermaids, ethereal figures, and ocean symbols create an intimate, serene, and enveloping visual narrative.",
         },
       ],
-      trajectoryEyebrow: "Trajectory",
+      trajectoryEyebrow: "Invitation",
       trajectoryDescription:
-        "Since 2020, the artist has presented work in residencies and studio exhibitions in Buenos Aires, Montevideo, and Barcelona, collaborating with conservation workshops to research mineral supports and long-lasting materials.",
+        "Each artwork invites you to slow down and enter a sensory experience where the sea, light, and imagination exist in balance.",
       viewGallery: "View gallery",
       contact: "Get in touch",
     },

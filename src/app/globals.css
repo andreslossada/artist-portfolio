@@ -3,6 +3,11 @@
 :root {
   --theme-transition-duration: 620ms;
   --theme-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --page-transition-exit-duration: 220ms;
+  --page-transition-enter-duration: 320ms;
+  --page-transition-gap: 70ms;
+  --page-transition-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --page-transition-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
 
   --color-canvas: #ffffff;
   --color-canvas-soft: #eef4fb;
@@ -62,12 +67,15 @@ html[data-theme="dark"] {
   box-sizing: border-box;
 }
 
-html {
-  scrollbar-gutter: stable;
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-html:has(.landing-page) {
-  scrollbar-gutter: auto;
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }
 
 body {
@@ -138,6 +146,50 @@ html.theme-transitioning *::after {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+::view-transition-group(.page-shell) {
+  animation: none;
+}
+
+::view-transition-group(site-header),
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-old(.page-shell) {
+  animation:
+    page-fade-out var(--page-transition-exit-duration)
+      var(--page-transition-ease-out) both;
+}
+
+::view-transition-new(.page-shell) {
+  animation:
+    page-fade-in var(--page-transition-enter-duration) var(--page-transition-ease-in)
+      calc(var(--page-transition-exit-duration) + var(--page-transition-gap)) both;
+}
+
+@keyframes page-fade-out {
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 ::view-transition-group(.artwork-morph) {

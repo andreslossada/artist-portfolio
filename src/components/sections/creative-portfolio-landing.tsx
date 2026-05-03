@@ -8,6 +8,7 @@ import { ViewTransition, useCallback, useEffect, useRef, useState } from "react"
 import { SplashScreen } from "@/components/animations/splash-screen";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
+import { ViewModeSwitch } from "@/components/ui/view-mode-switch";
 import { landingGalleryItems } from "@/lib/content/landing-gallery";
 import type { Locale } from "@/lib/i18n";
 import type { Theme } from "@/lib/theme";
@@ -549,26 +550,21 @@ export function CreativePortfolioLanding({
             <div className="flex items-center">
               <Link
                 href="/"
-                className="text-[2rem] leading-none font-semibold tracking-[-0.06em] transition-colors hover:text-accent"
+                className="inline-flex h-8 items-center text-[2rem] leading-none font-semibold tracking-[-0.06em] transition-colors hover:text-accent md:h-10"
               >
                 IRINA
               </Link>
             </div>
 
-            <div className="flex justify-center">
-              <Link
-                href="/gallery"
-                className="border-b border-transparent text-xs text-ink/60 transition duration-200 hover:border-accent/45 hover:text-accent md:text-[1.95rem] md:leading-none"
-              >
-                {labels.list}
-              </Link>
+            <div className="flex items-center justify-center">
+              <ViewModeSwitch />
             </div>
 
             <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
               <LanguageSwitcher
                 locale={locale}
                 labels={languageLabels}
-                className="mr-1 flex items-center gap-1 md:mr-2 md:gap-2"
+                className="mr-1 md:mr-2"
               />
               <ThemeSwitcher
                 theme={theme}
@@ -577,13 +573,13 @@ export function CreativePortfolioLanding({
               />
               <Link
                 href="/about"
-                className="border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent"
+                className="inline-flex h-8 items-center border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent md:h-10"
               >
                 {labels.about}
               </Link>
               <Link
                 href="/contact"
-                className="border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent"
+                className="inline-flex h-8 items-center border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent md:h-10"
               >
                 {labels.contact}
               </Link>

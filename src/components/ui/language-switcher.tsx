@@ -2,6 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import type { Locale } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 type LanguageSwitcherProps = {
   locale: Locale;
@@ -37,14 +38,14 @@ export function LanguageSwitcher({
     <form
       action="/api/lang"
       method="get"
-      className={className}
+      className={cn("inline-flex h-8 items-stretch border border-accent/25 md:h-10", className)}
       aria-label="Language switcher"
     >
       <input type="hidden" name="redirect" value={redirect} />
       {languageOptions.map((option) => {
         const isActive = option.value === locale;
         const baseClasses =
-          "cursor-pointer border px-2 py-1 text-[0.58rem] leading-none font-semibold tracking-[0.1em] uppercase transition-all duration-200 focus-visible:ring-accent/40 focus-visible:ring-offset-1 focus-visible:outline-none focus-visible:ring-2 md:text-[0.65rem]";
+          "focus-visible:ring-accent/40 focus-visible:ring-offset-canvas inline-flex h-full min-w-8 cursor-pointer items-center justify-center rounded-none border border-transparent px-2 text-[0.58rem] leading-none font-semibold tracking-[0.1em] uppercase transition duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none md:min-w-10 md:text-[0.65rem]";
 
         return (
           <button
@@ -52,11 +53,12 @@ export function LanguageSwitcher({
             type={isActive ? "button" : "submit"}
             name="locale"
             value={option.value}
-            className={`${baseClasses} ${
+            className={cn(
+              baseClasses,
               isActive
                 ? "border-accent bg-accent text-white shadow-[0_4px_12px_rgba(43,95,168,0.3)]"
-                : "border-accent/25 bg-surface text-ink/65 hover:-translate-y-px hover:border-accent/55 hover:bg-accent-soft/40 hover:text-accent"
-            }`}
+                : "text-ink/60 hover:border-accent/45 hover:text-accent",
+            )}
             aria-current={isActive ? "true" : undefined}
           >
             {labels[option.labelKey]}

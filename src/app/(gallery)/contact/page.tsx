@@ -19,18 +19,18 @@ export default async function ContactPage() {
   const contactChannels = [
     {
       label: dict.contactPage.channels.email,
-      value: "hola@estudioirina.com",
-      href: "mailto:hola@estudioirina.com",
+      value: "irinagaray17@gmail.com",
+      href: "mailto:irinagaray17@gmail.com",
     },
     {
       label: dict.contactPage.channels.whatsapp,
-      value: "+54 9 11 5555 2026",
-      href: "https://wa.me/5491155552026",
+      value: "+58 424-2616988",
+      href: "https://wa.me/584242616988",
     },
     {
       label: dict.contactPage.channels.instagram,
-      value: "@estudio.irina",
-      href: "https://instagram.com/estudio.irina",
+      value: "@r_a_t_girl",
+      href: "https://www.instagram.com/r_a_t_girl/",
     },
   ];
 
@@ -49,22 +49,34 @@ export default async function ContactPage() {
       </header>
 
       <section className="mt-10 grid gap-5 md:grid-cols-3">
-        {contactChannels.map((channel) => (
-          <a
-            key={channel.label}
-            href={channel.href}
-            target={channel.href.startsWith("http") ? "_blank" : undefined}
-            rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
-            className="border-ink/10 shadow-card hover:border-accent/30 border bg-surface p-6 transition hover:-translate-y-0.5"
-          >
-            <p className="text-muted text-xs tracking-[0.2em] uppercase">
-              {channel.label}
-            </p>
-            <p className="font-display mt-3 text-3xl leading-tight">
-              {channel.value}
-            </p>
-          </a>
-        ))}
+        {contactChannels.map((channel) => {
+          const isEmail = channel.href.startsWith("mailto:");
+
+          return (
+            <a
+              key={channel.label}
+              href={channel.href}
+              target={channel.href.startsWith("http") ? "_blank" : undefined}
+              rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
+              className={`border-ink/10 shadow-card border p-6 transition hover:-translate-y-0.5 ${
+                isEmail
+                  ? "bg-accent !text-white hover:border-accent/80"
+                  : "hover:border-accent/30 bg-surface"
+              }`}
+            >
+              <p
+                className={`text-xs tracking-[0.2em] uppercase ${
+                  isEmail ? "text-white/85" : "text-muted"
+                }`}
+              >
+                {channel.label}
+              </p>
+              <p className="font-display mt-3 text-3xl leading-tight">
+                {channel.value}
+              </p>
+            </a>
+          );
+        })}
       </section>
 
       <section className="border-ink/10 mt-10 border bg-surface p-6 md:p-8">
@@ -76,8 +88,8 @@ export default async function ContactPage() {
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            href="mailto:hola@estudioirina.com"
-            className="bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+            href="mailto:irinagaray17@gmail.com"
+            className="bg-accent px-5 py-2 text-sm font-semibold !text-white visited:!text-white hover:!text-white transition hover:brightness-110"
           >
             {dict.contactPage.channels.email}
           </Link>

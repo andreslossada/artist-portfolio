@@ -91,7 +91,7 @@ export default async function ArtworkDetailPage({
           <div className="border-ink/10 mt-10 border-t pt-8 md:mt-auto">
             <Link
               href={`/contact?fromArtwork=${artwork.slug}`}
-              className="bg-accent inline-flex h-11 items-center justify-center border border-accent px-5 text-sm font-semibold text-white transition hover:brightness-110"
+              className="bg-accent inline-flex h-11 items-center justify-center border border-accent px-5 text-sm font-semibold !text-white transition hover:brightness-110"
             >
               {dict.artworkPage.shopCta}
             </Link>
