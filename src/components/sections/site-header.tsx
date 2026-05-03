@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
+import { getTheme } from "@/lib/theme";
 
 export async function SiteHeader() {
   const locale = await getLocale();
+  const theme = await getTheme();
   const dict = getDictionary(locale);
 
   return (
-    <header className="border-b border-accent/15 bg-white/95">
+    <header className="border-b border-accent/15 bg-transparent">
       <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
         <div className="flex items-center">
           <Link
@@ -33,6 +36,11 @@ export async function SiteHeader() {
             locale={locale}
             labels={dict.languageSwitcher}
             className="mr-1 flex items-center gap-1 md:mr-2 md:gap-2"
+          />
+          <ThemeSwitcher
+            theme={theme}
+            labels={dict.themeSwitcher}
+            className="mr-1 md:mr-2"
           />
           <Link
             href="/about"

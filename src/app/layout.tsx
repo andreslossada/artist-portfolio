@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
+import { getTheme } from "@/lib/theme";
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -32,10 +33,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocale();
+  const theme = await getTheme();
 
   return (
     <html
       lang={locale}
+      data-theme={theme}
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
       <body className="bg-canvas text-ink flex min-h-full flex-col">

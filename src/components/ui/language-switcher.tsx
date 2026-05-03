@@ -55,7 +55,7 @@ export function LanguageSwitcher({
             className={`${baseClasses} ${
               isActive
                 ? "border-accent bg-accent text-white shadow-[0_4px_12px_rgba(43,95,168,0.3)]"
-                : "border-accent/25 bg-white text-ink/65 hover:-translate-y-px hover:border-accent/55 hover:bg-accent-soft/40 hover:text-accent"
+                : "border-accent/25 bg-surface text-ink/65 hover:-translate-y-px hover:border-accent/55 hover:bg-accent-soft/40 hover:text-accent"
             }`}
             aria-current={isActive ? "true" : undefined}
           >

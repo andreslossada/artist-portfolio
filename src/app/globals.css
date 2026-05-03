@@ -1,20 +1,53 @@
 @import "tailwindcss";
 
 :root {
+  --theme-transition-duration: 620ms;
+  --theme-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
   --color-canvas: #ffffff;
   --color-canvas-soft: #eef4fb;
+  --color-surface: #ffffff;
   --color-ink: #111111;
   --color-muted: #5d6470;
   --color-accent: #2b5fa8;
   --color-accent-soft: #dbe8f8;
+  --color-canvas-glow-light:
+    radial-gradient(circle at 20% 18%, #d5e8ff 0%, #edf5ff 28%, #ffffff 58%),
+    radial-gradient(
+      circle at 78% 82%,
+      rgba(220, 233, 251, 0.95) 0%,
+      rgba(220, 233, 251, 0) 56%
+    );
+  --color-canvas-glow-dark:
+    radial-gradient(circle at 20% 18%, #1b2a3c 0%, #0d131b 54%, #101a27 100%),
+    radial-gradient(
+      circle at 78% 82%,
+      rgba(41, 63, 95, 0.48) 0%,
+      rgba(41, 63, 95, 0) 58%
+    );
 
   --radius-card: 0;
   --shadow-card: 0 20px 45px rgba(23, 46, 80, 0.12);
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --color-canvas: #0d131b;
+  --color-canvas-soft: #182231;
+  --color-surface: #111a24;
+  --color-ink: #e7eef8;
+  --color-muted: #9ca9bb;
+  --color-accent: #78abff;
+  --color-accent-soft: #253a58;
+
+  --shadow-card: 0 20px 45px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-canvas: var(--color-canvas);
   --color-canvas-soft: var(--color-canvas-soft);
+  --color-surface: var(--color-surface);
   --color-ink: var(--color-ink);
   --color-muted: var(--color-muted);
   --color-accent: var(--color-accent);
@@ -39,10 +72,67 @@ html:has(.landing-page) {
 
 body {
   margin: 0;
-  background: var(--color-canvas);
+  position: relative;
+  isolation: isolate;
+  background-color: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans), sans-serif;
   line-height: 1.5;
+  transition:
+    background-color var(--theme-transition-duration) var(--theme-transition-ease),
+    color var(--theme-transition-duration) var(--theme-transition-ease);
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  transition: opacity var(--theme-transition-duration) var(--theme-transition-ease);
+  will-change: opacity;
+}
+
+body::before {
+  opacity: 1;
+  background-image: var(--color-canvas-glow-light);
+}
+
+body::after {
+  opacity: 0;
+  background-image: var(--color-canvas-glow-dark);
+}
+
+html[data-theme="dark"] body::before {
+  opacity: 0;
+}
+
+html[data-theme="dark"] body::after {
+  opacity: 1;
+}
+
+.landing-page {
+  background: transparent;
+}
+
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition-property:
+    background-color,
+    border-color,
+    color,
+    fill,
+    stroke,
+    box-shadow,
+    opacity;
+  transition-duration: var(--theme-transition-duration);
+  transition-timing-function: var(--theme-transition-ease);
 }
 
 a {

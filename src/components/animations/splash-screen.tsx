@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
+import type { Theme } from "@/lib/theme";
 
 type SplashScreenProps = {
+  theme: Theme;
   onComplete: () => void;
 };
 
@@ -12,7 +14,7 @@ const SPLASH_MAX_DURATION_MS = 9000;
 const IRINA_SVG_URL = "/Irina.svg";
 const SWEEP_DURATION = 2.5;
 
-export function SplashScreen({ onComplete }: SplashScreenProps) {
+export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [isFading, setIsFading] = useState(false);
   const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
@@ -114,7 +116,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         gsap.set(path, {
           strokeDasharray: length + 2,
           strokeDashoffset: length + 2,
-          stroke: "#161616",
+          stroke: theme === "dark" ? "#e7eef8" : "#161616",
+          fill: theme === "dark" ? "#e7eef8" : "#161616",
           strokeWidth: 1.7,
           strokeLinecap: "butt",
           strokeLinejoin: "round",
@@ -210,7 +213,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
       timeline.to({}, { duration: 0.4 }, latestPathEnd + 0.05);
     },
-    [finishSplash, isVisible, svgMarkup],
+    [finishSplash, isVisible, svgMarkup, theme],
   );
 
   useEffect(() => {
@@ -235,7 +238,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   return (
     <div
       ref={scopeRef}
-      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center bg-[radial-gradient(circle_at_20%_18%,#e8f1fb_0%,#ffffff_54%,#f4f8fd_100%)] transition-opacity duration-500 ${isFading ? "opacity-0" : "opacity-100"}`}
+      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center transition-opacity duration-500 ${theme === "dark" ? "bg-[radial-gradient(circle_at_20%_18%,#1b2a3c_0%,#0d131b_54%,#101a27_100%)]" : "bg-[radial-gradient(circle_at_20%_18%,#d5e8ff_0%,#edf5ff_28%,#ffffff_58%),radial-gradient(circle_at_78%_82%,#dce9fb_0%,rgba(220,233,251,0)_56%)]"} ${isFading ? "opacity-0" : "opacity-100"}`}
       role="presentation"
       aria-hidden="true"
     >

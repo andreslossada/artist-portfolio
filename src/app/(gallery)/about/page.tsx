@@ -35,7 +35,7 @@ export default async function AboutPage() {
         {dict.aboutPage.processPillars.map((pillar) => (
           <article
             key={pillar.title}
-            className="border-ink/10 shadow-card border bg-white p-6"
+            className="border-ink/10 shadow-card border bg-surface p-6"
           >
             <h2 className="font-display text-3xl leading-tight">{pillar.title}</h2>
             <p className="text-muted mt-3 text-sm leading-relaxed">
@@ -45,7 +45,7 @@ export default async function AboutPage() {
         ))}
       </section>
 
-      <section className="border-ink/10 mt-10 border bg-white p-6 md:p-8">
+      <section className="border-ink/10 mt-10 border bg-surface p-6 md:p-8">
         <p className="text-muted text-xs tracking-[0.2em] uppercase">
           {dict.aboutPage.trajectoryEyebrow}
         </p>

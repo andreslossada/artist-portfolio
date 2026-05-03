@@ -7,15 +7,17 @@ import gsap from "gsap";
 import { ViewTransition, useCallback, useEffect, useRef, useState } from "react";
 import { SplashScreen } from "@/components/animations/splash-screen";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { landingGalleryItems } from "@/lib/content/landing-gallery";
 import type { Locale } from "@/lib/i18n";
+import type { Theme } from "@/lib/theme";
 
 const progressSegments = Math.min(12, landingGalleryItems.length);
 const sliderLoopCopies = 5;
 const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 10;
 const mouseDragScrollFactor = 0.7;
-let hasShownLandingSplash = false;
+const shownSplashThemes = new Set<Theme>();
 
 type CreativePortfolioLandingProps = {
   locale: Locale;
@@ -28,6 +30,11 @@ type CreativePortfolioLandingProps = {
     spanish: string;
     english: string;
   };
+  themeLabels: {
+    light: string;
+    dark: string;
+  };
+  theme: Theme;
 };
 
 const loopedLandingGalleryItems = Array.from(
@@ -70,6 +77,8 @@ export function CreativePortfolioLanding({
   locale,
   labels,
   languageLabels,
+  themeLabels,
+  theme,
 }: CreativePortfolioLandingProps) {
   const pageRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
@@ -79,7 +88,7 @@ export function CreativePortfolioLanding({
   const [hoveredArtworkTitle, setHoveredArtworkTitle] = useState<string | null>(
     null,
   );
-  const [showSplash, setShowSplash] = useState(() => !hasShownLandingSplash);
+  const [showSplash, setShowSplash] = useState(() => !shownSplashThemes.has(theme));
   const [isSliderIntroReady, setIsSliderIntroReady] = useState(false);
   const markSliderIntroReady = useCallback(() => {
     window.requestAnimationFrame(() => {
@@ -87,9 +96,9 @@ export function CreativePortfolioLanding({
     });
   }, []);
   const handleSplashComplete = useCallback(() => {
-    hasShownLandingSplash = true;
+    shownSplashThemes.add(theme);
     setShowSplash(false);
-  }, []);
+  }, [theme]);
 
   const syncRailLoopState = useCallback(() => {
     const rail = railRef.current;
@@ -526,13 +535,15 @@ export function CreativePortfolioLanding({
   return (
     <div
       ref={pageRef}
-      className="landing-page h-screen overflow-hidden bg-white text-black"
+      className="landing-page h-screen overflow-hidden text-ink"
     >
-      {showSplash ? <SplashScreen onComplete={handleSplashComplete} /> : null}
+      {showSplash ? (
+        <SplashScreen theme={theme} onComplete={handleSplashComplete} />
+      ) : null}
 
       <div className="fixed inset-x-0 top-0 z-30 overflow-hidden">
         <header
-          className={`border-b border-accent/15 bg-white/95 motion-safe:will-change-transform ${showSplash ? "motion-safe:[transform:translateY(100%)]" : "motion-safe:animate-[landing-header-reveal_4000ms_cubic-bezier(0.22,1,0.36,1)_both]"}`}
+          className={`border-b border-accent/15 bg-transparent motion-safe:will-change-transform ${showSplash ? "motion-safe:[transform:translateY(100%)]" : "motion-safe:animate-[landing-header-reveal_4000ms_cubic-bezier(0.22,1,0.36,1)_both]"}`}
         >
           <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
             <div className="flex items-center">
@@ -558,6 +569,11 @@ export function CreativePortfolioLanding({
                 locale={locale}
                 labels={languageLabels}
                 className="mr-1 flex items-center gap-1 md:mr-2 md:gap-2"
+              />
+              <ThemeSwitcher
+                theme={theme}
+                labels={themeLabels}
+                className="mr-1 md:mr-2"
               />
               <Link
                 href="/about"
@@ -593,7 +609,7 @@ export function CreativePortfolioLanding({
                 <article
                   key={item.loopKey}
                   data-slider-card
-                  className="group relative aspect-2/3 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden bg-neutral-100 md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
+                  className="group relative aspect-2/3 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden bg-canvas-soft md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
                   onMouseEnter={() => setHoveredArtworkTitle(item.title)}
                   onMouseLeave={() => setHoveredArtworkTitle(null)}
                 >
@@ -623,7 +639,7 @@ export function CreativePortfolioLanding({
                         />
                         <div
                           data-slider-curtain
-                          className="pointer-events-none absolute -inset-px z-10 bg-white opacity-0"
+                          className="pointer-events-none absolute -inset-px z-10 bg-surface opacity-0"
                           aria-hidden="true"
                         />
                       </div>
@@ -657,7 +673,7 @@ export function CreativePortfolioLanding({
               {Array.from({ length: progressSegments }).map((_, index) => (
                 <span
                   key={index}
-                  className={`h-px w-7 md:w-14 ${index <= activeSegment ? "bg-accent" : "bg-accent/28"}`}
+                  className={`h-[2px] w-7 md:w-14 ${index <= activeSegment ? "bg-accent" : "bg-accent/28"}`}
                 />
               ))}
             </div>

@@ -33,7 +33,7 @@ export default async function ArtworkDetailPage({
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-8 md:px-10 md:py-6">
-      <article className="border-ink/10 shadow-card grid gap-6 border bg-white p-4 md:grid-cols-[22rem_minmax(0,1fr)] md:items-start md:gap-7 md:p-5">
+      <article className="border-ink/10 shadow-card grid gap-6 border bg-surface p-4 md:grid-cols-[22rem_minmax(0,1fr)] md:items-start md:gap-7 md:p-5">
         <ViewTransition name={transitionName} share="artwork-morph">
           <div className="relative mx-auto aspect-2/3 w-[min(92vw,22rem)] overflow-hidden bg-canvas-soft md:mx-0 md:w-88">
             <Image

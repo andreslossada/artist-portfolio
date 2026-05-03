@@ -55,7 +55,7 @@ export default async function ContactPage() {
             href={channel.href}
             target={channel.href.startsWith("http") ? "_blank" : undefined}
             rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
-            className="border-ink/10 shadow-card hover:border-accent/30 border bg-white p-6 transition hover:-translate-y-0.5"
+            className="border-ink/10 shadow-card hover:border-accent/30 border bg-surface p-6 transition hover:-translate-y-0.5"
           >
             <p className="text-muted text-xs tracking-[0.2em] uppercase">
               {channel.label}
@@ -67,7 +67,7 @@ export default async function ContactPage() {
         ))}
       </section>
 
-      <section className="border-ink/10 mt-10 border bg-white p-6 md:p-8">
+      <section className="border-ink/10 mt-10 border bg-surface p-6 md:p-8">
         <h2 className="font-display text-4xl leading-tight">
           {dict.contactPage.acquisitionsTitle}
         </h2>
