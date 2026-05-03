@@ -55,7 +55,7 @@ export default async function ContactPage() {
             href={channel.href}
             target={channel.href.startsWith("http") ? "_blank" : undefined}
             rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
-            className="border-ink/10 shadow-card border bg-white/70 p-6 transition hover:-translate-y-0.5"
+            className="border-ink/10 shadow-card hover:border-accent/30 border bg-white p-6 transition hover:-translate-y-0.5"
           >
             <p className="text-muted text-xs tracking-[0.2em] uppercase">
               {channel.label}
@@ -67,7 +67,7 @@ export default async function ContactPage() {
         ))}
       </section>
 
-      <section className="border-ink/10 mt-10 border bg-white/60 p-6 md:p-8">
+      <section className="border-ink/10 mt-10 border bg-white p-6 md:p-8">
         <h2 className="font-display text-4xl leading-tight">
           {dict.contactPage.acquisitionsTitle}
         </h2>
@@ -77,13 +77,13 @@ export default async function ContactPage() {
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="mailto:hola@estudioirina.com"
-            className="bg-ink px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            className="bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110"
           >
             {dict.contactPage.channels.email}
           </Link>
           <Link
             href="/gallery"
-            className="border border-current px-5 py-2 text-sm font-semibold transition hover:bg-black/5"
+            className="border-accent/35 text-accent hover:bg-accent-soft/55 border px-5 py-2 text-sm font-semibold transition"
           >
             {dict.contactPage.viewArtwork}
           </Link>

@@ -35,7 +35,7 @@ export default async function AboutPage() {
         {dict.aboutPage.processPillars.map((pillar) => (
           <article
             key={pillar.title}
-            className="border-ink/10 shadow-card border bg-white/70 p-6"
+            className="border-ink/10 shadow-card border bg-white p-6"
           >
             <h2 className="font-display text-3xl leading-tight">{pillar.title}</h2>
             <p className="text-muted mt-3 text-sm leading-relaxed">
@@ -45,7 +45,7 @@ export default async function AboutPage() {
         ))}
       </section>
 
-      <section className="border-ink/10 mt-10 border bg-white/60 p-6 md:p-8">
+      <section className="border-ink/10 mt-10 border bg-white p-6 md:p-8">
         <p className="text-muted text-xs tracking-[0.2em] uppercase">
           {dict.aboutPage.trajectoryEyebrow}
         </p>
@@ -55,13 +55,13 @@ export default async function AboutPage() {
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href="/gallery"
-            className="bg-ink px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            className="bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110"
           >
             {dict.aboutPage.viewGallery}
           </Link>
           <Link
             href="/contact"
-            className="border border-current px-5 py-2 text-sm font-semibold transition hover:bg-black/5"
+            className="border-accent/35 text-accent hover:bg-accent-soft/55 border px-5 py-2 text-sm font-semibold transition"
           >
             {dict.aboutPage.contact}
           </Link>

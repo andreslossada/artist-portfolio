@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --color-canvas: #f7f1e8;
-  --color-canvas-soft: #efe3d2;
-  --color-ink: #1d1a18;
-  --color-muted: #5f584f;
+  --color-canvas: #ffffff;
+  --color-canvas-soft: #eef4fb;
+  --color-ink: #111111;
+  --color-muted: #5d6470;
   --color-accent: #2b5fa8;
-  --color-accent-soft: #bfd3ea;
+  --color-accent-soft: #dbe8f8;
 
   --radius-card: 0;
-  --shadow-card: 0 20px 45px rgba(43, 30, 18, 0.14);
+  --shadow-card: 0 20px 45px rgba(23, 46, 80, 0.12);
 }
 
 @theme inline {
@@ -31,6 +31,10 @@
 
 html {
   scrollbar-gutter: stable;
+}
+
+html:has(.landing-page) {
+  scrollbar-gutter: auto;
 }
 
 body {

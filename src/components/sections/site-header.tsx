@@ -8,12 +8,12 @@ export async function SiteHeader() {
   const dict = getDictionary(locale);
 
   return (
-    <header className="border-b border-black/10 bg-white/95">
+    <header className="border-b border-accent/15 bg-white/95">
       <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
         <div className="flex items-center">
           <Link
             href="/"
-            className="text-[2rem] leading-none font-semibold tracking-[-0.06em]"
+            className="text-[2rem] leading-none font-semibold tracking-[-0.06em] transition-colors hover:text-accent"
           >
             IRINA
           </Link>
@@ -22,7 +22,7 @@ export async function SiteHeader() {
         <div className="flex justify-center">
           <Link
             href="/gallery"
-            className="border-b border-transparent text-xs text-black/55 transition duration-200 hover:border-black/30 hover:text-black/80 md:text-[1.95rem] md:leading-none"
+            className="border-b border-transparent text-xs text-ink/60 transition duration-200 hover:border-accent/45 hover:text-accent md:text-[1.95rem] md:leading-none"
           >
             {dict.landing.list}
           </Link>
@@ -36,13 +36,13 @@ export async function SiteHeader() {
           />
           <Link
             href="/about"
-            className="border-b border-transparent text-black/40 transition duration-200 hover:border-black/25 hover:text-black/70"
+            className="border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent"
           >
             {dict.landing.about}
           </Link>
           <Link
             href="/contact"
-            className="border-b border-transparent text-black/40 transition duration-200 hover:border-black/25 hover:text-black/70"
+            className="border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent"
           >
             {dict.landing.contact}
           </Link>

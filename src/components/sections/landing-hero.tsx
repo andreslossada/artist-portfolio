@@ -3,9 +3,9 @@ import { HeroReveal } from "@/components/animations/hero-reveal";
 
 export function LandingHero() {
   return (
-    <section className="border-ink/10 shadow-card relative overflow-hidden border bg-[radial-gradient(circle_at_top_right,#d7e5f6_0%,#e9eef3_42%,#f7f1e8_100%)] px-7 py-16 md:px-14">
+    <section className="border-ink/10 shadow-card relative overflow-hidden border bg-[radial-gradient(circle_at_top_right,#d7e5f6_0%,#edf3fb_42%,#ffffff_100%)] px-7 py-16 md:px-14">
       <div className="bg-accent/20 pointer-events-none absolute -top-16 -right-10 h-56 w-56 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-12 left-8 h-48 w-48 bg-white/50 blur-2xl" />
+      <div className="pointer-events-none absolute -bottom-12 left-8 h-48 w-48 bg-accent-soft/45 blur-2xl" />
 
       <HeroReveal>
         <p
@@ -38,7 +38,7 @@ export function LandingHero() {
           </Link>
           <Link
             href="/contact"
-            className="border-ink/20 text-ink hover:bg-canvas-soft border px-6 py-3 text-sm font-semibold transition"
+            className="border-accent/30 text-ink hover:bg-accent-soft/55 hover:text-accent border px-6 py-3 text-sm font-semibold transition"
           >
             Encargar obra
           </Link>

@@ -44,7 +44,7 @@ export function LanguageSwitcher({
       {languageOptions.map((option) => {
         const isActive = option.value === locale;
         const baseClasses =
-          "cursor-pointer border px-2 py-1 text-[0.58rem] leading-none font-semibold tracking-[0.1em] uppercase transition-all duration-200 md:text-[0.65rem]";
+          "cursor-pointer border px-2 py-1 text-[0.58rem] leading-none font-semibold tracking-[0.1em] uppercase transition-all duration-200 focus-visible:ring-accent/40 focus-visible:ring-offset-1 focus-visible:outline-none focus-visible:ring-2 md:text-[0.65rem]";
 
         return (
           <button
@@ -54,8 +54,8 @@ export function LanguageSwitcher({
             value={option.value}
             className={`${baseClasses} ${
               isActive
-                ? "border-black bg-black text-white shadow-[0_4px_12px_rgba(0,0,0,0.18)]"
-                : "border-black/20 bg-white/70 text-black/65 hover:-translate-y-px hover:border-black/45 hover:bg-white hover:text-black"
+                ? "border-accent bg-accent text-white shadow-[0_4px_12px_rgba(43,95,168,0.3)]"
+                : "border-accent/25 bg-white text-ink/65 hover:-translate-y-px hover:border-accent/55 hover:bg-accent-soft/40 hover:text-accent"
             }`}
             aria-current={isActive ? "true" : undefined}
           >

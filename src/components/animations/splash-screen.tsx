@@ -10,7 +10,7 @@ type SplashScreenProps = {
 const SPLASH_FADE_MS = 500;
 const SPLASH_MAX_DURATION_MS = 9000;
 const IRINA_SVG_URL = "/Irina.svg";
-const SWEEP_DURATION = .5;
+const SWEEP_DURATION = 2.5;
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
@@ -235,7 +235,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   return (
     <div
       ref={scopeRef}
-      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center bg-[radial-gradient(circle_at_20%_18%,#f4f2ec_0%,#ffffff_54%,#f5f7fb_100%)] transition-opacity duration-500 ${isFading ? "opacity-0" : "opacity-100"}`}
+      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center bg-[radial-gradient(circle_at_20%_18%,#e8f1fb_0%,#ffffff_54%,#f4f8fd_100%)] transition-opacity duration-500 ${isFading ? "opacity-0" : "opacity-100"}`}
       role="presentation"
       aria-hidden="true"
     >

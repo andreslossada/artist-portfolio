@@ -25,7 +25,7 @@ export function FeaturedArtworks() {
           <Link
             key={artwork.id}
             href={`/artwork/${artwork.slug}?vt=${artwork.slug}`}
-            className="group border-ink/10 bg-canvas-soft overflow-hidden border"
+            className="group border-ink/10 hover:border-accent/35 overflow-hidden border bg-white transition-colors"
           >
             <ViewTransition
               name={`artwork-image-${artwork.slug}`}

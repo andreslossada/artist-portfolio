@@ -14,7 +14,7 @@ const progressSegments = Math.min(12, landingGalleryItems.length);
 const sliderLoopCopies = 5;
 const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 10;
-const mouseDragScrollFactor = 0.5;
+const mouseDragScrollFactor = 0.7;
 let hasShownLandingSplash = false;
 
 type CreativePortfolioLandingProps = {
@@ -524,18 +524,21 @@ export function CreativePortfolioLanding({
   }, [markSliderIntroReady, showSplash]);
 
   return (
-    <div ref={pageRef} className="h-screen overflow-hidden bg-white text-black">
+    <div
+      ref={pageRef}
+      className="landing-page h-screen overflow-hidden bg-white text-black"
+    >
       {showSplash ? <SplashScreen onComplete={handleSplashComplete} /> : null}
 
       <div className="fixed inset-x-0 top-0 z-30 overflow-hidden">
         <header
-          className={`border-b border-black/10 bg-white/95 motion-safe:will-change-transform ${showSplash ? "motion-safe:[transform:translateY(100%)]" : "motion-safe:animate-[landing-header-reveal_4000ms_cubic-bezier(0.22,1,0.36,1)_both]"}`}
+          className={`border-b border-accent/15 bg-white/95 motion-safe:will-change-transform ${showSplash ? "motion-safe:[transform:translateY(100%)]" : "motion-safe:animate-[landing-header-reveal_4000ms_cubic-bezier(0.22,1,0.36,1)_both]"}`}
         >
           <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
             <div className="flex items-center">
               <Link
                 href="/"
-                className="text-[2rem] leading-none font-semibold tracking-[-0.06em]"
+                className="text-[2rem] leading-none font-semibold tracking-[-0.06em] transition-colors hover:text-accent"
               >
                 IRINA
               </Link>
@@ -544,7 +547,7 @@ export function CreativePortfolioLanding({
             <div className="flex justify-center">
               <Link
                 href="/gallery"
-                className="border-b border-transparent text-xs text-black/55 transition duration-200 hover:border-black/30 hover:text-black/80 md:text-[1.95rem] md:leading-none"
+                className="border-b border-transparent text-xs text-ink/60 transition duration-200 hover:border-accent/45 hover:text-accent md:text-[1.95rem] md:leading-none"
               >
                 {labels.list}
               </Link>
@@ -558,13 +561,13 @@ export function CreativePortfolioLanding({
               />
               <Link
                 href="/about"
-                className="border-b border-transparent text-black/40 transition duration-200 hover:border-black/25 hover:text-black/70"
+                className="border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent"
               >
                 {labels.about}
               </Link>
               <Link
                 href="/contact"
-                className="border-b border-transparent text-black/40 transition duration-200 hover:border-black/25 hover:text-black/70"
+                className="border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent"
               >
                 {labels.contact}
               </Link>
@@ -612,7 +615,7 @@ export function CreativePortfolioLanding({
                           fill
                           draggable={false}
                           sizes="(max-width: 768px) 62vw, 22vw"
-                          className="object-cover object-center contrast-105 saturate-105"
+                          className="object-cover object-center contrast-105 saturate-105 transition-transform duration-300 ease-in-out' group-hover:scale-[1.02]"
                           priority={
                             (item.id === "g1" || item.id === "g2") &&
                             item.copyIndex === centerLoopCopyIndex
@@ -632,12 +635,12 @@ export function CreativePortfolioLanding({
           </div>
         </section>
 
-        <footer className="flex flex-col items-center gap-4 py-4 md:gap-5 md:pb-6">
+        <footer className="flex flex-col items-center gap-4 py-1 md:gap-5 md:pb-6">
           <div id="about" aria-hidden="true" className="h-0 overflow-hidden" />
 
           <div
             id="contact"
-            className="flex h-16 w-full items-end justify-center overflow-hidden pb-1 md:h-24 md:pb-2"
+            className="flex h-16 w-full items-end justify-center overflow-hidden pb-1  md:pb-2"
           >
             {hoveredArtworkTitle ? (
               <p
@@ -654,7 +657,7 @@ export function CreativePortfolioLanding({
               {Array.from({ length: progressSegments }).map((_, index) => (
                 <span
                   key={index}
-                  className={`h-px w-7 md:w-14 ${index <= activeSegment ? "bg-black" : "bg-black/24"}`}
+                  className={`h-px w-7 md:w-14 ${index <= activeSegment ? "bg-accent" : "bg-accent/28"}`}
                 />
               ))}
             </div>
