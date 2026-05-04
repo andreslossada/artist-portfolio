@@ -19,6 +19,7 @@ const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 10;
 const mouseDragScrollFactor = 0.7;
 const shownSplashThemes = new Set<Theme>();
+let hasShownLandingHeaderReveal = false;
 
 type CreativePortfolioLandingProps = {
   locale: Locale;
@@ -90,6 +91,7 @@ export function CreativePortfolioLanding({
     null,
   );
   const [showSplash, setShowSplash] = useState(() => !shownSplashThemes.has(theme));
+  const [shouldAnimateHeader] = useState(() => !hasShownLandingHeaderReveal);
   const [isSliderIntroReady, setIsSliderIntroReady] = useState(false);
   const markSliderIntroReady = useCallback(() => {
     window.requestAnimationFrame(() => {
@@ -100,6 +102,14 @@ export function CreativePortfolioLanding({
     shownSplashThemes.add(theme);
     setShowSplash(false);
   }, [theme]);
+
+  useEffect(() => {
+    if (!shouldAnimateHeader || showSplash) {
+      return;
+    }
+
+    hasShownLandingHeaderReveal = true;
+  }, [shouldAnimateHeader, showSplash]);
 
   const syncRailLoopState = useCallback(() => {
     const rail = railRef.current;
@@ -543,49 +553,60 @@ export function CreativePortfolioLanding({
       ) : null}
 
       <div className="fixed inset-x-0 top-0 z-30 overflow-hidden">
-        <header
-          className={`border-b border-accent/15 bg-transparent motion-safe:will-change-transform ${showSplash ? "motion-safe:[transform:translateY(100%)]" : "motion-safe:animate-[landing-header-reveal_4000ms_cubic-bezier(0.22,1,0.36,1)_both]"}`}
+        <ViewTransition
+          name="site-header"
+          enter="none"
+          exit="none"
+          share="none"
+          update="none"
         >
-          <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
-            <div className="flex items-center">
-              <Link
-                href="/"
-                className="inline-flex h-8 items-center text-[2rem] leading-none font-semibold tracking-[-0.06em] transition-colors hover:text-accent md:h-10"
-              >
-                IRINA
-              </Link>
-            </div>
+          <header
+            className={`border-b border-accent/15 bg-transparent motion-safe:will-change-transform ${showSplash ? "motion-safe:[transform:translateY(100%)]" : shouldAnimateHeader ? "motion-safe:animate-[landing-header-reveal_4000ms_cubic-bezier(0.22,1,0.36,1)_both]" : ""}`}
+          >
+            <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
+              <div className="flex items-center">
+                <Link
+                  href="/"
+                  transitionTypes={["header-nav"]}
+                  className="inline-flex h-8 items-center text-[2rem] leading-none font-semibold tracking-[-0.06em] transition-colors hover:text-accent md:h-10"
+                >
+                  IRINA
+                </Link>
+              </div>
 
-            <div className="flex items-center justify-center">
-              <ViewModeSwitch />
-            </div>
+              <div className="flex items-center justify-center">
+                <ViewModeSwitch />
+              </div>
 
-            <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
-              <LanguageSwitcher
-                locale={locale}
-                labels={languageLabels}
-                className="mr-1 md:mr-2"
-              />
-              <ThemeSwitcher
-                theme={theme}
-                labels={themeLabels}
-                className="mr-1 md:mr-2"
-              />
-              <Link
-                href="/about"
-                className="inline-flex h-8 items-center border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent md:h-10"
-              >
-                {labels.about}
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex h-8 items-center border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent md:h-10"
-              >
-                {labels.contact}
-              </Link>
-            </nav>
-          </div>
-        </header>
+              <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
+                <LanguageSwitcher
+                  locale={locale}
+                  labels={languageLabels}
+                  className="mr-1 md:mr-2"
+                />
+                <ThemeSwitcher
+                  theme={theme}
+                  labels={themeLabels}
+                  className="mr-1 md:mr-2"
+                />
+                <Link
+                  href="/about"
+                  transitionTypes={["header-nav"]}
+                  className="inline-flex h-8 items-center border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent md:h-10"
+                >
+                  {labels.about}
+                </Link>
+                <Link
+                  href="/contact"
+                  transitionTypes={["header-nav"]}
+                  className="inline-flex h-8 items-center border-b border-transparent text-ink/45 transition duration-200 hover:border-accent/40 hover:text-accent md:h-10"
+                >
+                  {labels.contact}
+                </Link>
+              </nav>
+            </div>
+          </header>
+        </ViewTransition>
       </div>
 
       <main className="mx-auto flex h-screen w-full max-w-425 flex-col overflow-hidden px-5 pt-22 md:px-10 md:pt-[8.7rem]">
@@ -611,6 +632,7 @@ export function CreativePortfolioLanding({
                 >
                   <Link
                     href={`/artwork/${item.slug}?vt=${item.loopKey}`}
+                    transitionTypes={["artwork-open"]}
                     className="block h-full w-full outline-none"
                   >
                     <ViewTransition
@@ -626,8 +648,8 @@ export function CreativePortfolioLanding({
                           alt={`${item.title} - ${item.category}`}
                           fill
                           draggable={false}
-                          sizes="(max-width: 768px) 62vw, 22vw"
-                          className="object-cover object-center contrast-105 saturate-105 transition-transform duration-300 ease-in-out' group-hover:scale-[1.02]"
+                          sizes="(max-width: 768px) 62vw, 22rem"
+                          className="object-cover object-center contrast-105 saturate-105 transition-transform duration-300 ease-in-out group-hover:scale-[1.02]"
                           priority={
                             (item.id === "g1" || item.id === "g2") &&
                             item.copyIndex === centerLoopCopyIndex

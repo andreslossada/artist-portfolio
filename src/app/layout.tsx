@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { ViewTransition } from "react";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 import { getTheme } from "@/lib/theme";
@@ -42,7 +43,31 @@ export default async function RootLayout({
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
       <body className="bg-canvas text-ink flex min-h-full flex-col">
-        {children}
+        <ViewTransition
+          default="page-shell"
+          enter={{
+            default: "page-shell",
+            "artwork-open": "none",
+            "header-nav": "page-shell",
+          }}
+          exit={{
+            default: "page-shell",
+            "artwork-open": "none",
+            "header-nav": "page-shell",
+          }}
+          share={{
+            default: "page-shell",
+            "artwork-open": "none",
+            "header-nav": "page-shell",
+          }}
+          update={{
+            default: "page-shell",
+            "artwork-open": "none",
+            "header-nav": "page-shell",
+          }}
+        >
+          {children}
+        </ViewTransition>
       </body>
     </html>
   );

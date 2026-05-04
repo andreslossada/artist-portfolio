@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Irina favicon">
+  <defs>
+    <linearGradient id="bg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#15243a" />
+      <stop offset="1" stop-color="#2b5fa8" />
+    </linearGradient>
+    <linearGradient id="glow" x1="20" y1="14" x2="48" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="1" stop-color="#dce9ff" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#bg)" />
+  <rect x="18" y="15" width="28" height="6" rx="2" fill="url(#glow)" />
+  <rect x="28" y="21" width="8" height="23" rx="3" fill="url(#glow)" />
+  <rect x="18" y="44" width="28" height="6" rx="2" fill="url(#glow)" />
+  <circle cx="45" cy="22" r="4" fill="#9cc7ff" />
+</svg>

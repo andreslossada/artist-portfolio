@@ -12,6 +12,7 @@ type ViewModeSwitchProps = {
 export function ViewModeSwitch({ className }: ViewModeSwitchProps) {
   const pathname = usePathname();
   const isColumnsActive = pathname === "/";
+  const isGridActive = pathname === "/gallery";
 
   return (
     <div
@@ -23,6 +24,7 @@ export function ViewModeSwitch({ className }: ViewModeSwitchProps) {
     >
       <Link
         href="/"
+        transitionTypes={["header-nav"]}
         aria-label="Columnas"
         title="Columnas"
         aria-current={isColumnsActive ? "page" : undefined}
@@ -43,12 +45,13 @@ export function ViewModeSwitch({ className }: ViewModeSwitchProps) {
       </Link>
       <Link
         href="/gallery"
+        transitionTypes={["header-nav"]}
         aria-label="Grid"
         title="Grid"
-        aria-current={!isColumnsActive ? "page" : undefined}
+        aria-current={isGridActive ? "page" : undefined}
         className={cn(
           "focus-visible:ring-accent/40 focus-visible:ring-offset-canvas inline-flex h-full w-8 items-center justify-center rounded-none border border-transparent transition duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none md:w-10",
-          !isColumnsActive
+          isGridActive
             ? "border-accent bg-accent !text-white shadow-[0_4px_12px_rgba(43,95,168,0.3)]"
             : "text-ink/60 hover:border-accent/45 hover:text-accent",
         )}
@@ -56,7 +59,7 @@ export function ViewModeSwitch({ className }: ViewModeSwitchProps) {
         <LayoutGrid
           className={cn(
             "h-4 w-4 md:h-5 md:w-5",
-            !isColumnsActive && "!text-white",
+            isGridActive && "!text-white",
           )}
           aria-hidden="true"
         />

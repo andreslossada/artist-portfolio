@@ -58,11 +58,11 @@ export default async function ContactPage() {
               href={channel.href}
               target={channel.href.startsWith("http") ? "_blank" : undefined}
               rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
-              className={`border-ink/10 shadow-card border p-6 transition hover:-translate-y-0.5 ${
-                isEmail
-                  ? "bg-accent !text-white hover:border-accent/80"
-                  : "hover:border-accent/30 bg-surface"
-              }`}
+              className={`contact-card border-ink/10 shadow-card border p-6 transition-all duration-300 ease-out ${
+                  isEmail
+                    ? "bg-accent !text-white hover:border-accent/80"
+                    : "hover:border-accent/30 bg-surface hover:scale-[1.02]"
+                }`}
             >
               <p
                 className={`text-xs tracking-[0.2em] uppercase ${

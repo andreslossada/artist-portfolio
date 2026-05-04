@@ -50,7 +50,7 @@ const dictionaries = {
       eyebrow: "Sobre mí",
       title: "Un universo marino entre sueño y calma",
       description:
-        "La obra de Irina es un viaje visual onírico e inmersivo, profundamente inspirado en la energía de la playa y el océano. Su estilo destaca por el uso de pinceladas texturizadas y fluidas que imitan el movimiento del agua, combinando tonos fríos y relajantes con destellos cálidos y vibrantes. A través de figuras etéreas, sirenas y elementos marinos, su arte captura la magia del mar, invitando al espectador a sumergirse en un mundo tranquilo y lleno de fantasía.",
+        "La obra de Irina es un viaje visual profundamente inspirado en la energía de la playa y el océano. Su estilo destaca por el uso de pinceladas texturizadas y fluidas que imitan el movimiento del agua, combinando tonos fríos y relajantes con destellos cálidos y vibrantes. A través de figuras etéreas, sirenas y elementos marinos, su arte captura la magia del mar, invitando al espectador a sumergirse en un mundo tranquilo y lleno de fantasía.",
       visualTags: [
         "Onírico",
         "Inmersivo",
