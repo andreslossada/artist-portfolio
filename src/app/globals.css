@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --theme-transition-duration: 620ms;
+  --theme-transition-duration: 920ms;
   --theme-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --page-transition-exit-duration: 220ms;
-  --page-transition-enter-duration: 320ms;
+  --page-transition-exit-duration: 420ms;
+  --page-transition-enter-duration: 420ms;
   --page-transition-overlap: 110ms;
   --page-transition-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --page-transition-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
