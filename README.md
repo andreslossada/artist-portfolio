@@ -50,7 +50,14 @@ Flujo esperado:
 
 1. La artista crea/publica una obra en `/studio` con `forSale=true` y `price`.
 2. Un webhook de Sanity llama al endpoint anterior con el `_id` del documento.
-3. El servidor crea Product + Price en Stripe y escribe `stripePriceId` de vuelta en Sanity.
+3. El servidor crea/actualiza Product en Stripe y mantiene `stripeProductId` + `stripePriceId` en Sanity.
+
+Sincronización de cambios:
+
+- Si cambias `title` o `slug` en Sanity, se actualiza el Product en Stripe.
+- Si cambias `price` en Sanity, se crea un nuevo Price en Stripe y se reemplaza `stripePriceId`.
+- Si pones `forSale=false`, el Product se marca como inactivo en Stripe.
+- Si vuelves a `forSale=true`, el Product se reactiva y se asegura un Price válido.
 
 Variables requeridas para este flujo:
 
