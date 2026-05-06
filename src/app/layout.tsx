@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Manrope } from "next/font/google";
-import { ViewTransition } from "react";
+import { Lora, Manrope } from "next/font/google";
+import { RootViewTransition } from "@/components/ui/root-view-transition";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 import { getTheme } from "@/lib/theme";
 import "./globals.css";
 
-const display = Cormorant_Garamond({
+const display = Lora({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const sans = Manrope({
@@ -43,31 +43,9 @@ export default async function RootLayout({
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
       <body className="bg-canvas text-ink flex min-h-full flex-col">
-        <ViewTransition
-          default="page-shell"
-          enter={{
-            default: "page-shell",
-            "artwork-open": "none",
-            "header-nav": "page-shell",
-          }}
-          exit={{
-            default: "page-shell",
-            "artwork-open": "none",
-            "header-nav": "page-shell",
-          }}
-          share={{
-            default: "page-shell",
-            "artwork-open": "none",
-            "header-nav": "page-shell",
-          }}
-          update={{
-            default: "page-shell",
-            "artwork-open": "none",
-            "header-nav": "page-shell",
-          }}
-        >
+        <RootViewTransition>
           {children}
-        </ViewTransition>
+        </RootViewTransition>
       </body>
     </html>
   );
