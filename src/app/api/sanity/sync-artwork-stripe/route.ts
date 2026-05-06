@@ -13,6 +13,7 @@ type SanityArtworkForSync = {
     current?: string;
   };
   price?: number;
+  stripeProductId?: string;
   stripePriceId?: string;
   forSale?: boolean;
 };
@@ -22,6 +23,7 @@ const artworkByIdQuery = `*[_type == "artwork" && _id == $id][0]{
   title,
   slug,
   price,
+  stripeProductId,
   stripePriceId,
   forSale
 }`;
@@ -60,6 +62,13 @@ export async function POST(request: Request) {
   }
 
   if (!artwork.forSale) {
+    if (artwork.stripeProductId) {
+      const stripe = getStripeServerClient();
+      await stripe.products.update(artwork.stripeProductId, {
+        active: false,
+      });
+    }
+
     return NextResponse.json({ ok: true, skipped: "not-for-sale" });
   }
 
@@ -70,41 +79,79 @@ export async function POST(request: Request) {
     );
   }
 
-  if (artwork.stripePriceId) {
-    return NextResponse.json({
-      ok: true,
-      stripePriceId: artwork.stripePriceId,
-      skipped: "already-has-price",
+  const stripe = getStripeServerClient();
+
+  const expectedAmount = Math.round(artwork.price * 100);
+
+  let stripeProductId = artwork.stripeProductId;
+
+  if (!stripeProductId) {
+    const product = await stripe.products.create({
+      name: artwork.title,
+      description: `Artwork slug: ${artwork.slug.current}`,
+      active: true,
+      metadata: {
+        sanityArtworkId: artwork._id,
+        sanitySlug: artwork.slug.current,
+      },
+    });
+    stripeProductId = product.id;
+  } else {
+    await stripe.products.update(stripeProductId, {
+      name: artwork.title,
+      description: `Artwork slug: ${artwork.slug.current}`,
+      active: true,
+      metadata: {
+        sanityArtworkId: artwork._id,
+        sanitySlug: artwork.slug.current,
+      },
     });
   }
 
-  const stripe = getStripeServerClient();
+  let stripePriceId = artwork.stripePriceId;
+  let shouldCreatePrice = !stripePriceId;
 
-  const product = await stripe.products.create({
-    name: artwork.title,
-    description: `Artwork slug: ${artwork.slug.current}`,
-    metadata: {
-      sanityArtworkId: artwork._id,
-      sanitySlug: artwork.slug.current,
-    },
-  });
+  if (stripePriceId) {
+    try {
+      const existingPrice = await stripe.prices.retrieve(stripePriceId);
+      const hasExpectedAmount = existingPrice.unit_amount === expectedAmount;
+      const hasExpectedCurrency = existingPrice.currency === "usd";
+      const hasExpectedProduct =
+        (typeof existingPrice.product === "string"
+          ? existingPrice.product
+          : existingPrice.product.id) === stripeProductId;
 
-  const price = await stripe.prices.create({
-    product: product.id,
-    currency: "usd",
-    unit_amount: Math.round(artwork.price * 100),
-  });
+      shouldCreatePrice =
+        !existingPrice.active ||
+        !hasExpectedAmount ||
+        !hasExpectedCurrency ||
+        !hasExpectedProduct;
+    } catch {
+      shouldCreatePrice = true;
+    }
+  }
+
+  if (shouldCreatePrice) {
+    const newPrice = await stripe.prices.create({
+      product: stripeProductId,
+      currency: "usd",
+      unit_amount: expectedAmount,
+    });
+    stripePriceId = newPrice.id;
+  }
 
   await sanity
     .patch(artwork._id)
     .set({
-      stripePriceId: price.id,
+      stripeProductId,
+      stripePriceId,
     })
     .commit();
 
   return NextResponse.json({
     ok: true,
-    stripePriceId: price.id,
-    stripeProductId: product.id,
+    stripePriceId,
+    stripeProductId,
+    priceCreated: shouldCreatePrice,
   });
 }

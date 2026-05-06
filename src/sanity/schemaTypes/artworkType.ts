@@ -70,6 +70,18 @@ export const artworkType = defineType({
       validation: (rule) => rule.required().positive(),
     }),
     defineField({
+      name: "stripeProductId",
+      title: "Stripe Product ID",
+      type: "string",
+      description: "Product ID from Stripe (e.g. prod_123)",
+      validation: (rule) =>
+        rule.regex(/^prod_/, {
+          name: "product id",
+          invert: false,
+        }),
+      readOnly: true,
+    }),
+    defineField({
       name: "stripePriceId",
       title: "Stripe Price ID",
       type: "string",
