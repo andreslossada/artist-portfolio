@@ -10,6 +10,7 @@ export type Artwork = {
   excerpt: string;
   price: number;
   category: string;
+  stripePriceId: string;
 };
 
 export type Product = {

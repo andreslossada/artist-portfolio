@@ -19,6 +19,9 @@ const dictionaries = {
       contactTitle: "Contacto | Estudio Irina",
       contactDescription:
         "Contacta al estudio para adquisiciones, comisiones, exposiciones o prensa.",
+      cartTitle: "Carrito | Estudio Irina",
+      cartDescription:
+        "Revisa las obras seleccionadas y continúa el pago con Stripe.",
     },
     header: {
       home: "Inicio",
@@ -35,10 +38,15 @@ const dictionaries = {
       projects: "Proyectos",
       about: "Sobre mí",
       contact: "Contacto",
+      cart: "Carrito",
     },
     galleryPage: {
       eyebrow: "Galería",
       title: "Archivo de obra",
+    },
+    listPage: {
+      eyebrow: "Lista",
+      title: "Obras en lista",
     },
     shopPage: {
       eyebrow: "Tienda",
@@ -97,6 +105,17 @@ const dictionaries = {
         "Si te interesa adquirir una pieza o una edición limitada, puedes explorar la tienda y escribirnos para recibir ficha técnica completa, disponibilidad y opciones de entrega local.",
       goToShop: "Ir a tienda",
       viewArtwork: "Ver obra",
+      cart: {
+        title: "Carrito de obra",
+        empty: "Tu carrito está vacío.",
+        subtotal: "Subtotal",
+        checkout: "Pagar con Stripe",
+        clear: "Vaciar carrito",
+        remove: "Quitar",
+        loading: "Redirigiendo...",
+        error: "No se pudo iniciar el checkout. Intenta de nuevo.",
+        success: "Pago completado. Carrito vaciado.",
+      },
     },
     artworkPage: {
       backToGallery: "Volver a galería",
@@ -105,6 +124,8 @@ const dictionaries = {
       dimension: "Dimensión",
       year: "Año",
       shopCta: "Adquirir prints o catálogo",
+      addToCart: "Agregar al carrito",
+      viewCart: "Ver carrito",
     },
   },
   en: {
@@ -125,6 +146,9 @@ const dictionaries = {
       contactTitle: "Contact | Estudio Irina",
       contactDescription:
         "Contact the studio for acquisitions, commissions, exhibitions, or press.",
+      cartTitle: "Cart | Estudio Irina",
+      cartDescription:
+        "Review selected artworks and continue checkout with Stripe.",
     },
     header: {
       home: "Home",
@@ -141,10 +165,15 @@ const dictionaries = {
       projects: "Projects",
       about: "About",
       contact: "Contact",
+      cart: "Cart",
     },
     galleryPage: {
       eyebrow: "Gallery",
       title: "Artwork archive",
+    },
+    listPage: {
+      eyebrow: "List",
+      title: "Artworks in list view",
     },
     shopPage: {
       eyebrow: "Shop",
@@ -198,6 +227,17 @@ const dictionaries = {
         "If you are interested in acquiring a piece or a limited edition, you can explore the shop and contact us for a full technical sheet, availability, and local delivery options.",
       goToShop: "Go to shop",
       viewArtwork: "View artwork",
+      cart: {
+        title: "Artwork cart",
+        empty: "Your cart is empty.",
+        subtotal: "Subtotal",
+        checkout: "Pay with Stripe",
+        clear: "Clear cart",
+        remove: "Remove",
+        loading: "Redirecting...",
+        error: "Checkout could not be started. Please try again.",
+        success: "Payment completed. Cart cleared.",
+      },
     },
     artworkPage: {
       backToGallery: "Back to gallery",
@@ -206,6 +246,8 @@ const dictionaries = {
       dimension: "Dimensions",
       year: "Year",
       shopCta: "Acquire prints or catalog",
+      addToCart: "Add to cart",
+      viewCart: "View cart",
     },
   },
 } as const;

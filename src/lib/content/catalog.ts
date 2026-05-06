@@ -76,6 +76,8 @@ export const artworks: Artwork[] = artworkImageFiles.map((fileName, index) => {
   const slug = toArtworkSlug(fileName, index);
   const title = `${pickByHash(artworkTitlePool, fileName, "title")} ${String(index + 1).padStart(2, "0")}`;
   const description = pickByHash(artworkDescriptionPool, fileName, "description");
+  const envKey = `STRIPE_PRICE_ID_ARTWORK_${String(index + 1).padStart(2, "0")}`;
+  const stripePriceId = process.env[envKey] ?? "";
 
   return {
     id: `g${index + 1}`,
@@ -89,6 +91,7 @@ export const artworks: Artwork[] = artworkImageFiles.map((fileName, index) => {
     excerpt: description,
     price: pickByHash(artworkPricePool, fileName, "price"),
     category: pickByHash(artworkCategoryPool, fileName, "category"),
+    stripePriceId,
   };
 });
 
