@@ -38,6 +38,26 @@ npm run dev
 - `npm run build`: compilación de producción.
 - `npm run format`: formatea con Prettier.
 
+## Sanity + Stripe auto-sync
+
+El proyecto incluye un endpoint para automatizar el `stripePriceId` al publicar obras en Sanity:
+
+- Endpoint: `POST /api/sanity/sync-artwork-stripe`
+- Header requerido: `x-sanity-sync-secret: <SANITY_STRIPE_SYNC_SECRET>`
+- Payload mínimo: `{ "_id": "<sanity-document-id>" }`
+
+Flujo esperado:
+
+1. La artista crea/publica una obra en `/studio` con `forSale=true` y `price`.
+2. Un webhook de Sanity llama al endpoint anterior con el `_id` del documento.
+3. El servidor crea Product + Price en Stripe y escribe `stripePriceId` de vuelta en Sanity.
+
+Variables requeridas para este flujo:
+
+- `SANITY_API_WRITE_TOKEN` (token con permisos de escritura al dataset)
+- `SANITY_STRIPE_SYNC_SECRET` (secreto compartido con webhook de Sanity)
+- `STRIPE_SECRET_KEY`
+
 ## Estructura inicial
 
 - `src/app/(marketing)/page.tsx`: landing principal.

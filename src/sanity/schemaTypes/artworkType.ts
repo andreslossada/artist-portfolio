@@ -75,10 +75,11 @@ export const artworkType = defineType({
       type: "string",
       description: "Price ID from Stripe (e.g. price_123)",
       validation: (rule) =>
-        rule.required().regex(/^price_/, {
+        rule.regex(/^price_/, {
           name: "price id",
           invert: false,
         }),
+      readOnly: true,
     }),
     defineField({
       name: "forSale",
