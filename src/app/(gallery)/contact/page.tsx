@@ -101,6 +101,7 @@ export default async function ContactPage() {
           </Link>
         </div>
       </section>
+
     </main>
   );
 }
