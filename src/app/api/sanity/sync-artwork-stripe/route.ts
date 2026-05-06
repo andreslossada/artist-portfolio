@@ -20,20 +20,10 @@ type SanityArtworkForSync = {
 
 type ArtworkLookup = {
   published: SanityArtworkForSync | null;
-  draft: SanityArtworkForSync | null;
 };
 
 const artworkByIdQuery = `{
   "published": *[_type == "artwork" && _id == $publishedId][0]{
-    _id,
-    title,
-    slug,
-    price,
-    stripeProductId,
-    stripePriceId,
-    forSale
-  },
-  "draft": *[_type == "artwork" && _id == $draftId][0]{
     _id,
     title,
     slug,
@@ -66,21 +56,19 @@ export async function POST(request: Request) {
   }
 
   const publishedId = payload._id.replace(/^drafts\./, "");
-  const draftId = `drafts.${publishedId}`;
 
   const sanity = getSanityServerClient();
   const lookup = await sanity.fetch<ArtworkLookup>(
     artworkByIdQuery,
     {
       publishedId,
-      draftId,
     },
   );
 
-  const artwork = lookup.draft ?? lookup.published;
+  const artwork = lookup.published;
 
   if (!artwork) {
-    return NextResponse.json({ error: "Artwork not found" }, { status: 404 });
+    return NextResponse.json({ ok: true, skipped: "awaiting-publish" });
   }
 
   if (!artwork.forSale) {
@@ -105,7 +93,7 @@ export async function POST(request: Request) {
 
   const expectedAmount = Math.round(artwork.price * 100);
 
-  let stripeProductId = artwork.stripeProductId ?? lookup.published?.stripeProductId;
+  let stripeProductId = artwork.stripeProductId;
 
   if (!stripeProductId) {
     const existingProducts = await stripe.products.search({
@@ -127,19 +115,19 @@ export async function POST(request: Request) {
       });
       stripeProductId = product.id;
     }
-  } else {
-    await stripe.products.update(stripeProductId, {
-      name: artwork.title,
-      description: `Artwork slug: ${artwork.slug.current}`,
-      active: true,
-      metadata: {
-        sanityArtworkId: publishedId,
-        sanitySlug: artwork.slug.current,
-      },
-    });
   }
 
-  let stripePriceId = artwork.stripePriceId ?? lookup.published?.stripePriceId;
+  await stripe.products.update(stripeProductId, {
+    name: artwork.title,
+    description: `Artwork slug: ${artwork.slug.current}`,
+    active: true,
+    metadata: {
+      sanityArtworkId: publishedId,
+      sanitySlug: artwork.slug.current,
+    },
+  });
+
+  let stripePriceId = artwork.stripePriceId;
   let shouldCreatePrice = !stripePriceId;
 
   if (stripePriceId) {
@@ -169,24 +157,31 @@ export async function POST(request: Request) {
       unit_amount: expectedAmount,
     });
     stripePriceId = newPrice.id;
-  }
 
-  const docsToPatch = [lookup.published?._id, lookup.draft?._id].filter(
-    (id): id is string => Boolean(id),
-  );
-
-  let transaction = sanity.transaction();
-
-  for (const id of docsToPatch) {
-    transaction = transaction.patch(id, {
-      set: {
-        stripeProductId,
-        stripePriceId,
-      },
+    const activePrices = await stripe.prices.list({
+      product: stripeProductId,
+      active: true,
+      limit: 100,
     });
+
+    await Promise.all(
+      activePrices.data
+        .filter((price) => price.id !== stripePriceId)
+        .map((price) =>
+          stripe.prices.update(price.id, {
+            active: false,
+          }),
+        ),
+    );
   }
 
-  await transaction.commit();
+  await sanity
+    .patch(artwork._id)
+    .set({
+      stripeProductId,
+      stripePriceId,
+    })
+    .commit();
 
   return NextResponse.json({
     ok: true,
