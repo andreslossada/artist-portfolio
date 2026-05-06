@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 type HeaderNavLinkProps = {
-  href: "/about" | "/contact";
+  href: "/about" | "/contact" | "/cart";
   children: React.ReactNode;
 };
 

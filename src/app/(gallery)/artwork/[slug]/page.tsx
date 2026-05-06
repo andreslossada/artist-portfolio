@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
+import { ArtworkCartCta } from "@/components/ui/artwork-cart-cta";
 import { artworks, getArtworkBySlug } from "@/lib/content/catalog";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
@@ -89,12 +90,21 @@ export default async function ArtworkDetailPage({
           </dl>
 
           <div className="border-ink/10 mt-10 border-t pt-8 md:mt-auto">
-            <Link
-              href={`/contact?fromArtwork=${artwork.slug}`}
-              className="bg-accent inline-flex h-11 items-center justify-center border border-accent px-5 text-sm font-semibold !text-white transition hover:brightness-110"
-            >
-              {dict.artworkPage.shopCta}
-            </Link>
+            <div className="flex flex-wrap gap-3">
+              <ArtworkCartCta
+                artwork={artwork}
+                labels={{
+                  addToCart: dict.artworkPage.addToCart,
+                  viewCart: dict.artworkPage.viewCart,
+                }}
+              />
+              <Link
+                href={`/contact?fromArtwork=${artwork.slug}`}
+                className="border-accent/35 text-accent hover:bg-accent-soft/55 inline-flex h-11 items-center justify-center border px-5 text-sm font-semibold transition"
+              >
+                {dict.artworkPage.shopCta}
+              </Link>
+            </div>
           </div>
         </div>
       </article>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
+import { HeaderCartLink } from "@/components/ui/header-cart-link";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { HeaderNavLink } from "@/components/ui/header-nav-link";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
@@ -51,6 +52,7 @@ export async function SiteHeader() {
             <HeaderNavLink href="/about">
               {dict.landing.about}
             </HeaderNavLink>
+            <HeaderCartLink label={dict.landing.cart} />
             <HeaderNavLink href="/contact">
               {dict.landing.contact}
             </HeaderNavLink>
