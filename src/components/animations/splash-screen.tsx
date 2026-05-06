@@ -12,7 +12,7 @@ type SplashScreenProps = {
 const SPLASH_FADE_MS = 500;
 const SPLASH_MAX_DURATION_MS = 9000;
 const IRINA_SVG_URL = "/Irina.svg";
-const SWEEP_DURATION = 2.5;
+const SWEEP_DURATION = 0.5;
 
 export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
@@ -90,8 +90,41 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
         }
       });
 
+      const timeline = gsap.timeline({
+        defaults: { ease: "power2.out" },
+        onComplete: finishSplash,
+      });
+
+      timeline.fromTo(
+        "[data-splash-logo]",
+        {
+          opacity: 0,
+          y: 16,
+          scale: 0.985,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.35,
+        },
+      );
+
+      timeline.fromTo(
+        "[data-splash-reveal]",
+        {
+          clipPath: "inset(0 100% 0 0)",
+        },
+        {
+          clipPath: "inset(0 0% 0 0)",
+          duration: SWEEP_DURATION,
+          ease: "power2.inOut",
+        },
+        0.06,
+      );
+
       if (orderedPaths.length === 0) {
-        finishSplash();
+        timeline.to({}, { duration: SWEEP_DURATION * 0.5 }, SWEEP_DURATION);
         return;
       }
 
@@ -132,39 +165,6 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
       const minX = Math.min(...pathMetrics.map((metric) => metric.x));
       const maxX = Math.max(...pathMetrics.map((metric) => metric.x));
       const xSpan = Math.max(1, maxX - minX);
-
-      const timeline = gsap.timeline({
-        defaults: { ease: "power2.out" },
-        onComplete: finishSplash,
-      });
-
-      timeline.fromTo(
-        "[data-splash-logo]",
-        {
-          opacity: 0,
-          y: 16,
-          scale: 0.985,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.45,
-        },
-      );
-
-      timeline.fromTo(
-        "[data-splash-reveal]",
-        {
-          clipPath: "inset(0 100% 0 0)",
-        },
-        {
-          clipPath: "inset(0 0% 0 0)",
-          duration: SWEEP_DURATION,
-          ease: "power2.inOut",
-        },
-        0.08,
-      );
 
       let latestPathEnd = 0;
 
