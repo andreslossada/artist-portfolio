@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
-import { artworks } from "@/lib/content/catalog";
+import { getArtworks } from "@/lib/artworks";
 
-export function FeaturedArtworks() {
+export async function FeaturedArtworks() {
+  const artworks = await getArtworks();
+
   return (
     <section className="mt-14">
       <div className="mb-6 flex items-end justify-between gap-6">

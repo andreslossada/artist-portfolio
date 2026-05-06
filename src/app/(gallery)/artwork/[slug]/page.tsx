@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 import { ArtworkCartCta } from "@/components/ui/artwork-cart-cta";
-import { artworks, getArtworkBySlug } from "@/lib/content/catalog";
+import { getArtworkBySlug, getArtworks } from "@/lib/artworks";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 
@@ -12,7 +12,8 @@ type ArtworkDetailPageProps = {
   searchParams: Promise<{ vt?: string }>;
 };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const artworks = await getArtworks();
   return artworks.map((artwork) => ({ slug: artwork.slug }));
 }
 
@@ -24,7 +25,7 @@ export default async function ArtworkDetailPage({
   const dict = getDictionary(locale);
   const { slug } = await params;
   const { vt } = await searchParams;
-  const artwork = getArtworkBySlug(slug);
+  const artwork = await getArtworkBySlug(slug);
 
   if (!artwork) {
     notFound();

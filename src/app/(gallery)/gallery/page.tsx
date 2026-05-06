@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
-import { artworks } from "@/lib/content/catalog";
+import { getArtworks } from "@/lib/artworks";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 
 export default async function GalleryPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
+  const artworks = await getArtworks();
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
