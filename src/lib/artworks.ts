@@ -1,6 +1,5 @@
 import { cache } from "react";
 import type { SanityImageSource } from "@sanity/image-url";
-import { artworks as fallbackArtworks } from "@/lib/content/catalog";
 import { urlForImage } from "@/lib/sanity/image";
 import { getSanityClient, sanityReady } from "@/lib/sanity/client";
 import {
@@ -50,7 +49,7 @@ function toArtwork(item: SanityArtwork): Artwork | null {
 
 export const getArtworks = cache(async (): Promise<Artwork[]> => {
   if (!sanityReady()) {
-    return fallbackArtworks;
+    return [];
   }
 
   const docs = await getSanityClient().fetch<SanityArtwork[]>(artworksQuery);
@@ -58,12 +57,12 @@ export const getArtworks = cache(async (): Promise<Artwork[]> => {
     .map((item) => toArtwork(item))
     .filter((item): item is Artwork => item !== null);
 
-  return mapped.length > 0 ? mapped : fallbackArtworks;
+  return mapped;
 });
 
 export const getArtworkBySlug = cache(async (slug: string) => {
   if (!sanityReady()) {
-    return fallbackArtworks.find((artwork) => artwork.slug === slug) ?? null;
+    return null;
   }
 
   const doc = await getSanityClient().fetch<SanityArtwork | null>(

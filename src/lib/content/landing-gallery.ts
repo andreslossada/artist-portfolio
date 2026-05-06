@@ -1,3 +1,5 @@
-import { artworks } from "@/lib/content/catalog";
+import { getArtworks } from "@/lib/artworks";
 
-export const landingGalleryItems = artworks;
+export async function getLandingGalleryItems() {
+  return getArtworks();
+}
