@@ -20,10 +20,20 @@ type SanityArtworkForSync = {
 
 type ArtworkLookup = {
   published: SanityArtworkForSync | null;
+  draft: SanityArtworkForSync | null;
 };
 
 const artworkByIdQuery = `{
   "published": *[_type == "artwork" && _id == $publishedId][0]{
+    _id,
+    title,
+    slug,
+    price,
+    stripeProductId,
+    stripePriceId,
+    forSale
+  },
+  "draft": *[_type == "artwork" && _id == $draftId][0]{
     _id,
     title,
     slug,
@@ -56,25 +66,36 @@ export async function POST(request: Request) {
   }
 
   const publishedId = payload._id.replace(/^drafts\./, "");
+  const draftId = `drafts.${publishedId}`;
+  const isDraftEvent = payload._id.startsWith("drafts.");
 
   const sanity = getSanityServerClient();
   const lookup = await sanity.fetch<ArtworkLookup>(
     artworkByIdQuery,
     {
       publishedId,
+      draftId,
     },
   );
 
-  const artwork = lookup.published;
+  const artwork = isDraftEvent
+    ? (lookup.draft ?? lookup.published)
+    : (lookup.published ?? lookup.draft);
 
   if (!artwork) {
-    return NextResponse.json({ ok: true, skipped: "awaiting-publish" });
+    return NextResponse.json({ error: "Artwork not found" }, { status: 404 });
   }
 
+  const knownStripeProductId =
+    artwork.stripeProductId ?? lookup.published?.stripeProductId ?? lookup.draft?.stripeProductId;
+
+  const knownStripePriceId =
+    artwork.stripePriceId ?? lookup.published?.stripePriceId ?? lookup.draft?.stripePriceId;
+
   if (!artwork.forSale) {
-    if (artwork.stripeProductId) {
+    if (knownStripeProductId) {
       const stripe = getStripeServerClient();
-      await stripe.products.update(artwork.stripeProductId, {
+      await stripe.products.update(knownStripeProductId, {
         active: false,
       });
     }
@@ -93,7 +114,7 @@ export async function POST(request: Request) {
 
   const expectedAmount = Math.round(artwork.price * 100);
 
-  let stripeProductId = artwork.stripeProductId;
+  let stripeProductId = knownStripeProductId;
 
   if (!stripeProductId) {
     const existingProducts = await stripe.products.search({
@@ -127,27 +148,22 @@ export async function POST(request: Request) {
     },
   });
 
-  let stripePriceId = artwork.stripePriceId;
-  let shouldCreatePrice = !stripePriceId;
+  let stripePriceId = knownStripePriceId;
+  let shouldCreatePrice = true;
 
-  if (stripePriceId) {
-    try {
-      const existingPrice = await stripe.prices.retrieve(stripePriceId);
-      const hasExpectedAmount = existingPrice.unit_amount === expectedAmount;
-      const hasExpectedCurrency = existingPrice.currency === "usd";
-      const hasExpectedProduct =
-        (typeof existingPrice.product === "string"
-          ? existingPrice.product
-          : existingPrice.product.id) === stripeProductId;
+  const activePrices = await stripe.prices.list({
+    product: stripeProductId,
+    active: true,
+    limit: 100,
+  });
 
-      shouldCreatePrice =
-        !existingPrice.active ||
-        !hasExpectedAmount ||
-        !hasExpectedCurrency ||
-        !hasExpectedProduct;
-    } catch {
-      shouldCreatePrice = true;
-    }
+  const matchingActivePrice = activePrices.data.find(
+    (price) => price.currency === "usd" && price.unit_amount === expectedAmount,
+  );
+
+  if (matchingActivePrice) {
+    stripePriceId = matchingActivePrice.id;
+    shouldCreatePrice = false;
   }
 
   if (shouldCreatePrice) {
@@ -157,31 +173,34 @@ export async function POST(request: Request) {
       unit_amount: expectedAmount,
     });
     stripePriceId = newPrice.id;
-
-    const activePrices = await stripe.prices.list({
-      product: stripeProductId,
-      active: true,
-      limit: 100,
-    });
-
-    await Promise.all(
-      activePrices.data
-        .filter((price) => price.id !== stripePriceId)
-        .map((price) =>
-          stripe.prices.update(price.id, {
-            active: false,
-          }),
-        ),
-    );
   }
 
-  await sanity
-    .patch(artwork._id)
-    .set({
-      stripeProductId,
-      stripePriceId,
-    })
-    .commit();
+  await Promise.all(
+    activePrices.data
+      .filter((price) => price.id !== stripePriceId)
+      .map((price) =>
+        stripe.prices.update(price.id, {
+          active: false,
+        }),
+      ),
+  );
+
+  const docsToPatch = [lookup.published?._id, lookup.draft?._id].filter(
+    (id): id is string => Boolean(id),
+  );
+
+  let transaction = sanity.transaction();
+
+  for (const id of docsToPatch) {
+    transaction = transaction.patch(id, {
+      set: {
+        stripeProductId,
+        stripePriceId,
+      },
+    });
+  }
+
+  await transaction.commit();
 
   return NextResponse.json({
     ok: true,
