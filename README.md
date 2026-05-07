@@ -24,6 +24,13 @@ npm install
 cp .env.example .env.local
 ```
 
+Modo desarrollo de contenido (sin Sanity/Stripe):
+
+- Define `NEXT_PUBLIC_DEVELOPMENT_MODE=true` en `.env.local`.
+- La galería usa obras locales desde `public/arte` (`src/lib/content/catalog.ts`).
+- Se oculta carrito/checkout para pausar temporalmente la tienda.
+- Para volver al flujo real con Sanity/Stripe, usa `NEXT_PUBLIC_DEVELOPMENT_MODE=false`.
+
 3. Levanta desarrollo:
 
 ```bash

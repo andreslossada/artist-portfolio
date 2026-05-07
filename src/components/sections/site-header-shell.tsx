@@ -26,6 +26,7 @@ type SiteHeaderShellProps = {
     cart: string;
     contact: string;
   };
+  showCart?: boolean;
   headerClassName?: string;
 };
 
@@ -35,6 +36,7 @@ export function SiteHeaderShell({
   languageLabels,
   themeLabels,
   navLabels,
+  showCart = true,
   headerClassName = "border-b border-accent/15 bg-transparent",
 }: SiteHeaderShellProps) {
   return (
@@ -73,7 +75,7 @@ export function SiteHeaderShell({
               className="mr-1 md:mr-2"
             />
             <HeaderNavLink href="/about">{navLabels.about}</HeaderNavLink>
-            <HeaderCartLink label={navLabels.cart} />
+            {showCart ? <HeaderCartLink label={navLabels.cart} /> : null}
             <HeaderNavLink href="/contact">{navLabels.contact}</HeaderNavLink>
           </nav>
         </div>

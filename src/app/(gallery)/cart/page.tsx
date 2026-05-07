@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CartPanel } from "@/components/sections/cart-panel";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
+import { isDevelopmentContentMode } from "@/lib/runtime-mode";
 
 type CartPageProps = {
   searchParams: Promise<{ checkout?: string }>;
@@ -22,6 +23,25 @@ export default async function CartPage({ searchParams }: CartPageProps) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const { checkout } = await searchParams;
+  const developmentMode = isDevelopmentContentMode();
+
+  if (developmentMode) {
+    return (
+      <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
+        <header className="max-w-3xl">
+          <p className="text-muted text-xs tracking-[0.3em] uppercase">
+            {dict.landing.cart}
+          </p>
+          <h1 className="font-display mt-3 text-5xl leading-tight md:text-6xl">
+            {dict.contactPage.cart.title}
+          </h1>
+          <p className="text-muted mt-6 text-base leading-relaxed md:text-lg">
+            Development mode desactivado: carrito y checkout pausados temporalmente.
+          </p>
+        </header>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">

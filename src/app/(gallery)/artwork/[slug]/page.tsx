@@ -6,6 +6,7 @@ import { ArtworkCartCta } from "@/components/ui/artwork-cart-cta";
 import { getArtworkBySlug, getArtworks } from "@/lib/artworks";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
+import { isDevelopmentContentMode } from "@/lib/runtime-mode";
 
 type ArtworkDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -32,6 +33,7 @@ export default async function ArtworkDetailPage({
   }
 
   const transitionName = `artwork-image-${vt ?? artwork.slug}`;
+  const developmentMode = isDevelopmentContentMode();
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-8 md:px-10 md:py-6">
@@ -92,13 +94,15 @@ export default async function ArtworkDetailPage({
 
           <div className="border-ink/10 mt-10 border-t pt-8 md:mt-auto">
             <div className="flex flex-wrap gap-3">
-              <ArtworkCartCta
-                artwork={artwork}
-                labels={{
-                  addToCart: dict.artworkPage.addToCart,
-                  viewCart: dict.artworkPage.viewCart,
-                }}
-              />
+              {!developmentMode ? (
+                <ArtworkCartCta
+                  artwork={artwork}
+                  labels={{
+                    addToCart: dict.artworkPage.addToCart,
+                    viewCart: dict.artworkPage.viewCart,
+                  }}
+                />
+              ) : null}
               <Link
                 href={`/contact?fromArtwork=${artwork.slug}`}
                 className="border-accent/35 text-accent hover:bg-accent-soft/55 inline-flex h-11 items-center justify-center border px-5 text-sm font-semibold transition"
