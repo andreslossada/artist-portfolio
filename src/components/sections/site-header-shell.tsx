@@ -9,6 +9,7 @@ import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { ViewModeSwitch } from "@/components/ui/view-mode-switch";
 import type { Locale } from "@/lib/i18n";
 import type { Theme } from "@/lib/theme";
+import { irinaWordmarkFont } from "@/lib/wordmark-font";
 
 type SiteHeaderShellProps = {
   locale: Locale;
@@ -28,6 +29,8 @@ type SiteHeaderShellProps = {
   };
   showCart?: boolean;
   headerClassName?: string;
+  wordmarkTransitionName?: string;
+  hideWordmark?: boolean;
 };
 
 export function SiteHeaderShell({
@@ -38,6 +41,8 @@ export function SiteHeaderShell({
   navLabels,
   showCart = true,
   headerClassName = "border-b border-accent/15 bg-transparent",
+  wordmarkTransitionName,
+  hideWordmark = false,
 }: SiteHeaderShellProps) {
   return (
     <ViewTransition
@@ -53,9 +58,25 @@ export function SiteHeaderShell({
             <Link
               href="/"
               transitionTypes={["header-nav"]}
-              className="inline-flex h-8 items-center text-[2rem] leading-none font-semibold tracking-[-0.06em] transition-colors hover:text-accent md:h-10"
+              className={`${irinaWordmarkFont.className} hover:text-accent inline-flex h-8 items-center text-[2rem] leading-none font-medium tracking-[0.06em] italic transition-colors md:h-10`}
             >
-              IRINA
+              {wordmarkTransitionName ? (
+                <ViewTransition
+                  name={wordmarkTransitionName}
+                  share="irina-wordmark"
+                >
+                  <span className="block">Irina</span>
+                </ViewTransition>
+              ) : hideWordmark ? (
+                <span
+                  className="pointer-events-none block opacity-0 select-none"
+                  aria-hidden="true"
+                >
+                  Irina
+                </span>
+              ) : (
+                <span className="block">Irina</span>
+              )}
             </Link>
           </div>
 

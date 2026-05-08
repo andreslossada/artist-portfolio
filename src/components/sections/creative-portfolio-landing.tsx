@@ -6,6 +6,8 @@ import Link from "next/link";
 import gsap from "gsap";
 import {
   ViewTransition,
+  addTransitionType,
+  startTransition,
   useCallback,
   useEffect,
   useMemo,
@@ -23,7 +25,6 @@ const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 10;
 const mouseDragScrollFactor = 0.7;
 const shownSplashThemes = new Set<Theme>();
-let hasShownLandingHeaderReveal = false;
 
 type CreativePortfolioLandingProps = {
   locale: Locale;
@@ -55,12 +56,14 @@ const getSingleLoopWidth = (
   }
 
   if (railContent) {
-    const cards = railContent.querySelectorAll<HTMLElement>("[data-slider-card]");
+    const cards =
+      railContent.querySelectorAll<HTMLElement>("[data-slider-card]");
     const firstCard = cards[0];
     const nextLoopFirstCard = cards[itemsPerLoop];
 
     if (firstCard && nextLoopFirstCard) {
-      const measuredLoopWidth = nextLoopFirstCard.offsetLeft - firstCard.offsetLeft;
+      const measuredLoopWidth =
+        nextLoopFirstCard.offsetLeft - firstCard.offsetLeft;
 
       if (measuredLoopWidth > 0) {
         return measuredLoopWidth;
@@ -99,8 +102,9 @@ export function CreativePortfolioLanding({
   const [hoveredArtworkTitle, setHoveredArtworkTitle] = useState<string | null>(
     null,
   );
-  const [showSplash, setShowSplash] = useState(() => !shownSplashThemes.has(theme));
-  const [shouldAnimateHeader] = useState(() => !hasShownLandingHeaderReveal);
+  const [showSplash, setShowSplash] = useState(
+    () => !shownSplashThemes.has(theme),
+  );
   const [isSliderIntroReady, setIsSliderIntroReady] = useState(false);
   const markSliderIntroReady = useCallback(() => {
     window.requestAnimationFrame(() => {
@@ -108,17 +112,13 @@ export function CreativePortfolioLanding({
     });
   }, []);
   const handleSplashComplete = useCallback(() => {
-    shownSplashThemes.add(theme);
-    setShowSplash(false);
+    addTransitionType("splash-wordmark");
+
+    startTransition(() => {
+      shownSplashThemes.add(theme);
+      setShowSplash(false);
+    });
   }, [theme]);
-
-  useEffect(() => {
-    if (!shouldAnimateHeader || showSplash) {
-      return;
-    }
-
-    hasShownLandingHeaderReveal = true;
-  }, [shouldAnimateHeader, showSplash]);
 
   const syncRailLoopState = useCallback(() => {
     const rail = railRef.current;
@@ -273,7 +273,6 @@ export function CreativePortfolioLanding({
       startX = event.clientX;
       startScrollLeft = rail.scrollLeft;
       dragDistance = 0;
-
     };
 
     const dragRail = (event: PointerEvent) => {
@@ -489,18 +488,17 @@ export function CreativePortfolioLanding({
 
         markSliderIntroReady();
 
-        timeline = gsap
-          .timeline({
-            defaults: { ease: "power3.out" },
-            onComplete: () => {
-              gsap.set(animatedCards, {
-                clearProps: "x,scale,opacity,visibility,zIndex,willChange",
-              });
-              gsap.set(animatedCurtains, {
-                clearProps: "yPercent,opacity,transform,willChange",
-              });
-            },
-          });
+        timeline = gsap.timeline({
+          defaults: { ease: "power3.out" },
+          onComplete: () => {
+            gsap.set(animatedCards, {
+              clearProps: "x,scale,opacity,visibility,zIndex,willChange",
+            });
+            gsap.set(animatedCurtains, {
+              clearProps: "yPercent,opacity,transform,willChange",
+            });
+          },
+        });
 
         if (centerCurtain) {
           timeline.to(
@@ -537,7 +535,8 @@ export function CreativePortfolioLanding({
         );
       };
 
-      const centerImage = centerEntry.card.querySelector<HTMLImageElement>("img");
+      const centerImage =
+        centerEntry.card.querySelector<HTMLImageElement>("img");
 
       if (centerImage && !centerImage.complete) {
         const handleImageReady = () => {
@@ -568,7 +567,7 @@ export function CreativePortfolioLanding({
   return (
     <div
       ref={pageRef}
-      className="landing-page h-screen overflow-hidden text-ink"
+      className="landing-page text-ink h-screen overflow-hidden"
     >
       {showSplash ? (
         <SplashScreen theme={theme} onComplete={handleSplashComplete} />
@@ -580,12 +579,14 @@ export function CreativePortfolioLanding({
           theme={theme}
           languageLabels={languageLabels}
           themeLabels={themeLabels}
+          hideWordmark={showSplash}
+          wordmarkTransitionName={showSplash ? undefined : "irina-wordmark"}
           navLabels={{
             about: labels.about,
             cart: labels.cart,
             contact: labels.contact,
           }}
-          headerClassName={`border-b border-accent/15 bg-transparent motion-safe:will-change-transform ${showSplash ? "motion-safe:[transform:translateY(100%)]" : shouldAnimateHeader ? "motion-safe:animate-[landing-header-reveal_4000ms_cubic-bezier(0.22,1,0.36,1)_both]" : ""}`}
+          headerClassName="border-b border-accent/15 bg-transparent"
         />
       </div>
 
@@ -596,7 +597,7 @@ export function CreativePortfolioLanding({
         >
           <div
             ref={railRef}
-            className="flex h-full w-full cursor-grab touch-none select-none overflow-x-auto overflow-y-hidden py-3 [-ms-overflow-style:none] [scrollbar-width:none] md:py-4 [&::-webkit-scrollbar]:hidden"
+            className="flex h-full w-full cursor-grab touch-none overflow-x-auto overflow-y-hidden py-3 select-none [-ms-overflow-style:none] [scrollbar-width:none] md:py-4 [&::-webkit-scrollbar]:hidden"
           >
             <div
               ref={railContentRef}
@@ -606,7 +607,7 @@ export function CreativePortfolioLanding({
                 <article
                   key={item.loopKey}
                   data-slider-card
-                  className="group relative aspect-2/3 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden bg-canvas-soft md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
+                  className="group bg-canvas-soft relative aspect-2/3 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
                   onMouseEnter={() => setHoveredArtworkTitle(item.title)}
                   onMouseLeave={() => setHoveredArtworkTitle(null)}
                 >
@@ -638,7 +639,7 @@ export function CreativePortfolioLanding({
                         />
                         <div
                           data-slider-curtain
-                          className="pointer-events-none absolute -inset-px z-10 bg-surface opacity-0"
+                          className="bg-surface pointer-events-none absolute -inset-px z-10 opacity-0"
                           aria-hidden="true"
                         />
                       </div>
@@ -660,7 +661,7 @@ export function CreativePortfolioLanding({
 
           <div
             id="contact"
-            className="flex h-16 w-full items-end justify-center overflow-hidden pb-1  md:pb-2"
+            className="flex h-16 w-full items-end justify-center overflow-hidden pb-1 md:pb-2"
           >
             {hoveredArtworkTitle ? (
               <p

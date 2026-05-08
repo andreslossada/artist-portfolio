@@ -21,21 +21,25 @@ export function RootViewTransition({
         default: "page-shell",
         "artwork-open": "none",
         "header-nav": "page-shell",
+        "splash-wordmark": "none",
       }}
       exit={{
         default: "page-shell",
         "artwork-open": "none",
         "header-nav": "page-shell",
+        "splash-wordmark": "none",
       }}
       share={{
         default: "page-shell",
         "artwork-open": "none",
         "header-nav": "page-shell",
+        "splash-wordmark": "none",
       }}
       update={{
         default: "page-shell",
         "artwork-open": "none",
         "header-nav": "page-shell",
+        "splash-wordmark": "none",
       }}
     >
       {children}

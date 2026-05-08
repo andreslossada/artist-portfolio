@@ -1,8 +1,14 @@
 "use client";
 
-import { Cormorant_Garamond } from "next/font/google";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ViewTransition,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
+import { irinaWordmarkFont } from "@/lib/wordmark-font";
 import type { Theme } from "@/lib/theme";
 
 type SplashScreenProps = {
@@ -10,14 +16,8 @@ type SplashScreenProps = {
   onComplete: () => void;
 };
 
-const SPLASH_FADE_MS = 500;
+const SPLASH_EXIT_DELAY_MS = 40;
 const SPLASH_MAX_DURATION_MS = 5200;
-
-const splashWordmark = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["500", "600"],
-  style: ["italic"],
-});
 
 type ArcPathOptions = {
   baseline: number;
@@ -222,8 +222,6 @@ function createRandomWaveGeometry(): WaveGeometry {
 }
 
 export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
-  const [isVisible, setIsVisible] = useState(true);
-  const [isFading, setIsFading] = useState(false);
   const [isAnimationReady, setIsAnimationReady] = useState(false);
   const hasCompletedRef = useRef(false);
   const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -234,12 +232,10 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
     }
 
     hasCompletedRef.current = true;
-    setIsFading(true);
 
     fadeTimeoutRef.current = setTimeout(() => {
-      setIsVisible(false);
       onComplete();
-    }, SPLASH_FADE_MS);
+    }, SPLASH_EXIT_DELAY_MS);
   }, [onComplete]);
 
   useEffect(() => {
@@ -254,7 +250,7 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
 
   const scopeRef = useGsapContext<HTMLDivElement>(
     (scope, gsap) => {
-      if (!isVisible || hasCompletedRef.current) {
+      if (hasCompletedRef.current) {
         return;
       }
 
@@ -492,7 +488,7 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
       // GUIDE: small hold before fade-out
       timeline.to({}, { duration: 0.28 }, 3.02);
     },
-    [finishSplash, isVisible],
+    [finishSplash],
   );
 
   useEffect(() => {
@@ -507,10 +503,6 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
     };
   }, [finishSplash]);
 
-  if (!isVisible) {
-    return null;
-  }
-
   const shellClassName =
     theme === "dark"
       ? "bg-[linear-gradient(180deg,#ad956f_0%,#d6c09a_52%,#f1e0bf_100%)]"
@@ -522,7 +514,7 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
   return (
     <div
       ref={scopeRef}
-      className={`fixed inset-0 z-9999 flex h-screen w-screen items-center justify-center overflow-hidden transition-opacity duration-500 ${shellClassName} ${isFading ? "opacity-0" : "opacity-100"}`}
+      className={`fixed inset-0 z-9999 flex h-screen w-screen items-center justify-center overflow-hidden ${shellClassName}`}
       style={isAnimationReady ? undefined : { visibility: "hidden" }}
       role="presentation"
       aria-hidden="true"
@@ -617,16 +609,18 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
       <div className="absolute inset-x-0 top-[34%] flex justify-center px-6">
         <div className="relative flex flex-col items-center">
           <div className="relative overflow-visible px-4 py-5">
-            <span
-              data-splash-title
-              className={`${splashWordmark.className} relative z-10 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic ${titleClassName}`}
-            >
-              Irina
-            </span>
+            <ViewTransition name="irina-wordmark" share="irina-wordmark">
+              <span
+                data-splash-title
+                className={`${irinaWordmarkFont.className} relative z-10 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic ${titleClassName}`}
+              >
+                Irina
+              </span>
+            </ViewTransition>
 
             <span
               data-splash-title-reflection
-              className={`${splashWordmark.className} pointer-events-none absolute top-0 left-0 z-20 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic select-none ${reflectionClassName}`}
+              className={`${irinaWordmarkFont.className} pointer-events-none absolute top-0 left-0 z-20 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic select-none ${reflectionClassName}`}
               style={{
                 maskImage:
                   "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,1) 100%)",

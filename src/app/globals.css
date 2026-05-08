@@ -91,7 +91,8 @@ body {
   font-family: var(--font-sans), sans-serif;
   line-height: 1.5;
   transition:
-    background-color var(--theme-transition-duration) var(--theme-transition-ease),
+    background-color var(--theme-transition-duration)
+      var(--theme-transition-ease),
     color var(--theme-transition-duration) var(--theme-transition-ease);
 }
 
@@ -105,7 +106,8 @@ body::after {
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
-  transition: opacity var(--theme-transition-duration) var(--theme-transition-ease);
+  transition: opacity var(--theme-transition-duration)
+    var(--theme-transition-ease);
   will-change: opacity;
 }
 
@@ -136,13 +138,7 @@ html.theme-transitioning *,
 html.theme-transitioning *::before,
 html.theme-transitioning *::after {
   transition-property:
-    background-color,
-    border-color,
-    color,
-    fill,
-    stroke,
-    box-shadow,
-    opacity;
+    background-color, border-color, color, fill, stroke, box-shadow, opacity;
   transition-duration: var(--theme-transition-duration);
   transition-timing-function: var(--theme-transition-ease);
 }
@@ -178,15 +174,15 @@ html.theme-transitioning *::after {
 }
 
 ::view-transition-old(.page-shell) {
-  animation:
-    page-fade-out var(--page-transition-exit-duration)
-      var(--page-transition-ease-out) both;
+  animation: page-fade-out var(--page-transition-exit-duration)
+    var(--page-transition-ease-out) both;
 }
 
 ::view-transition-new(.page-shell) {
-  animation:
-    page-fade-in var(--page-transition-enter-duration) var(--page-transition-ease-in)
-      calc(var(--page-transition-exit-duration) - var(--page-transition-overlap)) both;
+  animation: page-fade-in var(--page-transition-enter-duration)
+    var(--page-transition-ease-in)
+    calc(var(--page-transition-exit-duration) - var(--page-transition-overlap))
+    both;
 }
 
 @keyframes page-fade-out {
@@ -211,6 +207,17 @@ html.theme-transitioning *::after {
 ::view-transition-group(.artwork-morph) {
   animation-duration: 420ms;
   animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+::view-transition-group(.irina-wordmark) {
+  animation-duration: 760ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 130;
+}
+
+::view-transition-old(.irina-wordmark),
+::view-transition-new(.irina-wordmark) {
+  mix-blend-mode: normal;
 }
 
 ::view-transition-image-pair(.artwork-morph) {
