@@ -1,5 +1,6 @@
 "use client";
 
+import { Cormorant_Garamond } from "next/font/google";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
 import type { Theme } from "@/lib/theme";
@@ -10,14 +11,220 @@ type SplashScreenProps = {
 };
 
 const SPLASH_FADE_MS = 500;
-const SPLASH_MAX_DURATION_MS = 9000;
-const IRINA_SVG_URL = "/Irina.svg";
-const SWEEP_DURATION = 0.5;
+const SPLASH_MAX_DURATION_MS = 5200;
+
+const splashWordmark = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  style: ["italic"],
+});
+
+type ArcPathOptions = {
+  baseline: number;
+  minSpan: number;
+  maxSpan: number;
+  liftMin: number;
+  liftMax: number;
+  dipMin: number;
+  dipMax: number;
+  startX: number;
+  endX: number;
+  minArcs?: number;
+  maxArcs?: number;
+};
+
+type ClosedArcPathOptions = ArcPathOptions & {
+  bottomY: number;
+};
+
+type WaveGeometry = {
+  mainFill: string;
+  softFill: string;
+  washFill: string;
+  swayProfiles: Array<{
+    xPercent: number;
+    scaleX: number;
+    duration: number;
+  }>;
+};
+
+const toFixed1 = (value: number) => Number(value.toFixed(1));
+
+function createSeededRandom(seed: number) {
+  let state = seed >>> 0;
+
+  return () => {
+    state = (1664525 * state + 1013904223) >>> 0;
+    return state / 4294967296;
+  };
+}
+
+function createOpenArcPath(options: ArcPathOptions, random: () => number) {
+  const {
+    baseline,
+    minSpan,
+    maxSpan,
+    liftMin,
+    liftMax,
+    dipMin,
+    dipMax,
+    startX,
+    endX,
+    minArcs,
+    maxArcs,
+  } = options;
+
+  let currentX = startX;
+  let path = `M${toFixed1(currentX)} ${toFixed1(baseline)}`;
+
+  if (typeof minArcs === "number" && typeof maxArcs === "number") {
+    const lowerArcCount = Math.max(1, Math.floor(minArcs));
+    const upperArcCount = Math.max(lowerArcCount, Math.floor(maxArcs));
+    const targetArcs =
+      lowerArcCount +
+      Math.floor(random() * (upperArcCount - lowerArcCount + 1));
+    const totalWidth = endX - startX;
+    let remainingWidth = totalWidth;
+
+    for (let arcIndex = 0; arcIndex < targetArcs; arcIndex += 1) {
+      const arcsLeft = targetArcs - arcIndex;
+      let span = remainingWidth;
+
+      if (arcsLeft > 1) {
+        const minForCurrent = Math.max(
+          minSpan,
+          remainingWidth - maxSpan * (arcsLeft - 1),
+        );
+        const maxForCurrent = Math.min(
+          maxSpan,
+          remainingWidth - minSpan * (arcsLeft - 1),
+        );
+
+        if (maxForCurrent >= minForCurrent) {
+          span = minForCurrent + (maxForCurrent - minForCurrent) * random();
+        } else {
+          span = remainingWidth / arcsLeft;
+        }
+      }
+
+      const nextX = currentX + span;
+      const crestY = baseline - (liftMin + (liftMax - liftMin) * random());
+      const troughY = baseline + (dipMin + (dipMax - dipMin) * random());
+      const control1X = currentX + span * (0.22 + random() * 0.16);
+      const control2X = currentX + span * (0.64 + random() * 0.18);
+
+      path += ` C${toFixed1(control1X)} ${toFixed1(crestY)} ${toFixed1(control2X)} ${toFixed1(troughY)} ${toFixed1(nextX)} ${toFixed1(baseline)}`;
+      currentX = nextX;
+      remainingWidth = endX - currentX;
+    }
+
+    return path;
+  }
+
+  while (currentX < endX - 0.1) {
+    const span = Math.min(
+      endX - currentX,
+      minSpan + (maxSpan - minSpan) * random(),
+    );
+    const nextX = currentX + span;
+    const crestY = baseline - (liftMin + (liftMax - liftMin) * random());
+    const troughY = baseline + (dipMin + (dipMax - dipMin) * random());
+    const control1X = currentX + span * (0.24 + random() * 0.16);
+    const control2X = currentX + span * (0.62 + random() * 0.2);
+
+    path += ` C${toFixed1(control1X)} ${toFixed1(crestY)} ${toFixed1(control2X)} ${toFixed1(troughY)} ${toFixed1(nextX)} ${toFixed1(baseline)}`;
+    currentX = nextX;
+  }
+
+  return path;
+}
+
+function createClosedArcPath(
+  options: ClosedArcPathOptions,
+  random: () => number,
+) {
+  const openPath = createOpenArcPath(options, random);
+
+  return `${openPath} L${toFixed1(options.endX)} ${toFixed1(options.bottomY)} L${toFixed1(options.startX)} ${toFixed1(options.bottomY)} Z`;
+}
+
+function createRandomWaveGeometry(): WaveGeometry {
+  const seed = (Math.random() * 4294967295) >>> 0 || 246813579;
+  const random = createSeededRandom(seed);
+  const randomBetween = (min: number, max: number) =>
+    min + (max - min) * random();
+
+  return {
+    mainFill: createClosedArcPath(
+      {
+        baseline: 318,
+        minSpan: 460,
+        maxSpan: 780,
+        liftMin: 18,
+        liftMax: 34,
+        dipMin: 8,
+        dipMax: 20,
+        startX: 0,
+        endX: 1440,
+        bottomY: 900,
+        minArcs: 2,
+        maxArcs: 3,
+      },
+      random,
+    ),
+    softFill: createClosedArcPath(
+      {
+        baseline: 346,
+        minSpan: 500,
+        maxSpan: 860,
+        liftMin: 14,
+        liftMax: 28,
+        dipMin: 8,
+        dipMax: 18,
+        startX: 0,
+        endX: 1440,
+        bottomY: 900,
+        minArcs: 2,
+        maxArcs: 3,
+      },
+      random,
+    ),
+    washFill: createClosedArcPath(
+      {
+        baseline: 196,
+        minSpan: 520,
+        maxSpan: 980,
+        liftMin: 10,
+        liftMax: 20,
+        dipMin: 6,
+        dipMax: 14,
+        startX: 0,
+        endX: 1440,
+        bottomY: 520,
+        minArcs: 2,
+        maxArcs: 3,
+      },
+      random,
+    ),
+    swayProfiles: [
+      {
+        xPercent: randomBetween(0.55, 1.1),
+        scaleX: randomBetween(1.003, 1.01),
+        duration: randomBetween(3.2, 4.2),
+      },
+      {
+        xPercent: -randomBetween(1.2, 2.0),
+        scaleX: randomBetween(1.008, 1.018),
+        duration: randomBetween(3.8, 5.2),
+      },
+    ],
+  };
+}
 
 export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [isFading, setIsFading] = useState(false);
-  const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
+  const [isAnimationReady, setIsAnimationReady] = useState(false);
   const hasCompletedRef = useRef(false);
   const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -36,33 +243,6 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
   }, [onComplete]);
 
   useEffect(() => {
-    let cancelled = false;
-
-    fetch(IRINA_SVG_URL, { cache: "force-cache" })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to load splash SVG");
-        }
-
-        return response.text();
-      })
-      .then((markup) => {
-        if (!cancelled) {
-          setSvgMarkup(markup);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          finishSplash();
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [finishSplash]);
-
-  useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -74,153 +254,249 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
 
   const scopeRef = useGsapContext<HTMLDivElement>(
     (scope, gsap) => {
-      if (!isVisible || !svgMarkup || hasCompletedRef.current) {
+      if (!isVisible || hasCompletedRef.current) {
         return;
       }
 
-      const paths = Array.from(
-        scope.querySelectorAll<SVGPathElement>("svg path"),
-      );
+      // GUIDE: Each visual layer has a data-* selector.
+      // If you add/remove layers in JSX, keep these selectors in sync.
 
-      const orderedPaths = [...paths].sort((a, b) => {
-        try {
-          return a.getBBox().x - b.getBBox().x;
-        } catch {
-          return 0;
+      const waveBands = scope.querySelectorAll<HTMLElement>("[data-wave-band]");
+      const wash = scope.querySelector<SVGSVGElement>("[data-splash-wash]");
+      const mainFillPath = scope.querySelector<SVGPathElement>(
+        "[data-wave-main-fill]",
+      );
+      const softFillPath = scope.querySelector<SVGPathElement>(
+        "[data-wave-soft-fill]",
+      );
+      const title = scope.querySelector<HTMLElement>("[data-splash-title]");
+      const titleReflection = scope.querySelector<HTMLElement>(
+        "[data-splash-title-reflection]",
+      );
+      const waveGeometry = createRandomWaveGeometry();
+
+      if (mainFillPath) {
+        mainFillPath.setAttribute("d", waveGeometry.mainFill);
+      }
+
+      if (softFillPath) {
+        softFillPath.setAttribute("d", waveGeometry.softFill);
+      }
+
+      if (wash) {
+        const washFillPath = wash.querySelector<SVGPathElement>(
+          "[data-splash-wash-fill]",
+        );
+
+        if (washFillPath) {
+          washFillPath.setAttribute("d", waveGeometry.washFill);
         }
+      }
+
+      // GUIDE: Initial hidden state before the timeline starts.
+      // TUNE HERE for where the wave starts (bigger yPercent = lower/off-screen).
+      gsap.set(waveBands, {
+        yPercent: (index) => (index === 0 ? 92 : 96),
+        xPercent: (index) => (index === 0 ? -5 : 4),
+        opacity: (index) => (index === 0 ? 0.98 : 0.68),
+        scaleY: (index) => (index === 0 ? 1.03 : 1.08),
       });
+      gsap.set(wash, {
+        yPercent: 92,
+        opacity: 0,
+        scaleY: 1.18,
+        transformOrigin: "50% 100%",
+      });
+      gsap.set(title, {
+        opacity: 0,
+        y: 22,
+        filter: "blur(8px)",
+        letterSpacing: "0.18em",
+        clipPath: "inset(0% 0% 100% 0%)",
+      });
+      gsap.set(titleReflection, {
+        opacity: 0,
+        x: 0,
+        y: 22,
+        scaleX: 1,
+        scaleY: 1,
+        filter: "blur(2px)",
+        clipPath: "inset(0% 0% 100% 0%)",
+        transformOrigin: "50% 0%",
+      });
+
+      setIsAnimationReady(true);
 
       const timeline = gsap.timeline({
-        defaults: { ease: "power2.out" },
+        defaults: { ease: "sine.inOut" },
         onComplete: finishSplash,
       });
+      const retreatStart = 1.26;
 
-      timeline.fromTo(
-        "[data-splash-logo]",
+      // GUIDE: Shoreline motion feels layered, like overlapping beach arcs.
+      waveBands.forEach((band, index) => {
+        const swayProfile =
+          waveGeometry.swayProfiles[
+            Math.min(index, waveGeometry.swayProfiles.length - 1)
+          ];
+
+        gsap.to(band, {
+          xPercent: () => swayProfile.xPercent * (0.82 + Math.random() * 0.32),
+          scaleX: () => swayProfile.scaleX * (0.996 + Math.random() * 0.016),
+          duration: () => swayProfile.duration * (0.88 + Math.random() * 0.28),
+          delay: index * 0.12,
+          repeat: -1,
+          yoyo: true,
+          repeatRefresh: true,
+          yoyoEase: true,
+          ease: "sine.inOut",
+        });
+      });
+
+      // GUIDE: Main narrative sequence
+      // 1) wave comes in: surge + settle
+      timeline.to(
+        waveBands,
         {
-          opacity: 0,
-          y: 16,
-          scale: 0.985,
+          yPercent: (index) => (index === 0 ? -5 : -1),
+          opacity: (index) => (index === 0 ? 1 : 0.74),
+          duration: 0.9,
+          stagger: 0.045,
+          ease: "power2.out",
         },
+        0,
+      );
+
+      timeline.to(
+        waveBands,
         {
+          yPercent: (index) => (index === 0 ? -2 : 1.5),
+          duration: 0.42,
+          stagger: 0.035,
+          ease: "sine.in",
+        },
+        0.96,
+      );
+
+      timeline.to(
+        wash,
+        {
+          yPercent: 10,
+          opacity: 0.5,
+          scaleY: 1.06,
+          duration: 0.66,
+          ease: "sine.out",
+        },
+        0.38,
+      );
+
+      timeline.to(
+        wash,
+        {
+          yPercent: 6,
+          opacity: 0.62,
+          scaleY: 1,
+          duration: 0.28,
+          ease: "sine.inOut",
+        },
+        1,
+      );
+
+      // 2) short beat while the name stays hidden beneath water
+      timeline.to({}, { duration: 0.22 }, 1.2);
+
+      // 3) wave retreats in two fluid phases; reveal happens with the retreat
+      timeline.to(
+        waveBands,
+        {
+          yPercent: (index) => (index === 0 ? 44 : 50),
+          xPercent: (index) => (index === 0 ? 2.6 : -2.8),
+          opacity: (index) => (index === 0 ? 0.94 : 0.6),
+          scaleY: (index) => (index === 0 ? 1.06 : 1.11),
+          duration: 0.52,
+          stagger: 0.04,
+          ease: "power1.in",
+        },
+        retreatStart,
+      );
+
+      timeline.to(
+        waveBands,
+        {
+          yPercent: (index) => (index === 0 ? 114 : 120),
+          xPercent: (index) => (index === 0 ? 3.8 : -3.8),
+          opacity: (index) => (index === 0 ? 0.9 : 0.56),
+          scaleY: (index) => (index === 0 ? 1.02 : 1.06),
+          duration: 0.88,
+          stagger: 0.03,
+          ease: "sine.out",
+        },
+        retreatStart + 0.36,
+      );
+
+      timeline.to(
+        wash,
+        {
+          yPercent: 28,
+          opacity: 0.48,
+          scaleY: 1.02,
+          duration: 0.46,
+          ease: "sine.in",
+        },
+        retreatStart + 0.02,
+      );
+
+      timeline.to(
+        wash,
+        {
+          yPercent: 108,
+          opacity: 0,
+          scaleY: 0.98,
+          duration: 0.88,
+          ease: "sine.out",
+        },
+        retreatStart + 0.4,
+      );
+
+      timeline.to(
+        title,
+        {
+          clipPath: "inset(0% 0% 0% 0%)",
           opacity: 1,
           y: 0,
-          scale: 1,
-          duration: 0.35,
+          filter: "blur(0px)",
+          letterSpacing: "0.08em",
+          duration: 0.84,
+          ease: "sine.out",
         },
+        retreatStart + 0.08,
       );
 
-      timeline.fromTo(
-        "[data-splash-reveal]",
+      timeline.to(
+        titleReflection,
         {
-          clipPath: "inset(0 100% 0 0)",
+          clipPath: "inset(0% 0% 0% 0%)",
+          opacity: 0.58,
+          x: 0,
+          y: -184,
+          scaleX: 1.03,
+          scaleY: 3.05,
+          filter: "blur(10px)",
+          letterSpacing: "0.12em",
+          duration: 0.88,
+          ease: "sine.out",
         },
-        {
-          clipPath: "inset(0 0% 0 0)",
-          duration: SWEEP_DURATION,
-          ease: "power2.inOut",
-        },
-        0.06,
+        retreatStart + 0.14,
       );
 
-      if (orderedPaths.length === 0) {
-        timeline.to({}, { duration: SWEEP_DURATION * 0.5 }, SWEEP_DURATION);
-        return;
-      }
-
-      const pathMetrics = orderedPaths.map((path, index) => {
-        let length = 900;
-        let x = index;
-
-        if (typeof path.getTotalLength === "function") {
-          try {
-            length = path.getTotalLength();
-          } catch {
-            length = 900;
-          }
-        }
-
-        try {
-          x = path.getBBox().x;
-        } catch {
-          x = index;
-        }
-
-        gsap.set(path, {
-          strokeDasharray: length + 2,
-          strokeDashoffset: length + 2,
-          stroke: theme === "dark" ? "#e7eef8" : "#161616",
-          fill: theme === "dark" ? "#e7eef8" : "#161616",
-          strokeWidth: 1.7,
-          strokeLinecap: "butt",
-          strokeLinejoin: "round",
-          strokeOpacity: 0,
-          fillOpacity: 0,
-          opacity: 0,
-        });
-
-        return { path, length, x };
-      });
-
-      const minX = Math.min(...pathMetrics.map((metric) => metric.x));
-      const maxX = Math.max(...pathMetrics.map((metric) => metric.x));
-      const xSpan = Math.max(1, maxX - minX);
-
-      let latestPathEnd = 0;
-
-      pathMetrics.forEach(({ path, length, x }) => {
-        const progress = (x - minX) / xSpan;
-        const startAt = 0.12 + progress * (SWEEP_DURATION - 0.3);
-        const drawDuration = Math.max(0.28, Math.min(0.76, length / 520));
-        const fillAt = startAt + drawDuration * 0.64;
-        const strokeFadeAt = startAt + drawDuration * 0.82;
-        const pathEnd = fillAt + 0.22;
-
-        latestPathEnd = Math.max(latestPathEnd, pathEnd);
-
-        timeline.to(
-          path,
-          {
-            strokeDashoffset: 0,
-            strokeOpacity: 1,
-            opacity: 1,
-            duration: drawDuration,
-            ease: "power2.out",
-          },
-          startAt,
-        );
-
-        timeline.to(
-          path,
-          {
-            fillOpacity: 1,
-            duration: 0.22,
-            ease: "power1.out",
-          },
-          fillAt,
-        );
-
-        timeline.to(
-          path,
-          {
-            strokeOpacity: 0.38,
-            duration: 0.18,
-            ease: "power1.out",
-          },
-          strokeFadeAt,
-        );
-      });
-
-      timeline.to({}, { duration: 0.4 }, latestPathEnd + 0.05);
+      // GUIDE: small hold before fade-out
+      timeline.to({}, { duration: 0.28 }, 3.02);
     },
-    [finishSplash, isVisible, svgMarkup, theme],
+    [finishSplash, isVisible],
   );
 
   useEffect(() => {
-    const failSafeTimeout = setTimeout(
-      finishSplash,
-      SPLASH_MAX_DURATION_MS,
-    );
+    const failSafeTimeout = setTimeout(finishSplash, SPLASH_MAX_DURATION_MS);
 
     return () => {
       window.clearTimeout(failSafeTimeout);
@@ -235,23 +511,134 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
     return null;
   }
 
+  const shellClassName =
+    theme === "dark"
+      ? "bg-[linear-gradient(180deg,#ad956f_0%,#d6c09a_52%,#f1e0bf_100%)]"
+      : "bg-[linear-gradient(180deg,#f7eed8_0%,#ecd8b0_52%,#ddc08b_100%)]";
+  const titleClassName = theme === "dark" ? "text-[#163a5b]" : "text-[#1e4568]";
+  const reflectionClassName =
+    theme === "dark" ? "text-[#2f5f86]/92" : "text-[#3a6f96]/88";
+
   return (
     <div
       ref={scopeRef}
-      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center transition-opacity duration-500 ${theme === "dark" ? "bg-[radial-gradient(circle_at_20%_18%,#1b2a3c_0%,#0d131b_54%,#101a27_100%)]" : "bg-[radial-gradient(circle_at_20%_18%,#d5e8ff_0%,#edf5ff_28%,#ffffff_58%),radial-gradient(circle_at_78%_82%,#dce9fb_0%,rgba(220,233,251,0)_56%)]"} ${isFading ? "opacity-0" : "opacity-100"}`}
+      className={`fixed inset-0 z-9999 flex h-screen w-screen items-center justify-center overflow-hidden transition-opacity duration-500 ${shellClassName} ${isFading ? "opacity-0" : "opacity-100"}`}
+      style={isAnimationReady ? undefined : { visibility: "hidden" }}
       role="presentation"
       aria-hidden="true"
     >
-      {svgMarkup ? (
-        <div className="w-[min(90vw,760px)] px-4 opacity-0" data-splash-logo>
-          <div
-            className="[&>svg]:h-auto [&>svg]:w-full"
-            data-splash-reveal
-            aria-hidden="true"
-            dangerouslySetInnerHTML={{ __html: svgMarkup }}
-          />
+      <svg
+        data-wave-band
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+        // GUIDE: To hide lateral edges while animating xPercent,
+        // make the layer wider than viewport and shift it left.
+        // TUNE HERE: left / width control side bleed.
+        className="pointer-events-none absolute top-[-14%] left-[-14%] h-[132%] w-[128%] motion-safe:will-change-transform"
+        style={{
+          maskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.96) 88%, rgba(0,0,0,0.68) 95%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.96) 88%, rgba(0,0,0,0.68) 95%, rgba(0,0,0,0) 100%)",
+        }}
+        aria-hidden="true"
+      >
+        <path
+          data-wave-main-fill
+          d="M0 300 C170 252 350 252 520 300 C690 348 870 348 1040 300 C1210 252 1360 262 1440 308 L1440 900 L0 900 Z"
+          fill="url(#waveMain)"
+        />
+
+        <defs>
+          <linearGradient id="waveMain" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.88)" />
+            <stop offset="30%" stopColor="rgba(196,233,251,0.72)" />
+            <stop offset="72%" stopColor="rgba(64,158,206,0.76)" />
+            <stop offset="90%" stopColor="rgba(36,116,175,0.78)" />
+            <stop offset="100%" stopColor="rgba(36,116,175,0.72)" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <svg
+        data-wave-band
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+        className="pointer-events-none absolute top-[-16%] left-[-12%] h-[108%] w-[124%] mix-blend-screen motion-safe:will-change-transform"
+        style={{
+          maskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.96) 88%, rgba(0,0,0,0.68) 95%, rgba(0,0,0,0) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.96) 88%, rgba(0,0,0,0.68) 95%, rgba(0,0,0,0) 100%)",
+        }}
+        aria-hidden="true"
+      >
+        <path
+          data-wave-soft-fill
+          d="M0 334 C182 292 362 292 544 334 C726 376 906 376 1088 334 C1244 298 1368 304 1440 342 L1440 900 L0 900 Z"
+          fill="url(#waveSoft)"
+        />
+
+        <defs>
+          <linearGradient id="waveSoft" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(255,255,255,0.74)" />
+            <stop offset="34%" stopColor="rgba(217,244,255,0.56)" />
+            <stop offset="74%" stopColor="rgba(111,194,229,0.5)" />
+            <stop offset="92%" stopColor="rgba(77,166,208,0.52)" />
+            <stop offset="100%" stopColor="rgba(77,166,208,0.4)" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <svg
+        data-splash-wash
+        viewBox="0 0 1440 520"
+        preserveAspectRatio="none"
+        className="pointer-events-none absolute inset-x-0 top-[48%] h-[24%] w-full motion-safe:will-change-transform"
+        aria-hidden="true"
+      >
+        <path
+          data-splash-wash-fill
+          d="M0 188 C238 146 426 230 720 188 C1036 146 1218 228 1440 186 L1440 520 L0 520 Z"
+          fill="url(#washBody)"
+        />
+
+        <defs>
+          <linearGradient id="washBody" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgba(241,251,255,0.78)" />
+            <stop offset="38%" stopColor="rgba(194,234,250,0.4)" />
+            <stop offset="78%" stopColor="rgba(148,210,236,0.34)" />
+            <stop offset="92%" stopColor="rgba(106,182,218,0.26)" />
+            <stop offset="100%" stopColor="rgba(106,182,218,0.14)" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <div className="absolute inset-x-0 top-[34%] flex justify-center px-6">
+        <div className="relative flex flex-col items-center">
+          <div className="relative overflow-visible px-4 py-5">
+            <span
+              data-splash-title
+              className={`${splashWordmark.className} relative z-10 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic ${titleClassName}`}
+            >
+              Irina
+            </span>
+
+            <span
+              data-splash-title-reflection
+              className={`${splashWordmark.className} pointer-events-none absolute top-0 left-0 z-20 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic select-none ${reflectionClassName}`}
+              style={{
+                maskImage:
+                  "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,1) 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,1) 100%)",
+              }}
+            >
+              Irina
+            </span>
+          </div>
         </div>
-      ) : null}
+      </div>
     </div>
   );
 }
