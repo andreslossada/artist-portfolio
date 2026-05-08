@@ -1,7 +1,7 @@
 import { cache } from "react";
 import type { SanityImageSource } from "@sanity/image-url";
 import { artworks as mockArtworks } from "@/lib/content/catalog";
-import { isDevelopmentContentMode } from "@/lib/runtime-mode";
+import { isMockContentSource } from "@/lib/runtime-mode";
 import { urlForImage } from "@/lib/sanity/image";
 import { getSanityClient, sanityReady } from "@/lib/sanity/client";
 import {
@@ -50,7 +50,7 @@ function toArtwork(item: SanityArtwork): Artwork | null {
 }
 
 export const getArtworks = cache(async (): Promise<Artwork[]> => {
-  if (isDevelopmentContentMode()) {
+  if (isMockContentSource()) {
     return mockArtworks;
   }
 
@@ -67,7 +67,7 @@ export const getArtworks = cache(async (): Promise<Artwork[]> => {
 });
 
 export const getArtworkBySlug = cache(async (slug: string) => {
-  if (isDevelopmentContentMode()) {
+  if (isMockContentSource()) {
     return mockArtworks.find((item) => item.slug === slug) ?? null;
   }
 

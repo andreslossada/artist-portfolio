@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isDevelopmentContentMode } from "@/lib/runtime-mode";
+import { isCommerceEnabled } from "@/lib/runtime-mode";
 import { getStripeServerClient } from "@/lib/stripe/server";
 
 type CheckoutPayload = {
@@ -27,9 +27,9 @@ async function getCheckoutPayload(request: Request): Promise<CheckoutPayload> {
 }
 
 export async function POST(request: Request) {
-  if (!isDevelopmentContentMode()) {
+  if (!isCommerceEnabled()) {
     return NextResponse.json(
-      { error: "Checkout is disabled outside development content mode" },
+      { error: "Checkout is disabled" },
       { status: 503 },
     );
   }

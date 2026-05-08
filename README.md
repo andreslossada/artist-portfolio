@@ -24,12 +24,19 @@ npm install
 cp .env.example .env.local
 ```
 
-Modo desarrollo de contenido (sin Sanity/Stripe):
+Control de contenido y tienda por flags:
 
-- Define `NEXT_PUBLIC_DEVELOPMENT_MODE=true` en `.env.local`.
-- La galería usa obras locales desde `public/arte` (`src/lib/content/catalog.ts`).
-- Se oculta carrito/checkout para pausar temporalmente la tienda.
-- Para volver al flujo real con Sanity/Stripe, usa `NEXT_PUBLIC_DEVELOPMENT_MODE=false`.
+- `NEXT_PUBLIC_CONTENT_SOURCE=sanity|mock`
+  - `sanity`: usa contenido de Sanity.
+  - `mock`: usa obras locales de `public/arte` (`src/lib/content/catalog.ts`).
+- `NEXT_PUBLIC_COMMERCE_ENABLED=true|false`
+  - `true`: carrito y checkout activos.
+  - `false`: carrito/checkout ocultos o pausados.
+
+Ejemplo temporal para referencia en producción sin obras reales:
+
+- `NEXT_PUBLIC_CONTENT_SOURCE=mock`
+- `NEXT_PUBLIC_COMMERCE_ENABLED=false`
 
 3. Levanta desarrollo:
 

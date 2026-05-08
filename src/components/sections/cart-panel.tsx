@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { isDevelopmentContentMode } from "@/lib/runtime-mode";
+import { isCommerceEnabled } from "@/lib/runtime-mode";
 import { useCartStore } from "@/store/cart-store";
 
 type CartPanelProps = {
@@ -21,7 +21,7 @@ type CartPanelProps = {
 };
 
 export function CartPanel({ labels, checkoutStatus }: CartPanelProps) {
-  const developmentMode = isDevelopmentContentMode();
+  const commerceEnabled = isCommerceEnabled();
   const items = useCartStore((state) => state.items);
   const subtotal = useCartStore((state) => state.subtotal());
   const removeItem = useCartStore((state) => state.removeItem);
@@ -36,8 +36,8 @@ export function CartPanel({ labels, checkoutStatus }: CartPanelProps) {
   }, [checkoutStatus, clearCart]);
 
   const handleCheckout = async () => {
-    if (!developmentMode) {
-      setErrorMessage("Checkout desactivado en este modo.");
+    if (!commerceEnabled) {
+      setErrorMessage("Checkout desactivado temporalmente.");
       return;
     }
 

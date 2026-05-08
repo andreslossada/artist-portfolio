@@ -1,7 +1,7 @@
 import { SiteHeaderShell } from "@/components/sections/site-header-shell";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
-import { isDevelopmentContentMode } from "@/lib/runtime-mode";
+import { isCommerceEnabled, isMockContentSource } from "@/lib/runtime-mode";
 import { getTheme } from "@/lib/theme";
 
 export async function SiteHeader() {
@@ -20,7 +20,7 @@ export async function SiteHeader() {
         cart: dict.landing.cart,
         contact: dict.landing.contact,
       }}
-      showCart={!isDevelopmentContentMode()}
+      showCart={isCommerceEnabled() || isMockContentSource()}
     />
   );
 }
