@@ -30,6 +30,7 @@ type CreativePortfolioLandingProps = {
   locale: Locale;
   labels: {
     list: string;
+    shop: string;
     about: string;
     cart: string;
     contact: string;
@@ -582,6 +583,7 @@ export function CreativePortfolioLanding({
           hideWordmark={showSplash}
           wordmarkTransitionName={showSplash ? undefined : "irina-wordmark"}
           navLabels={{
+            shop: labels.shop,
             about: labels.about,
             cart: labels.cart,
             contact: labels.contact,

@@ -16,6 +16,7 @@ export async function SiteHeader() {
       languageLabels={dict.languageSwitcher}
       themeLabels={dict.themeSwitcher}
       navLabels={{
+        shop: dict.header.shop,
         about: dict.landing.about,
         cart: dict.landing.cart,
         contact: dict.landing.contact,

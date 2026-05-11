@@ -23,6 +23,7 @@ type SiteHeaderShellProps = {
     dark: string;
   };
   navLabels: {
+    shop?: string;
     about: string;
     cart: string;
     contact: string;
@@ -96,8 +97,11 @@ export function SiteHeaderShell({
               className="mr-1 md:mr-2"
             />
             <HeaderNavLink href="/about">{navLabels.about}</HeaderNavLink>
-            {showCart ? <HeaderCartLink label={navLabels.cart} /> : null}
+            {navLabels.shop ? (
+              <HeaderNavLink href="/shop">{navLabels.shop}</HeaderNavLink>
+            ) : null}
             <HeaderNavLink href="/contact">{navLabels.contact}</HeaderNavLink>
+            {showCart ? <HeaderCartLink label={navLabels.cart} /> : null}
           </nav>
         </div>
       </header>
