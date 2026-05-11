@@ -485,7 +485,7 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
         retreatStart + 0.14,
       );
 
-      // GUIDE: small hold before fade-out
+      // GUIDE: small hold before view-transition capture
       timeline.to({}, { duration: 0.28 }, 3.02);
     },
     [finishSplash],

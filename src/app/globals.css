@@ -210,14 +210,33 @@ html.theme-transitioning *::after {
 }
 
 ::view-transition-group(.irina-wordmark) {
-  animation-duration: 760ms;
+  animation-duration: 700ms;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 130;
 }
 
-::view-transition-old(.irina-wordmark),
-::view-transition-new(.irina-wordmark) {
+::view-transition-old(.irina-wordmark) {
+  animation-name: wordmark-morph-out;
+  animation-duration: inherit;
   mix-blend-mode: normal;
+}
+
+::view-transition-new(.irina-wordmark) {
+  animation-name: wordmark-morph-in;
+  animation-duration: inherit;
+  mix-blend-mode: normal;
+}
+
+@keyframes wordmark-morph-out {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes wordmark-morph-in {
+  0% { opacity: 0; }
+  75% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 ::view-transition-image-pair(.artwork-morph) {
