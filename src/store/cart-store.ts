@@ -2,16 +2,22 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { Artwork } from "@/types/content";
+import type { Artwork, Product, CartItemKind } from "@/types/content";
 
-export type CartItem = Pick<
-  Artwork,
-  "id" | "slug" | "title" | "imageUrl" | "price" | "stripePriceId"
->;
+export type CartItem = {
+  id: string;
+  slug: string;
+  title: string;
+  imageUrl: string;
+  price: number;
+  stripePriceId: string;
+  kind: CartItemKind;
+};
 
 type CartStoreState = {
   items: CartItem[];
   addArtwork: (artwork: Artwork) => void;
+  addProduct: (product: Product) => void;
   removeItem: (id: string) => void;
   clearCart: () => void;
   isInCart: (id: string) => boolean;
@@ -19,13 +25,24 @@ type CartStoreState = {
   count: () => number;
 };
 
-const toCartItem = (artwork: Artwork): CartItem => ({
+const artworkToCartItem = (artwork: Artwork): CartItem => ({
   id: artwork.id,
   slug: artwork.slug,
   title: artwork.title,
   imageUrl: artwork.imageUrl,
   price: artwork.price,
   stripePriceId: artwork.stripePriceId,
+  kind: "artwork",
+});
+
+const productToCartItem = (product: Product): CartItem => ({
+  id: product.id,
+  slug: product.slug,
+  title: product.name,
+  imageUrl: product.imageUrl,
+  price: product.price,
+  stripePriceId: product.stripePriceId,
+  kind: "product",
 });
 
 export const useCartStore = create<CartStoreState>()(
@@ -38,7 +55,16 @@ export const useCartStore = create<CartStoreState>()(
             return state;
           }
 
-          return { items: [...state.items, toCartItem(artwork)] };
+          return { items: [...state.items, artworkToCartItem(artwork)] };
+        });
+      },
+      addProduct: (product) => {
+        set((state) => {
+          if (state.items.some((item) => item.id === product.id)) {
+            return state;
+          }
+
+          return { items: [...state.items, productToCartItem(product)] };
         });
       },
       removeItem: (id) => {

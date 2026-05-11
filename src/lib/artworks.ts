@@ -1,6 +1,6 @@
 import { cache } from "react";
 import type { SanityImageSource } from "@sanity/image-url";
-import { artworks as mockArtworks } from "@/lib/content/catalog";
+import { artworks as mockArtworks, products as mockProducts } from "@/lib/content/catalog";
 import { isMockContentSource } from "@/lib/runtime-mode";
 import { urlForImage } from "@/lib/sanity/image";
 import { getSanityClient, sanityReady } from "@/lib/sanity/client";
@@ -8,7 +8,7 @@ import {
   artworkBySlugQuery,
   artworksQuery,
 } from "@/lib/sanity/queries/artworks";
-import type { Artwork } from "@/types/content";
+import type { Artwork, Product } from "@/types/content";
 
 type SanityArtwork = {
   _id: string;
@@ -87,4 +87,12 @@ export const getArtworkBySlug = cache(async (slug: string) => {
   }
 
   return toArtwork(doc);
+});
+
+export const getProducts = cache(async (): Promise<Product[]> => {
+  return mockProducts;
+});
+
+export const getProductBySlug = cache(async (slug: string) => {
+  return mockProducts.find((item) => item.slug === slug) ?? null;
 });

@@ -22,6 +22,9 @@ const dictionaries = {
       cartTitle: "Carrito | Estudio Irina",
       cartDescription:
         "Revisa las obras seleccionadas y continúa el pago con Stripe.",
+      shopTitle: "Tienda | Estudio Irina",
+      shopDescription:
+        "Camisas, stickers y ediciones limitadas del estudio.",
     },
     header: {
       home: "Inicio",
@@ -36,6 +39,7 @@ const dictionaries = {
     landing: {
       list: "Galería",
       projects: "Proyectos",
+      shop: "Tienda",
       about: "Sobre mí",
       contact: "Contacto",
       cart: "Carrito",
@@ -43,16 +47,22 @@ const dictionaries = {
     galleryPage: {
       eyebrow: "Galería",
       title: "Archivo de obra",
-    },
-    listPage: {
-      eyebrow: "Lista",
-      title: "Obras en lista",
+      listEyebrow: "Lista",
+      listTitle: "Obras en lista",
     },
     shopPage: {
       eyebrow: "Tienda",
       title: "Ediciones y publicaciones",
       fromArtworkHint: "Estás explorando opciones para adquirir piezas relacionadas.",
       buyWithStripe: "Comprar con Stripe",
+      categoryAll: "Todos",
+      categoryShirts: "Camisas",
+      categoryStickers: "Stickers",
+      categoryPrints: "Ediciones",
+      addToCart: "Agregar al carrito",
+      viewCart: "Ver carrito",
+      empty: "No hay productos en esta categoría todavía.",
+      backToShop: "Volver a tienda",
     },
     aboutPage: {
       eyebrow: "Sobre mí",
@@ -149,6 +159,9 @@ const dictionaries = {
       cartTitle: "Cart | Estudio Irina",
       cartDescription:
         "Review selected artworks and continue checkout with Stripe.",
+      shopTitle: "Shop | Estudio Irina",
+      shopDescription:
+        "Shirts, stickers, and limited editions from the studio.",
     },
     header: {
       home: "Home",
@@ -163,6 +176,7 @@ const dictionaries = {
     landing: {
       list: "List",
       projects: "Projects",
+      shop: "Shop",
       about: "About",
       contact: "Contact",
       cart: "Cart",
@@ -170,16 +184,22 @@ const dictionaries = {
     galleryPage: {
       eyebrow: "Gallery",
       title: "Artwork archive",
-    },
-    listPage: {
-      eyebrow: "List",
-      title: "Artworks in list view",
+      listEyebrow: "List",
+      listTitle: "Artworks in list view",
     },
     shopPage: {
       eyebrow: "Shop",
       title: "Editions and publications",
       fromArtworkHint: "You are exploring options to acquire related pieces.",
       buyWithStripe: "Buy with Stripe",
+      categoryAll: "All",
+      categoryShirts: "Shirts",
+      categoryStickers: "Stickers",
+      categoryPrints: "Prints",
+      addToCart: "Add to cart",
+      viewCart: "View cart",
+      empty: "No products in this category yet.",
+      backToShop: "Back to shop",
     },
     aboutPage: {
       eyebrow: "About",

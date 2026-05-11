@@ -13,12 +13,19 @@ export type Artwork = {
   stripePriceId: string;
 };
 
+export type ProductCategory = "shirt" | "sticker" | "print";
+
 export type Product = {
   id: string;
+  slug: string;
   name: string;
   description: string;
+  excerpt: string;
   price: number;
   currency: "usd";
   imageUrl: string;
   stripePriceId: string;
+  category: ProductCategory;
 };
+
+export type CartItemKind = "artwork" | "product";

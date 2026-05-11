@@ -98,24 +98,145 @@ export const artworks: Artwork[] = artworkImageFiles.map((fileName, index) => {
 export const products: Product[] = [
   {
     id: "p1",
+    slug: "print-fine-art-mareas-ocre",
     name: "Print Fine Art - Mareas Ocre",
-    description: "Impresión giclee firmada, edición limitada de 30 unidades.",
+    description:
+      "Impresión giclee firmada sobre papel Hahnemuehle Photo Rag 308 g/m². Edición limitada de 30 unidades numeradas a mano. 50 x 70 cm.",
+    excerpt: "Impresión giclee firmada, edición limitada de 30 unidades.",
     price: 240,
     currency: "usd",
-    imageUrl: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=900&q=80",
+    imageUrl: `/arte/${artworkImageFiles[0]}`,
     stripePriceId: "price_placeholder_mareas_ocre",
+    category: "print",
   },
   {
     id: "p2",
+    slug: "catalogo-estudio-2026",
     name: "Catálogo de Estudio 2026",
-    description: "Publicación de 96 páginas con proceso y archivo de obra.",
+    description:
+      "Publicación de 96 páginas con proceso, archivo de obra y ensayo visual. Tapa dura con sobrecubierta, 21 x 28 cm.",
+    excerpt: "Publicación de 96 páginas con proceso y archivo de obra.",
     price: 68,
     currency: "usd",
-    imageUrl: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80",
+    imageUrl: `/arte/${artworkImageFiles[1]}`,
     stripePriceId: "price_placeholder_catalogo_2026",
+    category: "print",
+  },
+  {
+    id: "s1",
+    slug: "camiseta-marea",
+    name: "Camiseta Marea",
+    description:
+      "Camiseta 100% algodón orgánico con serigrafía de la obra Marea de Luz. Corte unisex, disponible en blanco y negro. Lavable a máquina.",
+    excerpt: "Algodón orgánico con serigrafía original.",
+    price: 48,
+    currency: "usd",
+    imageUrl: `/arte/${artworkImageFiles[2]}`,
+    stripePriceId: "price_placeholder_camiseta_marea",
+    category: "shirt",
+  },
+  {
+    id: "s2",
+    slug: "camiseta-pulso",
+    name: "Camiseta Pulso",
+    description:
+      "Camiseta 100% algodón orgánico con serigrafía de la obra Pulso Terracota. Corte unisex, disponible en blanco y negro. Lavable a máquina.",
+    excerpt: "Algodón orgánico con serigrafía original.",
+    price: 48,
+    currency: "usd",
+    imageUrl: `/arte/${artworkImageFiles[3]}`,
+    stripePriceId: "price_placeholder_camiseta_pulso",
+    category: "shirt",
+  },
+  {
+    id: "s3",
+    slug: "camiseta-bruma",
+    name: "Camiseta Bruma",
+    description:
+      "Camiseta 100% algodón orgánico con serigrafía de la obra Bruma Orgánica. Corte unisex, disponible en blanco y negro. Lavable a máquina.",
+    excerpt: "Algodón orgánico con serigrafía original.",
+    price: 48,
+    currency: "usd",
+    imageUrl: `/arte/${artworkImageFiles[4]}`,
+    stripePriceId: "price_placeholder_camiseta_bruma",
+    category: "shirt",
+  },
+  {
+    id: "s4",
+    slug: "camiseta-suspendida",
+    name: "Camiseta Suspendida",
+    description:
+      "Camiseta 100% algodón orgánico con serigrafía de la obra Materia Suspendida. Corte unisex, disponible en blanco y negro. Lavable a máquina.",
+    excerpt: "Algodón orgánico con serigrafía original.",
+    price: 48,
+    currency: "usd",
+    imageUrl: `/arte/${artworkImageFiles[5]}`,
+    stripePriceId: "price_placeholder_camiseta_suspendida",
+    category: "shirt",
+  },
+  {
+    id: "k1",
+    slug: "sticker-marea",
+    name: "Sticker Marea de Luz",
+    description:
+      "Sticker vinílico de alta resistencia al agua y al sol. Basado en la obra Marea de Luz. 10 x 10 cm.",
+    excerpt: "Sticker vinílico resistente al agua y sol.",
+    price: 8,
+    currency: "usd",
+    imageUrl: `/arte/${artworkImageFiles[6]}`,
+    stripePriceId: "price_placeholder_sticker_marea",
+    category: "sticker",
+  },
+  {
+    id: "k2",
+    slug: "sticker-pulso",
+    name: "Sticker Pulso Terracota",
+    description:
+      "Sticker vinílico de alta resistencia al agua y al sol. Basado en la obra Pulso Terracota. 10 x 10 cm.",
+    excerpt: "Sticker vinílico resistente al agua y sol.",
+    price: 8,
+    currency: "usd",
+    imageUrl: `/arte/${artworkImageFiles[7]}`,
+    stripePriceId: "price_placeholder_sticker_pulso",
+    category: "sticker",
+  },
+  {
+    id: "k3",
+    slug: "sticker-bruma",
+    name: "Sticker Bruma Orgánica",
+    description:
+      "Sticker vinílico de alta resistencia al agua y al sol. Basado en la obra Bruma Orgánica. 10 x 10 cm.",
+    excerpt: "Sticker vinílico resistente al agua y sol.",
+    price: 8,
+    currency: "usd",
+    imageUrl: `/arte/${artworkImageFiles[8]}`,
+    stripePriceId: "price_placeholder_sticker_bruma",
+    category: "sticker",
+  },
+  {
+    id: "k4",
+    slug: "sticker-ecos",
+    name: "Sticker Ecos de Lienzo",
+    description:
+      "Sticker vinílico de alta resistencia al agua y al sol. Basado en la obra Ecos de Lienzo. 10 x 10 cm.",
+    excerpt: "Sticker vinílico resistente al agua y sol.",
+    price: 8,
+    currency: "usd",
+    imageUrl: `/arte/${artworkImageFiles[9]}`,
+    stripePriceId: "price_placeholder_sticker_ecos",
+    category: "sticker",
   },
 ];
 
 export function getArtworkBySlug(slug: string) {
   return artworks.find((artwork) => artwork.slug === slug);
+}
+
+export function getProductBySlug(slug: string) {
+  return products.find((product) => product.slug === slug);
+}
+
+export function getProductsByCategory(category?: Product["category"]) {
+  if (!category) return products;
+  return products.filter((product) => product.category === category);
 }
