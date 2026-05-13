@@ -105,7 +105,8 @@ export const products: Product[] = [
     excerpt: "Impresión giclee firmada, edición limitada de 30 unidades.",
     price: 240,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[0]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_mareas_ocre",
     category: "print",
   },
@@ -118,7 +119,8 @@ export const products: Product[] = [
     excerpt: "Publicación de 96 páginas con proceso y archivo de obra.",
     price: 68,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[1]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_catalogo_2026",
     category: "print",
   },
@@ -131,7 +133,8 @@ export const products: Product[] = [
     excerpt: "Algodón orgánico con serigrafía original.",
     price: 48,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[2]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_camiseta_marea",
     category: "shirt",
   },
@@ -144,7 +147,8 @@ export const products: Product[] = [
     excerpt: "Algodón orgánico con serigrafía original.",
     price: 48,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[3]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_camiseta_pulso",
     category: "shirt",
   },
@@ -157,7 +161,8 @@ export const products: Product[] = [
     excerpt: "Algodón orgánico con serigrafía original.",
     price: 48,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[4]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1554568218-0f1715e72254?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_camiseta_bruma",
     category: "shirt",
   },
@@ -170,7 +175,8 @@ export const products: Product[] = [
     excerpt: "Algodón orgánico con serigrafía original.",
     price: 48,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[5]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_camiseta_suspendida",
     category: "shirt",
   },
@@ -183,7 +189,8 @@ export const products: Product[] = [
     excerpt: "Sticker vinílico resistente al agua y sol.",
     price: 8,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[6]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1484239398315-f1681ef72fe6?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_sticker_marea",
     category: "sticker",
   },
@@ -196,7 +203,8 @@ export const products: Product[] = [
     excerpt: "Sticker vinílico resistente al agua y sol.",
     price: 8,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[7]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1761897756298-b854bc9ed2ee?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_sticker_pulso",
     category: "sticker",
   },
@@ -209,7 +217,8 @@ export const products: Product[] = [
     excerpt: "Sticker vinílico resistente al agua y sol.",
     price: 8,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[8]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1700779100884-824d4a9caece?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_sticker_bruma",
     category: "sticker",
   },
@@ -222,7 +231,8 @@ export const products: Product[] = [
     excerpt: "Sticker vinílico resistente al agua y sol.",
     price: 8,
     currency: "usd",
-    imageUrl: `/arte/${artworkImageFiles[9]}`,
+    imageUrl:
+      "https://images.unsplash.com/photo-1621524440591-8f7cf4aa0949?auto=format&fit=crop&w=900&q=80",
     stripePriceId: "price_placeholder_sticker_ecos",
     category: "sticker",
   },
