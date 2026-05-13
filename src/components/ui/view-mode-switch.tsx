@@ -2,7 +2,7 @@
 
 import { Columns3, LayoutGrid, Rows3 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 type ViewModeSwitchProps = {
@@ -11,9 +11,12 @@ type ViewModeSwitchProps = {
 
 export function ViewModeSwitch({ className }: ViewModeSwitchProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isColumnsActive = pathname === "/";
-  const isGridActive = pathname === "/gallery";
-  const isListActive = pathname === "/list";
+  const isGalleryPath = pathname === "/gallery";
+  const viewParam = searchParams.get("view");
+  const isGridActive = isGalleryPath && viewParam !== "list";
+  const isListActive = isGalleryPath && viewParam === "list";
 
   return (
     <div
@@ -45,7 +48,7 @@ export function ViewModeSwitch({ className }: ViewModeSwitchProps) {
         />
       </Link>
       <Link
-        href="/gallery"
+        href="/gallery?view=grid"
         transitionTypes={["header-nav"]}
         aria-label="Grid"
         title="Grid"
@@ -66,7 +69,7 @@ export function ViewModeSwitch({ className }: ViewModeSwitchProps) {
         />
       </Link>
       <Link
-        href="/list"
+        href="/gallery?view=list"
         transitionTypes={["header-nav"]}
         aria-label="Lista"
         title="Lista"

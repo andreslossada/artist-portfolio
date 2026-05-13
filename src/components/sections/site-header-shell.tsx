@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { ViewTransition } from "react";
 import { HeaderCartLink } from "@/components/ui/header-cart-link";
@@ -82,7 +83,9 @@ export function SiteHeaderShell({
           </div>
 
           <div className="flex items-center justify-center">
-            <ViewModeSwitch />
+            <Suspense>
+              <ViewModeSwitch />
+            </Suspense>
           </div>
 
           <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
