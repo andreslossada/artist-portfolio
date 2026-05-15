@@ -16,6 +16,7 @@ export type CartItem = {
 
 type CartStoreState = {
   items: CartItem[];
+  _hasHydrated: boolean;
   addArtwork: (artwork: Artwork) => void;
   addProduct: (product: Product) => void;
   removeItem: (id: string) => void;
@@ -49,6 +50,7 @@ export const useCartStore = create<CartStoreState>()(
   persist(
     (set, get) => ({
       items: [],
+      _hasHydrated: false,
       addArtwork: (artwork) => {
         set((state) => {
           if (state.items.some((item) => item.id === artwork.id)) {
@@ -89,6 +91,11 @@ export const useCartStore = create<CartStoreState>()(
       name: "artwork-cart",
       partialize: (state) => ({ items: state.items }),
       storage: createJSONStorage(() => localStorage),
+      onRehydrateStorage: () => {
+        return () => {
+          useCartStore.setState({ _hasHydrated: true });
+        };
+      },
     },
   ),
 );

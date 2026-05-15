@@ -13,6 +13,7 @@ type HeaderCartLinkProps = {
 export function HeaderCartLink({ label }: HeaderCartLinkProps) {
   const pathname = usePathname();
   const count = useCartStore((state) => state.count());
+  const hasHydrated = useCartStore((state) => state._hasHydrated);
   const isActive = pathname === "/cart";
 
   return (
@@ -29,7 +30,7 @@ export function HeaderCartLink({ label }: HeaderCartLinkProps) {
       )}
     >
       <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
-      {count > 0 ? (
+      {hasHydrated && count > 0 ? (
         <span className="border-accent/30 bg-surface absolute -top-0 right-0 min-w-4 -translate-y-1/2 translate-x-1/2 border px-1 text-center text-[0.55em] leading-4">
           {count}
         </span>
