@@ -25,6 +25,7 @@ export function GalleryList({ artworks }: GalleryListProps) {
                 src={artwork.imageUrl}
                 alt={artwork.title}
                 fill
+                sizes="(max-width: 768px) 92px, 160px"
                 className="object-cover transition duration-500 group-hover:scale-[1.03]"
               />
             </div>

@@ -25,6 +25,7 @@ export function GalleryGrid({ artworks }: GalleryGridProps) {
                 src={artwork.imageUrl}
                 alt={artwork.title}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover transition duration-500 group-hover:scale-[1.03]"
               />
             </div>
