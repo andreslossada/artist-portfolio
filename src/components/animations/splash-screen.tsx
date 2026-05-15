@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
 import { irinaWordmarkFont } from "@/lib/wordmark-font";
 import type { Theme } from "@/lib/theme";
@@ -199,7 +194,7 @@ function createRandomWaveGeometry(): WaveGeometry {
         dipMax: 14,
         startX: 0,
         endX: 1440,
-        bottomY: 520,
+        bottomY: 900,
         minArcs: 2,
         maxArcs: 3,
       },
@@ -304,18 +299,18 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
       });
       gsap.set(title, {
         opacity: 0,
-        y: 22,
+        y: 0,
         filter: "blur(8px)",
-        letterSpacing: "0.18em",
         clipPath: "inset(0% 0% 100% 0%)",
       });
       gsap.set(titleReflection, {
         opacity: 0,
         x: 0,
-        y: 22,
-        scaleX: 1,
-        scaleY: 1,
-        filter: "blur(2px)",
+        y: -184,
+        scaleX: 1.03,
+        scaleY: 3.05,
+        filter: "blur(10px)",
+        letterSpacing: "0.12em",
         clipPath: "inset(0% 0% 100% 0%)",
         transformOrigin: "50% 0%",
       });
@@ -446,7 +441,7 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
         {
           yPercent: 108,
           opacity: 0,
-          scaleY: 0.98,
+          scaleY: 1.35,
           duration: 0.88,
           ease: "sine.out",
         },
@@ -458,9 +453,7 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
         {
           clipPath: "inset(0% 0% 0% 0%)",
           opacity: 1,
-          y: 0,
           filter: "blur(0px)",
-          letterSpacing: "0.08em",
           duration: 0.84,
           ease: "sine.out",
         },
@@ -472,12 +465,6 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
         {
           clipPath: "inset(0% 0% 0% 0%)",
           opacity: 0.58,
-          x: 0,
-          y: -184,
-          scaleX: 1.03,
-          scaleY: 3.05,
-          filter: "blur(10px)",
-          letterSpacing: "0.12em",
           duration: 0.88,
           ease: "sine.out",
         },
@@ -502,13 +489,10 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
     };
   }, [finishSplash]);
 
-  const shellClassName =
-    theme === "dark"
-      ? "bg-[#0d131b]"
-      : "bg-[linear-gradient(180deg,#f7eed8_0%,#ecd8b0_52%,#ddc08b_100%)]";
-  const titleClassName = theme === "dark" ? "text-[#f0f0f0]" : "text-[#111111]";
+  const shellClassName = theme === "dark" ? "bg-[#0d131b]" : "bg-[#f7eed8bf]";
+  const titleClassName = theme === "dark" ? "text-[#f0f0f0]" : "text-[#444444]";
   const reflectionClassName =
-    theme === "dark" ? "text-[#f0f0f0]/40" : "text-[#111111]/60";
+    theme === "dark" ? "text-[#f0f0f0]/40" : "text-[#444444]/60";
 
   const waveMainStops =
     theme === "dark"
@@ -634,9 +618,9 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
 
       <svg
         data-splash-wash
-        viewBox="0 0 1440 520"
+        viewBox="0 0 1440 900"
         preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-x-0 top-[48%] h-[24%] w-full motion-safe:will-change-transform"
+        className="pointer-events-none absolute inset-x-0 top-[20%] h-[100%] w-full motion-safe:will-change-transform"
         aria-hidden="true"
       >
         <path
