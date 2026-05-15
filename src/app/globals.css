@@ -8,7 +8,7 @@
   --page-transition-overlap: 110ms;
   --page-transition-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --page-transition-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
-
+  /* --colorsdf: #f7eed80f; */
   --color-canvas: #ffffff;
   --color-canvas-soft: #eef4fb;
   --color-surface: #ffffff;
@@ -61,6 +61,7 @@ html[data-theme="dark"] {
   --font-display: var(--font-display);
   --radius-card: var(--radius-card);
   --shadow-card: var(--shadow-card);
+  --max-width-425: 106.25rem;
 }
 
 * {
@@ -71,6 +72,7 @@ html,
 body {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  overflow-x: hidden;
 }
 
 html {
@@ -150,6 +152,10 @@ html.theme-transitioning *::after {
   }
 }
 
+.site-header {
+  view-transition-name: none;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -158,20 +164,6 @@ html.theme-transitioning *::after {
 
 ::view-transition-group(.page-shell) {
   animation: none;
-  overflow: clip;
-}
-
-::view-transition-group(site-header) {
-  animation: none !important;
-  z-index: 100;
-}
-
-::view-transition-old(site-header) {
-  display: none;
-}
-
-::view-transition-new(site-header) {
-  animation: none !important;
 }
 
 ::view-transition-old(.page-shell) {

@@ -52,7 +52,8 @@ export default async function ArtworkDetailPage({
 
         <div className="flex h-full flex-col">
           <Link
-            href="/gallery"
+            href={`/gallery?vt=${artwork.slug}`}
+            transitionTypes={["artwork-open"]}
             className="text-muted hover:text-accent mb-5 inline-flex text-xs tracking-[0.2em] uppercase transition"
           >
             {dict.artworkPage.backToGallery}

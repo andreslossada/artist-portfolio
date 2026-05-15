@@ -28,7 +28,7 @@ export function ViewModeSwitch({ className }: ViewModeSwitchProps) {
     >
       <Link
         href="/"
-        transitionTypes={["header-nav"]}
+        transitionTypes={["landing-nav"]}
         aria-label="Columnas"
         title="Columnas"
         aria-current={isColumnsActive ? "page" : undefined}

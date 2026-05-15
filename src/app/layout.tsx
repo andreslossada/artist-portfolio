@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Lora, Manrope } from "next/font/google";
-import { RootViewTransition } from "@/components/ui/root-view-transition";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 import { getTheme } from "@/lib/theme";
@@ -43,9 +42,7 @@ export default async function RootLayout({
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
       <body className="bg-canvas text-ink flex min-h-full flex-col">
-        <RootViewTransition>
-          {children}
-        </RootViewTransition>
+        {children}
       </body>
     </html>
   );

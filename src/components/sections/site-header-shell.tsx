@@ -2,7 +2,6 @@
 
 import { Suspense } from "react";
 import Link from "next/link";
-import { ViewTransition } from "react";
 import { HeaderCartLink } from "@/components/ui/header-cart-link";
 import { HeaderNavLink } from "@/components/ui/header-nav-link";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
@@ -45,19 +44,12 @@ export function SiteHeaderShell({
   hideWordmark = false,
 }: SiteHeaderShellProps) {
   return (
-    <ViewTransition
-      name="site-header"
-      enter="none"
-      exit="none"
-      share="none"
-      update="none"
-    >
-      <header className={headerClassName}>
+    <header className={`site-header ${headerClassName}`}>
         <div className="mx-auto grid w-full max-w-425 grid-cols-[auto_1fr_auto] items-center gap-3 px-5 py-4 md:px-10 md:py-6">
           <div className="flex items-center">
             <Link
               href="/"
-              transitionTypes={["header-nav"]}
+              transitionTypes={["landing-nav"]}
               className={`${irinaWordmarkFont.className} hover:text-accent inline-flex h-8 items-center text-[2rem] leading-none font-medium tracking-[0.06em] italic transition-colors md:h-10`}
             >
               {hideWordmark ? (
@@ -99,6 +91,5 @@ export function SiteHeaderShell({
           </nav>
         </div>
       </header>
-    </ViewTransition>
   );
 }

@@ -14,6 +14,7 @@ export function GalleryList({ artworks }: GalleryListProps) {
         <Link
           key={artwork.id}
           href={`/artwork/${artwork.slug}?vt=${artwork.slug}`}
+          transitionTypes={["artwork-open"]}
           className="group border-ink/10 hover:border-accent/35 grid grid-cols-[92px_1fr] items-stretch overflow-hidden border bg-surface transition-colors md:grid-cols-[160px_1fr]"
         >
           <ViewTransition

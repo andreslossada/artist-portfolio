@@ -3,11 +3,7 @@
 import { usePathname } from "next/navigation";
 import { ViewTransition } from "react";
 
-export function RootViewTransition({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   if (pathname.startsWith("/studio")) {

@@ -1,3 +1,4 @@
+import { PageTransition } from "@/components/ui/page-transition";
 import { SiteFooter } from "@/components/sections/site-footer";
 import { SiteHeader } from "@/components/sections/site-header";
 
@@ -9,8 +10,10 @@ export default function GalleryLayout({
   return (
     <>
       <SiteHeader />
-      {children}
-      <SiteFooter />
+      <PageTransition>
+        {children}
+        <SiteFooter />
+      </PageTransition>
     </>
   );
 }
