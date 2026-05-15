@@ -6,10 +6,10 @@ import Link from "next/link";
 import gsap from "gsap";
 import {
   ViewTransition,
-  addTransitionType,
   startTransition,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -87,10 +87,11 @@ export function CreativePortfolioLanding({
   const loopedLandingGalleryItems = useMemo(
     () =>
       Array.from({ length: sliderLoopCopies }, (_, copyIndex) =>
-        artworks.map((item) => ({
+        artworks.map((item, index) => ({
           ...item,
           copyIndex,
           loopKey: `${copyIndex}-${item.id}`,
+          index,
         })),
       ).flat(),
     [artworks],
@@ -106,15 +107,7 @@ export function CreativePortfolioLanding({
   const [showSplash, setShowSplash] = useState(
     () => !shownSplashThemes.has(theme),
   );
-  const [isSliderIntroReady, setIsSliderIntroReady] = useState(false);
-  const markSliderIntroReady = useCallback(() => {
-    window.requestAnimationFrame(() => {
-      setIsSliderIntroReady(true);
-    });
-  }, []);
   const handleSplashComplete = useCallback(() => {
-    addTransitionType("splash-wordmark");
-
     startTransition(() => {
       shownSplashThemes.add(theme);
       setShowSplash(false);
@@ -370,7 +363,7 @@ export function CreativePortfolioLanding({
     };
   }, [syncRailLoopState]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (showSplash) {
       return;
     }
@@ -382,188 +375,226 @@ export function CreativePortfolioLanding({
       return;
     }
 
-    const cards = Array.from(
-      railContent.querySelectorAll<HTMLElement>("[data-slider-card]"),
-    );
-    const cardCurtains = cards
-      .map((card) => card.querySelector<HTMLElement>("[data-slider-curtain]"))
-      .filter((curtain): curtain is HTMLElement => curtain !== null);
-    const maxAnimatedCards = 5;
+    const ctx = gsap.context(() => {
+      const cards = Array.from(
+        railContent.querySelectorAll<HTMLElement>("[data-slider-card]"),
+      );
+      const cardCurtains = cards
+        .map((card) => card.querySelector<HTMLElement>("[data-slider-curtain]"))
+        .filter((curtain): curtain is HTMLElement => curtain !== null);
+      const maxAnimatedCards = 5;
 
-    if (cards.length === 0) {
-      markSliderIntroReady();
-      return;
-    }
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      gsap.set(cards, {
-        autoAlpha: 1,
-        x: 0,
-        scale: 1,
-        clearProps: "x,scale,opacity,visibility,zIndex,willChange",
-      });
-      gsap.set(cardCurtains, {
-        clearProps: "yPercent,opacity,transform,willChange",
-      });
-      markSliderIntroReady();
-      return;
-    }
-
-    let timeline: gsap.core.Timeline | null = null;
-    let removeCenterImageListener: (() => void) | null = null;
-    const frameId = window.requestAnimationFrame(() => {
-      const railRect = rail.getBoundingClientRect();
-      const viewportCenterX = railRect.left + railRect.width / 2;
-      const cardEntries = cards.map((card, index) => {
-        const cardRect = card.getBoundingClientRect();
-        const centerX = cardRect.left + cardRect.width / 2;
-
-        return {
-          card,
-          index,
-          centerX,
-          distanceToCenter: Math.abs(centerX - viewportCenterX),
-        };
-      });
-
-      const animatedEntries = [...cardEntries]
-        .sort((a, b) => a.distanceToCenter - b.distanceToCenter)
-        .slice(0, Math.min(maxAnimatedCards, cardEntries.length))
-        .sort((a, b) => a.index - b.index);
-
-      if (animatedEntries.length === 0) {
-        markSliderIntroReady();
+      if (cards.length === 0) {
         return;
       }
 
-      const centerEntry = animatedEntries.reduce((closest, entry) =>
-        entry.distanceToCenter < closest.distanceToCenter ? entry : closest,
-      );
-      const animatedCards = animatedEntries.map(({ card }) => card);
-      const animatedCurtains = animatedCards
-        .map((card) => card.querySelector<HTMLElement>("[data-slider-curtain]"))
-        .filter((curtain): curtain is HTMLElement => curtain !== null);
-      const centerCurtain = centerEntry.card.querySelector<HTMLElement>(
-        "[data-slider-curtain]",
-      );
-      const sideCards = animatedEntries
-        .filter(({ index }) => index !== centerEntry.index)
-        .map(({ card }) => card);
-
-      gsap.set(animatedCards, {
-        autoAlpha: 1,
-        scale: 0.94,
-        willChange: "transform, opacity",
-      });
-
-      const maxLayer = animatedEntries.length * 2;
-
-      animatedEntries.forEach((entry) => {
-        const distance = Math.abs(entry.index - centerEntry.index);
-        const sideBias = entry.index < centerEntry.index ? 1 : 0;
-
-        gsap.set(entry.card, {
-          x: Math.round(viewportCenterX - entry.centerX),
-          zIndex: Math.max(1, maxLayer - distance * 2 + sideBias),
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        gsap.set(cards, {
+          autoAlpha: 1,
+          x: 0,
+          scale: 1,
+          clearProps: "x,scale,opacity,visibility,zIndex,willChange",
         });
-      });
-
-      gsap.set(centerEntry.card, {
-        autoAlpha: 1,
-        scale: 1,
-        zIndex: maxLayer + 2,
-      });
-
-      if (centerCurtain) {
-        gsap.set(centerCurtain, {
-          yPercent: 0,
-          opacity: 1,
-          willChange: "transform, opacity",
+        gsap.set(cardCurtains, {
+          clearProps: "yPercent,opacity,transform,willChange",
         });
+        return;
       }
 
-      const playIntro = () => {
-        if (timeline) {
+      gsap.set(cards, { autoAlpha: 0 });
+
+      let timeline: gsap.core.Timeline | null = null;
+      let removeCenterImageListener: (() => void) | null = null;
+      let fallbackTimerId: ReturnType<typeof setTimeout> | null = null;
+
+      const setupAnimation = () => {
+        const railRect = rail.getBoundingClientRect();
+        const viewportCenterX = railRect.left + railRect.width / 2;
+        const cardEntries = cards.map((card, index) => {
+          const cardRect = card.getBoundingClientRect();
+          const centerX = cardRect.left + cardRect.width / 2;
+
+          return {
+            card,
+            index,
+            centerX,
+            distanceToCenter: Math.abs(centerX - viewportCenterX),
+          };
+        });
+
+        const animatedEntries = [...cardEntries]
+          .sort((a, b) => a.distanceToCenter - b.distanceToCenter)
+          .slice(0, Math.min(maxAnimatedCards, cardEntries.length))
+          .sort((a, b) => a.index - b.index);
+
+        if (animatedEntries.length === 0) {
           return;
         }
 
-        markSliderIntroReady();
+        const centerEntry = animatedEntries.reduce((closest, entry) =>
+          entry.distanceToCenter < closest.distanceToCenter ? entry : closest,
+        );
+        const animatedCards = animatedEntries.map(({ card }) => card);
+        const animatedCurtains = animatedCards
+          .map((card) =>
+            card.querySelector<HTMLElement>("[data-slider-curtain]"),
+          )
+          .filter((curtain): curtain is HTMLElement => curtain !== null);
+        const centerMedia = centerEntry.card.querySelector<HTMLElement>(
+          "[data-slider-media]",
+        );
+        const sideCards = animatedEntries
+          .filter(({ index }) => index !== centerEntry.index)
+          .map(({ card }) => card);
 
-        timeline = gsap.timeline({
-          defaults: { ease: "power3.out" },
-          onComplete: () => {
-            gsap.set(animatedCards, {
-              clearProps: "x,scale,opacity,visibility,zIndex,willChange",
-            });
-            gsap.set(animatedCurtains, {
-              clearProps: "yPercent,opacity,transform,willChange",
-            });
-          },
+        gsap.set(sideCards, {
+          autoAlpha: 0,
+          scale: 0.94,
+          willChange: "transform, opacity",
         });
 
-        if (centerCurtain) {
-          timeline.to(
-            centerCurtain,
-            {
-              yPercent: 100,
-              duration: 0.8,
-              ease: "power2.out",
-            },
-            0,
-          );
+        const maxLayer = animatedEntries.length * 2;
+
+        animatedEntries.forEach((entry) => {
+          const distance = Math.abs(entry.index - centerEntry.index);
+          const sideBias = entry.index < centerEntry.index ? 1 : 0;
+
+          gsap.set(entry.card, {
+            x: Math.round(viewportCenterX - entry.centerX),
+            zIndex: Math.max(1, maxLayer - distance * 2 + sideBias),
+          });
+        });
+
+        gsap.set(centerEntry.card, {
+          autoAlpha: 1,
+          scale: 1,
+          zIndex: maxLayer + 2,
+        });
+
+        if (centerMedia) {
+          gsap.set(centerEntry.card, { backgroundColor: "transparent" });
+          gsap.set(centerMedia, {
+            clipPath: "inset(0% 0% 100% 0%)",
+            willChange: "clip-path",
+          });
         }
 
-        timeline.to(
-          sideCards,
-          {
-            x: 0,
-            scale: 1,
-            duration: 1.2,
-            stagger: { each: 0.08, from: "center" },
-            ease: "power3.out",
-          },
-          ">",
-        );
+        const playIntro = () => {
+          if (timeline) {
+            return;
+          }
 
-        timeline.to(
-          centerEntry.card,
-          {
-            x: 0,
-            duration: 1.2,
-            ease: "power3.out",
-          },
-          "<",
-        );
+          timeline = gsap.timeline({
+            defaults: { ease: "power3.out" },
+            onComplete: () => {
+              gsap.set(animatedCards, {
+                clearProps: "x,scale,opacity,visibility,zIndex,willChange",
+              });
+              gsap.set(animatedCurtains, {
+                clearProps: "yPercent,opacity,transform,willChange",
+              });
+              if (centerMedia) {
+                gsap.set([centerEntry.card, centerMedia], {
+                  clearProps: "clipPath,willChange,backgroundColor",
+                });
+              }
+              gsap.set(cards, {
+                clearProps: "opacity,visibility",
+              });
+            },
+          });
+
+          if (centerMedia) {
+            timeline.to(
+              centerMedia,
+              {
+                clipPath: "inset(0% 0% 0% 0%)",
+                duration: 0.8,
+                ease: "power2.out",
+              },
+              0.7,
+            );
+          }
+
+          timeline.to(
+            sideCards,
+            {
+              x: 0,
+              scale: 1,
+              autoAlpha: 1,
+              duration: 1.2,
+              stagger: { each: 0.08, from: "center" },
+              ease: "power3.out",
+            },
+            ">",
+          );
+
+          timeline.to(
+            centerEntry.card,
+            {
+              x: 0,
+              duration: 1.2,
+              ease: "power3.out",
+            },
+            "<",
+          );
+        };
+
+        const centerImage =
+          centerEntry.card.querySelector<HTMLImageElement>("img");
+
+        if (centerImage && !centerImage.complete) {
+          const handleImageReady = () => {
+            playIntro();
+          };
+
+          centerImage.addEventListener("load", handleImageReady, {
+            once: true,
+          });
+          centerImage.addEventListener("error", handleImageReady, {
+            once: true,
+          });
+
+          removeCenterImageListener = () => {
+            centerImage.removeEventListener("load", handleImageReady);
+            centerImage.removeEventListener("error", handleImageReady);
+          };
+
+          return;
+        }
+
+        playIntro();
       };
 
-      const centerImage =
-        centerEntry.card.querySelector<HTMLImageElement>("img");
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(setupAnimation);
+      });
 
-      if (centerImage && !centerImage.complete) {
-        const handleImageReady = () => {
-          playIntro();
-        };
+      fallbackTimerId = setTimeout(() => {
+        if (!timeline) {
+          gsap.set(cards, {
+            autoAlpha: 1,
+            clearProps: "transform,willChange",
+          });
+          gsap.set(cardCurtains, {
+            clearProps: "transform,willChange",
+          });
+        }
+      }, 2000);
 
-        centerImage.addEventListener("load", handleImageReady, { once: true });
-        centerImage.addEventListener("error", handleImageReady, { once: true });
-
-        removeCenterImageListener = () => {
-          centerImage.removeEventListener("load", handleImageReady);
-          centerImage.removeEventListener("error", handleImageReady);
-        };
-
-        return;
-      }
-
-      playIntro();
-    });
+      return () => {
+        if (fallbackTimerId) {
+          clearTimeout(fallbackTimerId);
+        }
+        removeCenterImageListener?.();
+        timeline?.kill();
+      };
+    }, railContent);
 
     return () => {
-      window.cancelAnimationFrame(frameId);
-      removeCenterImageListener?.();
-      timeline?.kill();
+      ctx.revert();
     };
-  }, [markSliderIntroReady, showSplash]);
+  }, [showSplash]);
 
   return (
     <div
@@ -574,14 +605,15 @@ export function CreativePortfolioLanding({
         <SplashScreen theme={theme} onComplete={handleSplashComplete} />
       ) : null}
 
-      <div className="fixed inset-x-0 top-0 z-30 overflow-hidden">
+      <div
+        className={`fixed inset-x-0 top-0 z-30 overflow-hidden ${showSplash ? "invisible" : ""}`}
+      >
         <SiteHeaderShell
           locale={locale}
           theme={theme}
           languageLabels={languageLabels}
           themeLabels={themeLabels}
           hideWordmark={showSplash}
-          wordmarkTransitionName={showSplash ? undefined : "irina-wordmark"}
           navLabels={{
             shop: labels.shop,
             about: labels.about,
@@ -603,7 +635,7 @@ export function CreativePortfolioLanding({
           >
             <div
               ref={railContentRef}
-              className={`flex h-full w-full gap-3 md:gap-4 ${isSliderIntroReady ? "opacity-100" : "opacity-0"}`}
+              className={`flex h-full w-full gap-3 md:gap-4 ${showSplash ? "invisible" : ""}`}
             >
               {loopedLandingGalleryItems.map((item) => (
                 <article
@@ -634,14 +666,13 @@ export function CreativePortfolioLanding({
                           sizes="(max-width: 768px) 62vw, 22rem"
                           className="object-cover object-center contrast-105 saturate-105 transition-transform duration-300 ease-in-out group-hover:scale-[1.02]"
                           priority={
-                            (item.slug === artworks[0]?.slug ||
-                              item.slug === artworks[1]?.slug) &&
-                            item.copyIndex === centerLoopCopyIndex
+                            item.copyIndex === centerLoopCopyIndex &&
+                            item.index < 5
                           }
                         />
                         <div
                           data-slider-curtain
-                          className="bg-surface pointer-events-none absolute -inset-px z-10 opacity-0"
+                          className="bg-canvas-soft pointer-events-none absolute -inset-px z-10 opacity-0"
                           aria-hidden="true"
                         />
                       </div>
