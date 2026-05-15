@@ -31,7 +31,6 @@ type SiteHeaderShellProps = {
   };
   showCart?: boolean;
   headerClassName?: string;
-  wordmarkTransitionName?: string;
   hideWordmark?: boolean;
 };
 
@@ -43,7 +42,6 @@ export function SiteHeaderShell({
   navLabels,
   showCart = true,
   headerClassName = "border-b border-accent/15 bg-transparent",
-  wordmarkTransitionName,
   hideWordmark = false,
 }: SiteHeaderShellProps) {
   return (
@@ -62,14 +60,7 @@ export function SiteHeaderShell({
               transitionTypes={["header-nav"]}
               className={`${irinaWordmarkFont.className} hover:text-accent inline-flex h-8 items-center text-[2rem] leading-none font-medium tracking-[0.06em] italic transition-colors md:h-10`}
             >
-              {wordmarkTransitionName ? (
-                <ViewTransition
-                  name={wordmarkTransitionName}
-                  share="irina-wordmark"
-                >
-                  <span className="block">Irina</span>
-                </ViewTransition>
-              ) : hideWordmark ? (
+              {hideWordmark ? (
                 <span
                   className="pointer-events-none block opacity-0 select-none"
                   aria-hidden="true"
