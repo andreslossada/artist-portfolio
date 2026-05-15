@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ViewTransition,
   useCallback,
   useEffect,
   useRef,
@@ -505,11 +504,62 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
 
   const shellClassName =
     theme === "dark"
-      ? "bg-[linear-gradient(180deg,#ad956f_0%,#d6c09a_52%,#f1e0bf_100%)]"
+      ? "bg-[#0d131b]"
       : "bg-[linear-gradient(180deg,#f7eed8_0%,#ecd8b0_52%,#ddc08b_100%)]";
-  const titleClassName = theme === "dark" ? "text-[#163a5b]" : "text-[#1e4568]";
+  const titleClassName = theme === "dark" ? "text-[#f0f0f0]" : "text-[#111111]";
   const reflectionClassName =
-    theme === "dark" ? "text-[#2f5f86]/92" : "text-[#3a6f96]/88";
+    theme === "dark" ? "text-[#f0f0f0]/40" : "text-[#111111]/60";
+
+  const waveMainStops =
+    theme === "dark"
+      ? [
+          "rgba(255,255,255,0.22)",
+          "rgba(255,255,255,0.18)",
+          "rgba(255,255,255,0.14)",
+          "rgba(255,255,255,0.10)",
+          "rgba(255,255,255,0.08)",
+        ]
+      : [
+          "rgba(255,255,255,0.88)",
+          "rgba(196,233,251,0.72)",
+          "rgba(64,158,206,0.76)",
+          "rgba(36,116,175,0.78)",
+          "rgba(36,116,175,0.72)",
+        ];
+
+  const waveSoftStops =
+    theme === "dark"
+      ? [
+          "rgba(255,255,255,0.18)",
+          "rgba(255,255,255,0.14)",
+          "rgba(255,255,255,0.10)",
+          "rgba(255,255,255,0.08)",
+          "rgba(255,255,255,0.06)",
+        ]
+      : [
+          "rgba(255,255,255,0.74)",
+          "rgba(217,244,255,0.56)",
+          "rgba(111,194,229,0.5)",
+          "rgba(77,166,208,0.52)",
+          "rgba(77,166,208,0.4)",
+        ];
+
+  const washBodyStops =
+    theme === "dark"
+      ? [
+          "rgba(255,255,255,0.14)",
+          "rgba(255,255,255,0.10)",
+          "rgba(255,255,255,0.08)",
+          "rgba(255,255,255,0.06)",
+          "rgba(255,255,255,0.04)",
+        ]
+      : [
+          "rgba(241,251,255,0.78)",
+          "rgba(194,234,250,0.4)",
+          "rgba(148,210,236,0.34)",
+          "rgba(106,182,218,0.26)",
+          "rgba(106,182,218,0.14)",
+        ];
 
   return (
     <div
@@ -543,11 +593,11 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
 
         <defs>
           <linearGradient id="waveMain" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.88)" />
-            <stop offset="30%" stopColor="rgba(196,233,251,0.72)" />
-            <stop offset="72%" stopColor="rgba(64,158,206,0.76)" />
-            <stop offset="90%" stopColor="rgba(36,116,175,0.78)" />
-            <stop offset="100%" stopColor="rgba(36,116,175,0.72)" />
+            <stop offset="0%" stopColor={waveMainStops[0]} />
+            <stop offset="30%" stopColor={waveMainStops[1]} />
+            <stop offset="72%" stopColor={waveMainStops[2]} />
+            <stop offset="90%" stopColor={waveMainStops[3]} />
+            <stop offset="100%" stopColor={waveMainStops[4]} />
           </linearGradient>
         </defs>
       </svg>
@@ -573,11 +623,11 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
 
         <defs>
           <linearGradient id="waveSoft" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.74)" />
-            <stop offset="34%" stopColor="rgba(217,244,255,0.56)" />
-            <stop offset="74%" stopColor="rgba(111,194,229,0.5)" />
-            <stop offset="92%" stopColor="rgba(77,166,208,0.52)" />
-            <stop offset="100%" stopColor="rgba(77,166,208,0.4)" />
+            <stop offset="0%" stopColor={waveSoftStops[0]} />
+            <stop offset="34%" stopColor={waveSoftStops[1]} />
+            <stop offset="74%" stopColor={waveSoftStops[2]} />
+            <stop offset="92%" stopColor={waveSoftStops[3]} />
+            <stop offset="100%" stopColor={waveSoftStops[4]} />
           </linearGradient>
         </defs>
       </svg>
@@ -597,11 +647,11 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
 
         <defs>
           <linearGradient id="washBody" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(241,251,255,0.78)" />
-            <stop offset="38%" stopColor="rgba(194,234,250,0.4)" />
-            <stop offset="78%" stopColor="rgba(148,210,236,0.34)" />
-            <stop offset="92%" stopColor="rgba(106,182,218,0.26)" />
-            <stop offset="100%" stopColor="rgba(106,182,218,0.14)" />
+            <stop offset="0%" stopColor={washBodyStops[0]} />
+            <stop offset="38%" stopColor={washBodyStops[1]} />
+            <stop offset="78%" stopColor={washBodyStops[2]} />
+            <stop offset="92%" stopColor={washBodyStops[3]} />
+            <stop offset="100%" stopColor={washBodyStops[4]} />
           </linearGradient>
         </defs>
       </svg>
@@ -609,14 +659,12 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
       <div className="absolute inset-x-0 top-[34%] flex justify-center px-6">
         <div className="relative flex flex-col items-center">
           <div className="relative overflow-visible px-4 py-5">
-            <ViewTransition name="irina-wordmark" share="irina-wordmark">
-              <span
-                data-splash-title
-                className={`${irinaWordmarkFont.className} relative z-10 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic ${titleClassName}`}
-              >
-                Irina
-              </span>
-            </ViewTransition>
+            <span
+              data-splash-title
+              className={`${irinaWordmarkFont.className} relative z-10 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic ${titleClassName}`}
+            >
+              Irina
+            </span>
 
             <span
               data-splash-title-reflection
