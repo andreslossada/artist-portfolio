@@ -40,15 +40,15 @@ export default async function ContactPage() {
         <p className="text-muted text-xs tracking-[0.3em] uppercase">
           {dict.contactPage.eyebrow}
         </p>
-        <h1 className="font-display mt-3 text-5xl leading-tight md:text-6xl">
+        <h1 className="font-display mt-3 text-4xl leading-tight md:text-6xl">
           {dict.contactPage.title}
         </h1>
-        <p className="text-muted mt-6 text-base leading-relaxed md:text-lg">
+        <p className="text-muted mt-4 text-base leading-relaxed md:mt-6 md:text-lg">
           {dict.contactPage.description}
         </p>
       </header>
 
-      <section className="mt-10 grid gap-5 md:grid-cols-3">
+      <section className="mt-8 grid gap-4 md:mt-10 md:grid-cols-3 md:gap-5">
         {contactChannels.map((channel) => {
           const isEmail = channel.href.startsWith("mailto:");
 
@@ -58,10 +58,10 @@ export default async function ContactPage() {
               href={channel.href}
               target={channel.href.startsWith("http") ? "_blank" : undefined}
               rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
-              className={`contact-card border-ink/10 shadow-card border p-6 transition-all duration-300 ease-out ${
+              className={`contact-card border-ink/10 shadow-card border p-5 transition-all duration-300 ease-out active:scale-[0.98] md:p-6 ${
                   isEmail
                     ? "bg-accent !text-white hover:border-accent/80"
-                    : "hover:border-accent/30 bg-surface hover:scale-[1.02]"
+                    : "hover:border-accent/30 bg-surface md:hover:scale-[1.02]"
                 }`}
             >
               <p
@@ -71,7 +71,7 @@ export default async function ContactPage() {
               >
                 {channel.label}
               </p>
-              <p className="font-display mt-3 text-3xl leading-tight">
+              <p className="font-display mt-2 break-words text-2xl leading-tight md:mt-3 md:text-3xl">
                 {channel.value}
               </p>
             </a>
@@ -79,23 +79,23 @@ export default async function ContactPage() {
         })}
       </section>
 
-      <section className="border-ink/10 mt-10 border bg-surface p-6 md:p-8">
-        <h2 className="font-display text-4xl leading-tight">
+      <section className="border-ink/10 mt-8 border bg-surface p-5 md:mt-10 md:p-8">
+        <h2 className="font-display text-3xl leading-tight md:text-4xl">
           {dict.contactPage.acquisitionsTitle}
         </h2>
-        <p className="text-muted mt-4 max-w-2xl text-base leading-relaxed md:text-lg">
+        <p className="text-muted mt-3 max-w-2xl text-base leading-relaxed md:mt-4 md:text-lg">
           {dict.contactPage.acquisitionsDescription}
         </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-5 flex flex-col gap-3 md:mt-6 md:flex-row md:flex-wrap">
           <Link
             href="mailto:irinagaray17@gmail.com"
-            className="bg-accent px-5 py-2 text-sm font-semibold !text-white visited:!text-white hover:!text-white transition hover:brightness-110"
+            className="bg-accent px-5 py-3 text-center text-sm font-semibold !text-white visited:!text-white hover:!text-white transition hover:brightness-110 md:py-2"
           >
             {dict.contactPage.channels.email}
           </Link>
           <Link
             href="/gallery"
-            className="border-accent/35 text-accent hover:bg-accent-soft/55 border px-5 py-2 text-sm font-semibold transition"
+            className="border-accent/35 text-accent hover:bg-accent-soft/55 border px-5 py-3 text-center text-sm font-semibold transition md:py-2"
           >
             {dict.contactPage.viewArtwork}
           </Link>

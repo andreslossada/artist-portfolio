@@ -34,16 +34,16 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
-      <header className="mb-10">
+      <header className="mb-8 md:mb-10">
         <p className="text-muted text-xs tracking-[0.3em] uppercase">
           {dict.shopPage.eyebrow}
         </p>
-        <h1 className="font-display mt-2 text-5xl leading-tight">
+        <h1 className="font-display mt-2 text-4xl leading-tight md:text-5xl">
           {dict.shopPage.title}
         </h1>
       </header>
 
-      <nav className="border-ink/10 mb-10 flex flex-wrap gap-2 border-b pb-4">
+      <nav className="border-ink/10 mb-8 flex flex-wrap gap-2 border-b pb-4 md:mb-10">
         <Link
           href="/shop"
           className={`inline-flex h-9 items-center border px-4 text-sm font-semibold transition ${
