@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HeaderCartLink } from "@/components/ui/header-cart-link";
 import { HeaderNavLink } from "@/components/ui/header-nav-link";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { MobileMenu } from "@/components/ui/mobile-menu";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { ViewModeSwitch } from "@/components/ui/view-mode-switch";
 import type { Locale } from "@/lib/i18n";
@@ -71,7 +72,8 @@ export function SiteHeaderShell({
             </Suspense>
           </div>
 
-          <nav className="flex items-center gap-3 text-xs md:gap-12 md:text-[1.95rem] md:leading-none">
+          {/* Desktop navigation */}
+          <nav className="hidden items-center gap-3 text-xs md:flex md:gap-12 md:text-[1.95rem] md:leading-none">
             <LanguageSwitcher
               locale={locale}
               labels={languageLabels}
@@ -89,6 +91,18 @@ export function SiteHeaderShell({
             <HeaderNavLink href="/contact">{navLabels.contact}</HeaderNavLink>
             {showCart ? <HeaderCartLink label={navLabels.cart} /> : null}
           </nav>
+
+          {/* Mobile menu */}
+          <div className="flex items-center justify-end md:hidden">
+            <MobileMenu
+              locale={locale}
+              theme={theme}
+              languageLabels={languageLabels}
+              themeLabels={themeLabels}
+              navLabels={navLabels}
+              showCart={showCart}
+            />
+          </div>
         </div>
       </header>
   );
