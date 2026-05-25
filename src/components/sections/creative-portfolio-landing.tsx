@@ -160,27 +160,25 @@ export function CreativePortfolioLanding({
 
     const minBoundary = singleLoopWidth * (centerLoopCopyIndex - 0.5);
     const maxBoundary = singleLoopWidth * (centerLoopCopyIndex + 0.5);
+    const railScrollLeft = rail.scrollLeft;
+    let effectiveScrollLeft = railScrollLeft;
     let didWrap = false;
 
-    if (rail.scrollLeft < minBoundary) {
-      rail.scrollLeft += singleLoopWidth;
+    if (railScrollLeft < minBoundary) {
+      effectiveScrollLeft = railScrollLeft + singleLoopWidth;
       didWrap = true;
-    }
-
-    if (rail.scrollLeft > maxBoundary) {
-      rail.scrollLeft -= singleLoopWidth;
+    } else if (railScrollLeft > maxBoundary) {
+      effectiveScrollLeft = railScrollLeft - singleLoopWidth;
       didWrap = true;
     }
 
     if (didWrap && lenis) {
-      lenis.scrollTo(rail.scrollLeft, {
-        immediate: true,
-        force: true,
-      });
+      lenis.scrollTo(effectiveScrollLeft, { immediate: true });
     }
 
     const loopOffset =
-      ((rail.scrollLeft % singleLoopWidth) + singleLoopWidth) % singleLoopWidth;
+      ((effectiveScrollLeft % singleLoopWidth) + singleLoopWidth) %
+      singleLoopWidth;
     const progress = loopOffset / singleLoopWidth;
     const nextSegment = Math.round(progress * (progressSegments - 1));
     setActiveSegment(nextSegment);
@@ -209,7 +207,7 @@ export function CreativePortfolioLanding({
 
         const cardOffset = card.offsetLeft - railContentOffsetLeft;
         const visibleCenterX =
-          railLeft + cardOffset + card.offsetWidth / 2 - rail.scrollLeft;
+          railLeft + cardOffset + card.offsetWidth / 2 - effectiveScrollLeft;
 
         if (
           visibleCenterX + card.offsetWidth / 2 < railLeft ||
