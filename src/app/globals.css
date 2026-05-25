@@ -152,6 +152,10 @@ html.theme-transitioning *::after {
   }
 }
 
+html[data-splash="active"] .site-header {
+  visibility: hidden;
+}
+
 .site-header {
   view-transition-name: none;
 }

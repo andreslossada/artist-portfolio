@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
 import { irinaWordmarkFont } from "@/lib/wordmark-font";
+import { ShellIcon } from "@/components/ui/shell-icon";
 import type { Theme } from "@/lib/theme";
 
 type SplashScreenProps = {
@@ -233,6 +234,14 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
   }, [onComplete]);
 
   useEffect(() => {
+    document.documentElement.setAttribute("data-splash", "active");
+
+    return () => {
+      document.documentElement.removeAttribute("data-splash");
+    };
+  }, []);
+
+  useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -260,6 +269,7 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
         "[data-wave-soft-fill]",
       );
       const title = scope.querySelector<HTMLElement>("[data-splash-title]");
+      const shellIcon = scope.querySelector<HTMLElement>("[data-splash-shell]");
       const titleReflection = scope.querySelector<HTMLElement>(
         "[data-splash-title-reflection]",
       );
@@ -301,6 +311,10 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
         opacity: 0,
         y: 0,
         filter: "blur(8px)",
+        clipPath: "inset(0% 0% 100% 0%)",
+      });
+      gsap.set(shellIcon, {
+        opacity: 0,
         clipPath: "inset(0% 0% 100% 0%)",
       });
       gsap.set(titleReflection, {
@@ -461,6 +475,17 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
       );
 
       timeline.to(
+        shellIcon,
+        {
+          clipPath: "inset(0% 0% 0% 0%)",
+          opacity: 1,
+          duration: 0.84,
+          ease: "sine.out",
+        },
+        retreatStart + 0.08,
+      );
+
+      timeline.to(
         titleReflection,
         {
           clipPath: "inset(0% 0% 0% 0%)",
@@ -548,7 +573,7 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
   return (
     <div
       ref={scopeRef}
-      className={`fixed inset-0 z-9999 flex h-screen w-screen items-center justify-center overflow-hidden ${shellClassName}`}
+      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center overflow-hidden ${shellClassName}`}
       style={isAnimationReady ? undefined : { visibility: "hidden" }}
       role="presentation"
       aria-hidden="true"
@@ -643,25 +668,35 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
       <div className="absolute inset-x-0 top-[34%] flex justify-center px-6">
         <div className="relative flex flex-col items-center">
           <div className="relative overflow-visible px-4 py-5">
-            <span
-              data-splash-title
-              className={`${irinaWordmarkFont.className} relative z-10 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic ${titleClassName}`}
-            >
-              Irina
-            </span>
+            <div className="relative z-10 flex items-center gap-[0.15em]">
+              <span
+                data-splash-shell
+                className="flex shrink-0 items-center text-[clamp(3.6rem,13vw,9rem)]"
+              >
+                <ShellIcon size="0.65em" />
+              </span>
+              <span className="relative">
+                <span
+                  data-splash-title
+                  className={`${irinaWordmarkFont.className} block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] italic ${titleClassName}`}
+                >
+                  Irina
+                </span>
 
-            <span
-              data-splash-title-reflection
-              className={`${irinaWordmarkFont.className} pointer-events-none absolute top-0 left-0 z-20 block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[0.06em] italic select-none ${reflectionClassName}`}
-              style={{
-                maskImage:
-                  "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,1) 100%)",
-                WebkitMaskImage:
-                  "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,1) 100%)",
-              }}
-            >
-              Irina
-            </span>
+                <span
+                  data-splash-title-reflection
+                  className={`${irinaWordmarkFont.className} pointer-events-none absolute inset-0 text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] italic select-none ${reflectionClassName}`}
+                  style={{
+                    maskImage:
+                      "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,1) 100%)",
+                    WebkitMaskImage:
+                      "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,1) 100%)",
+                  }}
+                >
+                  Irina
+                </span>
+              </span>
+            </div>
           </div>
         </div>
       </div>
