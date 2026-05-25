@@ -89,6 +89,22 @@ export function CreativePortfolioLanding({
   );
   const [isRailReady, setIsRailReady] = useState(false);
   const prevShowSplashRef = useRef(showSplash);
+  const parallaxCacheRef = useRef<{
+    wraps: HTMLElement[];
+    cards: HTMLElement[];
+    imgs: (HTMLImageElement | null)[];
+    railLeft: number;
+    railWidth: number;
+    railContentOffsetLeft: number;
+  }>({
+    wraps: [],
+    cards: [],
+    imgs: [],
+    railLeft: 0,
+    railWidth: 0,
+    railContentOffsetLeft: 0,
+  });
+  const reducedMotionRef = useRef(false);
   const handleSplashComplete = useCallback(() => {
     startTransition(() => {
       shownSplashThemes.add(theme);
@@ -96,6 +112,27 @@ export function CreativePortfolioLanding({
       setIsRailReady(false);
     });
   }, [theme]);
+
+  const populateParallaxCache = useCallback(() => {
+    const rail = railRef.current;
+    const railContent = railContentRef.current;
+    if (!rail || !railContent) return;
+    const rect = rail.getBoundingClientRect();
+    const wraps = [
+      ...railContent.querySelectorAll<HTMLElement>("[data-parallax-wrap]"),
+    ];
+    const cards = [
+      ...railContent.querySelectorAll<HTMLElement>("[data-slider-card]"),
+    ];
+    parallaxCacheRef.current = {
+      wraps,
+      cards,
+      imgs: wraps.map((w) => w.querySelector<HTMLImageElement>("img")),
+      railLeft: rect.left,
+      railWidth: rect.width,
+      railContentOffsetLeft: railContent.offsetLeft,
+    };
+  }, []);
 
   const syncRailLoopState = useCallback(() => {
     const rail = railRef.current;
@@ -148,58 +185,55 @@ export function CreativePortfolioLanding({
     const nextSegment = Math.round(progress * (progressSegments - 1));
     setActiveSegment(nextSegment);
 
-    const railContent = railContentRef.current;
-    if (railContent) {
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      const cards =
-        railContent.querySelectorAll<HTMLElement>("[data-slider-card]");
-      const parallaxWraps =
-        railContent.querySelectorAll<HTMLElement>("[data-parallax-wrap]");
-      const railRect = rail.getBoundingClientRect();
-      const railCenterX = railRect.left + railRect.width / 2;
+    let cache = parallaxCacheRef.current;
+    if (cache.wraps.length === 0 && !reducedMotionRef.current) {
+      populateParallaxCache();
+      cache = parallaxCacheRef.current;
+    }
+    if (cache.wraps.length > 0 && !reducedMotionRef.current) {
+      const {
+        wraps,
+        cards,
+        imgs,
+        railLeft,
+        railWidth,
+        railContentOffsetLeft,
+      } = cache;
+      const railCenterX = railLeft + railWidth / 2;
 
-      for (let i = 0; i < parallaxWraps.length; i++) {
-        const wrap = parallaxWraps[i];
-        const img = wrap.querySelector("img");
-
-        if (prefersReducedMotion) {
-          wrap.style.transform = "";
-          wrap.style.willChange = "";
-          if (img) img.style.scale = "";
-          continue;
-        }
-
+      for (let i = 0; i < wraps.length; i++) {
+        const wrap = wraps[i];
+        const img = imgs[i];
         const card = cards[i];
         if (!card) continue;
 
-        const offsetLeft = card.offsetLeft - railContent.offsetLeft;
-        const cardCenterX = offsetLeft + card.offsetWidth / 2 - rail.scrollLeft;
-        const visibleCenterX = railRect.left + cardCenterX;
+        const cardOffset = card.offsetLeft - railContentOffsetLeft;
+        const visibleCenterX =
+          railLeft + cardOffset + card.offsetWidth / 2 - rail.scrollLeft;
 
-        if (visibleCenterX + card.offsetWidth / 2 < railRect.left ||
-            visibleCenterX - card.offsetWidth / 2 > railRect.right) {
+        if (
+          visibleCenterX + card.offsetWidth / 2 < railLeft ||
+          visibleCenterX - card.offsetWidth / 2 > railLeft + railWidth
+        ) {
           wrap.style.transform = "";
           wrap.style.willChange = "";
           continue;
         }
 
-        const distanceFromCenter = visibleCenterX - railCenterX;
-        const halfRailWidth = railRect.width / 2;
-        const normalizedOffset =
-          Math.max(-1, Math.min(1, distanceFromCenter / halfRailWidth));
-
-        const translateX = normalizedOffset * parallaxMaxShiftPercent;
+        const normalizedOffset = Math.max(
+          -1,
+          Math.min(
+            1,
+            (visibleCenterX - railCenterX) / (railWidth / 2),
+          ),
+        );
 
         wrap.style.willChange = "transform";
-        wrap.style.transform = `translateX(${translateX}%)`;
-        if (img) {
-          img.style.scale = String(parallaxImageScale);
-        }
+        wrap.style.transform = `translateX(${normalizedOffset * parallaxMaxShiftPercent}%)`;
+        if (img) img.style.scale = String(parallaxImageScale);
       }
     }
-  }, [artworks.length, progressSegments]);
+  }, [artworks.length, progressSegments, populateParallaxCache]);
 
   const initializeRailScroll = useCallback(() => {
     const rail = railRef.current;
@@ -433,6 +467,25 @@ export function CreativePortfolioLanding({
       rail.removeEventListener("dragstart", preventNativeDrag);
     };
   }, [syncRailLoopState]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    reducedMotionRef.current = mq.matches;
+    const onChange = (e: MediaQueryListEvent) => {
+      reducedMotionRef.current = e.matches;
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (showSplash) return;
+    populateParallaxCache();
+    window.addEventListener("resize", populateParallaxCache);
+    return () => {
+      window.removeEventListener("resize", populateParallaxCache);
+    };
+  }, [showSplash, populateParallaxCache]);
 
   useLayoutEffect(() => {
     const prevShowSplash = prevShowSplashRef.current;
