@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
+import CopyEmailCard from "@/components/ui/copy-email-card";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -48,9 +49,19 @@ export default async function ContactPage() {
         </p>
       </header>
 
-      <section className="mt-8 grid gap-4 md:mt-10 md:grid-cols-3 md:gap-5">
+      <section className="mt-8 grid grid-cols-1 gap-4 md:mt-10 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
         {contactChannels.map((channel) => {
           const isEmail = channel.href.startsWith("mailto:");
+
+          if (isEmail) {
+            return (
+              <CopyEmailCard
+                key={channel.label}
+                label={channel.label}
+                email={channel.value}
+              />
+            );
+          }
 
           return (
             <a
@@ -58,20 +69,12 @@ export default async function ContactPage() {
               href={channel.href}
               target={channel.href.startsWith("http") ? "_blank" : undefined}
               rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
-              className={`contact-card border-ink/10 shadow-card border p-5 transition-all duration-300 ease-out active:scale-[0.98] md:p-6 ${
-                  isEmail
-                    ? "bg-accent !text-white hover:border-accent/80"
-                    : "hover:border-accent/30 bg-surface md:hover:scale-[1.02]"
-                }`}
+              className="contact-card border-ink/10 shadow-card hover:border-accent/30 bg-surface border p-5 transition-all duration-300 ease-out active:scale-[0.98] md:p-6 md:hover:scale-[1.02]"
             >
-              <p
-                className={`text-xs tracking-[0.2em] uppercase ${
-                  isEmail ? "text-white/85" : "text-muted"
-                }`}
-              >
+              <p className="text-muted text-xs tracking-[0.2em] uppercase">
                 {channel.label}
               </p>
-              <p className="font-display mt-2 break-words text-2xl leading-tight md:mt-3 md:text-3xl">
+              <p className="font-display mt-2 whitespace-nowrap text-sm leading-tight tracking-tight md:mt-3 md:text-base lg:text-lg">
                 {channel.value}
               </p>
             </a>
