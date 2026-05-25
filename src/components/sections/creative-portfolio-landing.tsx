@@ -23,7 +23,8 @@ const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 10;
 const mouseDragScrollFactor = 0.7;
 const shownSplashThemes = new Set<Theme>();
-const parallaxIntensity = 50;
+const parallaxImageScale = 1.7;
+const parallaxMaxShiftPercent = 30;
 
 type CreativePortfolioLandingProps = {
   theme: Theme;
@@ -149,28 +150,53 @@ export function CreativePortfolioLanding({
 
     const railContent = railContentRef.current;
     if (railContent) {
-      const viewportCenterX = window.innerWidth / 2;
       const prefersReducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
       ).matches;
-      const mediaContainers =
-        railContent.querySelectorAll("[data-slider-media]");
+      const cards =
+        railContent.querySelectorAll<HTMLElement>("[data-slider-card]");
+      const parallaxWraps =
+        railContent.querySelectorAll<HTMLElement>("[data-parallax-wrap]");
+      const railRect = rail.getBoundingClientRect();
+      const railCenterX = railRect.left + railRect.width / 2;
 
-      for (const container of mediaContainers) {
-        const img = container.querySelector("img");
-        if (!img) continue;
+      for (let i = 0; i < parallaxWraps.length; i++) {
+        const wrap = parallaxWraps[i];
+        const img = wrap.querySelector("img");
+
         if (prefersReducedMotion) {
-          img.style.objectPosition = "";
+          wrap.style.transform = "";
+          wrap.style.willChange = "";
+          if (img) img.style.scale = "";
           continue;
         }
-        const rect = container.getBoundingClientRect();
-        if (rect.right < 0 || rect.left > window.innerWidth) continue;
-        const imageCenterX = rect.left + rect.width / 2;
+
+        const card = cards[i];
+        if (!card) continue;
+
+        const offsetLeft = card.offsetLeft - railContent.offsetLeft;
+        const cardCenterX = offsetLeft + card.offsetWidth / 2 - rail.scrollLeft;
+        const visibleCenterX = railRect.left + cardCenterX;
+
+        if (visibleCenterX + card.offsetWidth / 2 < railRect.left ||
+            visibleCenterX - card.offsetWidth / 2 > railRect.right) {
+          wrap.style.transform = "";
+          wrap.style.willChange = "";
+          continue;
+        }
+
+        const distanceFromCenter = visibleCenterX - railCenterX;
+        const halfRailWidth = railRect.width / 2;
         const normalizedOffset =
-          (imageCenterX - viewportCenterX) / (window.innerWidth * 0.5);
-        const clampedOffset = Math.max(-1, Math.min(1, normalizedOffset));
-        const objectPositionX = 50 - clampedOffset * parallaxIntensity;
-        img.style.objectPosition = `${objectPositionX}% 50%`;
+          Math.max(-1, Math.min(1, distanceFromCenter / halfRailWidth));
+
+        const translateX = normalizedOffset * parallaxMaxShiftPercent;
+
+        wrap.style.willChange = "transform";
+        wrap.style.transform = `translateX(${translateX}%)`;
+        if (img) {
+          img.style.scale = String(parallaxImageScale);
+        }
       }
     }
   }, [artworks.length, progressSegments]);
@@ -265,6 +291,8 @@ export function CreativePortfolioLanding({
     let startScrollLeft = 0;
     let dragDistance = 0;
     let cancelClickUntil = 0;
+    let velocityTracker: { x: number; time: number }[] = [];
+    let lastDragTarget = 0;
 
     const startDragging = (event: PointerEvent) => {
       if (event.pointerType === "mouse" && event.button !== 0) {
@@ -277,7 +305,9 @@ export function CreativePortfolioLanding({
       activePointerType = event.pointerType;
       startX = event.clientX;
       startScrollLeft = rail.scrollLeft;
+      lastDragTarget = rail.scrollLeft;
       dragDistance = 0;
+      velocityTracker = [];
     };
 
     const dragRail = (event: PointerEvent) => {
@@ -306,7 +336,20 @@ export function CreativePortfolioLanding({
       dragDistance = Math.abs(deltaX);
       const dragScrollFactor =
         activePointerType === "mouse" ? mouseDragScrollFactor : 1;
-      rail.scrollLeft = startScrollLeft - deltaX * dragScrollFactor;
+      const targetScroll = startScrollLeft - deltaX * dragScrollFactor;
+      lastDragTarget = targetScroll;
+
+      velocityTracker.push({ x: event.clientX, time: event.timeStamp });
+      if (velocityTracker.length > 5) {
+        velocityTracker.shift();
+      }
+
+      const lenis = lenisRef.current;
+      if (lenis) {
+        lenis.scrollTo(targetScroll, { immediate: false, force: true });
+      } else {
+        rail.scrollLeft = targetScroll;
+      }
       syncRailLoopState();
     };
 
@@ -323,6 +366,22 @@ export function CreativePortfolioLanding({
 
       isDragging = false;
       rail.classList.remove("cursor-grabbing");
+
+      const lenis = lenisRef.current;
+      if (lenis && velocityTracker.length >= 2) {
+        const first = velocityTracker[0];
+        const last = velocityTracker[velocityTracker.length - 1];
+        const dt = last.time - first.time;
+        if (dt > 0) {
+          const pxPerMs = (last.x - first.x) / dt;
+          const momentum =
+            activePointerType === "mouse"
+              ? pxPerMs * mouseDragScrollFactor
+              : pxPerMs;
+          const momentumTarget = lastDragTarget - momentum * 120;
+          lenis.scrollTo(momentumTarget, { immediate: false, force: true });
+        }
+      }
 
       try {
         if (rail.hasPointerCapture(event.pointerId)) {
@@ -341,6 +400,7 @@ export function CreativePortfolioLanding({
       isDragging = false;
       activePointerId = null;
       activePointerType = null;
+      velocityTracker = [];
       rail.classList.remove("cursor-grabbing");
     };
 
@@ -672,7 +732,7 @@ export function CreativePortfolioLanding({
                 <article
                   key={item.loopKey}
                   data-slider-card
-                  className="group bg-canvas-soft relative aspect-2/3 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
+                  className="group bg-canvas-soft relative aspect-3/4 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
                   onMouseEnter={() => setHoveredArtworkTitle(item.title)}
                   onMouseLeave={() => setHoveredArtworkTitle(null)}
                 >
@@ -689,18 +749,21 @@ export function CreativePortfolioLanding({
                         data-slider-media
                         className="relative h-full w-full overflow-hidden"
                       >
+                        <div data-parallax-wrap className="h-full w-full">
                         <Image
                           src={item.imageUrl}
                           alt={`${item.title} - ${item.category}`}
                           fill
                           draggable={false}
                           sizes="(max-width: 768px) 62vw, 22rem"
-                          className="object-cover object-center contrast-105 saturate-105 transition-transform duration-300 ease-in-out group-hover:scale-[1.02]"
+                          className="object-cover contrast-105 saturate-105 transition-[scale] duration-300 ease-in-out group-hover:scale-[1.72]"
+                          style={{ scale: `${parallaxImageScale}` }}
                           priority={
                             item.copyIndex === centerLoopCopyIndex &&
                             item.index < 5
                           }
                         />
+                        </div>
                         <div
                           data-slider-curtain
                           className="bg-canvas-soft pointer-events-none absolute -inset-px z-10 opacity-0"
