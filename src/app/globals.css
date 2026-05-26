@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
 @keyframes aurora {
   from {
     background-position:
@@ -23,59 +21,39 @@
   --page-transition-overlap: 110ms;
   --page-transition-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --page-transition-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
-  /* --colorsdf: #f7eed80f; */
-  --color-canvas: #ffffff;
-  --color-canvas-soft: #eef4fb;
-  --color-surface: #ffffff;
-  --color-ink: #111111;
-  --color-muted: #5d6470;
-  --color-accent: #2b5fa8;
-  --color-accent-soft: #dbe8f8;
-  --color-canvas-glow-light:
-    radial-gradient(circle at 20% 18%, #d5e8ff 0%, #edf5ff 28%, #ffffff 58%),
-    radial-gradient(
-      circle at 78% 82%,
-      rgba(220, 233, 251, 0.95) 0%,
-      rgba(220, 233, 251, 0) 56%
-    );
-  --color-canvas-glow-dark:
+
+  --color-canvas: #0a1628;
+  --color-canvas-soft: #0f1f35;
+  --color-surface: #111e30;
+  --color-ink: #e7eef8;
+  --color-muted: #8a9bb5;
+  --color-accent: #5ba3e6;
+  --color-accent-soft: #1a3050;
+  --color-canvas-glow:
     radial-gradient(
       ellipse 55% 42% at 82% 4%,
-      rgba(0, 205, 235, 0.16) 0%,
-      rgba(0, 160, 200, 0.07) 32%,
+      rgba(0, 180, 210, 0.14) 0%,
+      rgba(0, 140, 180, 0.06) 32%,
       transparent 62%
     ),
     radial-gradient(
       ellipse 45% 38% at 50% 1%,
-      rgba(0, 175, 210, 0.09) 0%,
+      rgba(0, 160, 190, 0.08) 0%,
       transparent 52%
     ),
     radial-gradient(
       ellipse 90% 38% at 50% 96%,
-      rgba(10, 30, 55, 0.38) 0%,
+      rgba(8, 25, 45, 0.45) 0%,
       transparent 55%
     ),
     radial-gradient(
       ellipse 45% 32% at 12% 18%,
-      rgba(0, 115, 165, 0.06) 0%,
+      rgba(0, 100, 150, 0.05) 0%,
       transparent 50%
     );
 
   --radius-card: 0;
-  --shadow-card: 0 20px 45px rgba(23, 46, 80, 0.12);
-  color-scheme: light;
-}
-
-html[data-theme="dark"] {
-  --color-canvas: #0d131b;
-  --color-canvas-soft: #182231;
-  --color-surface: #111a24;
-  --color-ink: #e7eef8;
-  --color-muted: #9ca9bb;
-  --color-accent: #78abff;
-  --color-accent-soft: #253a58;
-
-  --shadow-card: 0 20px 45px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 20px 45px rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
 
@@ -123,57 +101,23 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans), sans-serif;
   line-height: 1.5;
-  transition:
-    background-color var(--theme-transition-duration)
-      var(--theme-transition-ease),
-    color var(--theme-transition-duration) var(--theme-transition-ease);
 }
 
-body::before,
-body::after {
+body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  background-image: var(--color-canvas-glow);
   background-repeat: no-repeat;
   background-size: cover;
   background-attachment: fixed;
-  transition: opacity var(--theme-transition-duration)
-    var(--theme-transition-ease);
-  will-change: opacity;
-}
-
-body::before {
-  opacity: 1;
-  background-image: var(--color-canvas-glow-light);
-}
-
-body::after {
-  opacity: 0;
-  background-image: var(--color-canvas-glow-dark);
-}
-
-html[data-theme="dark"] body::before {
-  opacity: 0;
-}
-
-html[data-theme="dark"] body::after {
   opacity: 1;
 }
 
 .landing-page {
   background: transparent;
-}
-
-html.theme-transitioning,
-html.theme-transitioning *,
-html.theme-transitioning *::before,
-html.theme-transitioning *::after {
-  transition-property:
-    background-color, border-color, color, fill, stroke, box-shadow, opacity;
-  transition-duration: var(--theme-transition-duration);
-  transition-timing-function: var(--theme-transition-ease);
 }
 
 @layer base {
