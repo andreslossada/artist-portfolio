@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@keyframes aurora {
+  from {
+    background-position:
+      50% 50%,
+      50% 50%;
+  }
+  to {
+    background-position:
+      350% 50%,
+      350% 50%;
+  }
+}
+
 :root {
   --theme-transition-duration: 920ms;
   --theme-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -24,11 +39,26 @@
       rgba(220, 233, 251, 0) 56%
     );
   --color-canvas-glow-dark:
-    radial-gradient(circle at 20% 18%, #1b2a3c 0%, #0d131b 54%, #101a27 100%),
     radial-gradient(
-      circle at 78% 82%,
-      rgba(41, 63, 95, 0.48) 0%,
-      rgba(41, 63, 95, 0) 58%
+      ellipse 55% 42% at 82% 4%,
+      rgba(0, 205, 235, 0.16) 0%,
+      rgba(0, 160, 200, 0.07) 32%,
+      transparent 62%
+    ),
+    radial-gradient(
+      ellipse 45% 38% at 50% 1%,
+      rgba(0, 175, 210, 0.09) 0%,
+      transparent 52%
+    ),
+    radial-gradient(
+      ellipse 90% 38% at 50% 96%,
+      rgba(10, 30, 55, 0.38) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 45% 32% at 12% 18%,
+      rgba(0, 115, 165, 0.06) 0%,
+      transparent 50%
     );
 
   --radius-card: 0;
@@ -62,6 +92,7 @@ html[data-theme="dark"] {
   --radius-card: var(--radius-card);
   --shadow-card: var(--shadow-card);
   --max-width-425: 106.25rem;
+  --animate-aurora: aurora 60s linear infinite;
 }
 
 * {
@@ -153,6 +184,10 @@ html.theme-transitioning *::after {
 }
 
 html[data-splash="active"] .site-header {
+  visibility: hidden;
+}
+
+html[data-splash="active"] .aurora-overlay {
   visibility: hidden;
 }
 

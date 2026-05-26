@@ -3,6 +3,7 @@ import { Lora, Manrope } from "next/font/google";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 import { getTheme } from "@/lib/theme";
+import { AuroraBackground } from "@/components/ui/aurora-background";
 import "./globals.css";
 
 const display = Lora({
@@ -41,8 +42,10 @@ export default async function RootLayout({
       data-theme={theme}
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
-      <body className="bg-canvas text-ink flex min-h-full flex-col">
-        {children}
+      <body className="bg-canvas text-ink relative flex min-h-full flex-col">
+        <AuroraBackground className="min-h-screen items-stretch justify-start">
+          {children}
+        </AuroraBackground>
       </body>
     </html>
   );
