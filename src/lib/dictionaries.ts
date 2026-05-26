@@ -6,10 +6,6 @@ const dictionaries = {
       spanish: "ES",
       english: "EN",
     },
-    themeSwitcher: {
-      light: "Claro",
-      dark: "Oscuro",
-    },
     metadata: {
       siteTitle: "Irina | Artista pintora",
       siteDescription: "Landing portfolio minimalista para artista pintora",
@@ -142,10 +138,6 @@ const dictionaries = {
     languageSwitcher: {
       spanish: "ES",
       english: "EN",
-    },
-    themeSwitcher: {
-      light: "Light",
-      dark: "Dark",
     },
     metadata: {
       siteTitle: "Irina | Painter",
