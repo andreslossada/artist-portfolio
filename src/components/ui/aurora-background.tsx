@@ -19,6 +19,7 @@ export const AuroraBackground = ({
         "relative flex flex-col items-center justify-center bg-canvas text-ink",
         className,
       )}
+      data-aurora-bg
       {...props}
     >
       <div

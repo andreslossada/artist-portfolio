@@ -22,9 +22,9 @@
   --page-transition-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --page-transition-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --color-canvas: #0a1628;
-  --color-canvas-soft: #0f1f35;
-  --color-surface: #111e30;
+  --color-canvas: #0f2847;
+  --color-canvas-soft: #163358;
+  --color-surface: #1a3a5f;
   --color-ink: #e7eef8;
   --color-muted: #8a9bb5;
   --color-accent: #5ba3e6;
@@ -135,8 +135,8 @@ html[data-splash="active"] .aurora-overlay {
   visibility: hidden;
 }
 
-html[data-splash="active"] body {
-  background-color: #f7eed8;
+html[data-splash="active"] [data-aurora-bg] {
+  background-color: #f7eed8 !important;
 }
 
 html[data-splash="active"] .landing-page > main {

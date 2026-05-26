@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
 import { irinaWordmarkFont } from "@/lib/wordmark-font";
 import { ShellIcon } from "@/components/ui/shell-icon";
@@ -215,7 +215,6 @@ function createRandomWaveGeometry(): WaveGeometry {
 }
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
-  const [isAnimationReady, setIsAnimationReady] = useState(false);
   const hasCompletedRef = useRef(false);
   const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -327,13 +326,15 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         transformOrigin: "50% 0%",
       });
 
-      setIsAnimationReady(true);
-
       const timeline = gsap.timeline({
         defaults: { ease: "sine.inOut" },
         onComplete: finishSplash,
       });
-      const retreatStart = 1.26;
+      const delay = 0.5;
+      const retreatStart = delay + 1.26;
+
+      // Reveal splash content after initial delay
+      timeline.set(scope, { opacity: 1 }, delay);
 
       // GUIDE: Shoreline motion feels layered, like overlapping beach arcs.
       waveBands.forEach((band, index) => {
@@ -366,7 +367,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           stagger: 0.045,
           ease: "power2.out",
         },
-        0,
+        delay,
       );
 
       timeline.to(
@@ -377,7 +378,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           stagger: 0.035,
           ease: "sine.in",
         },
-        0.96,
+        delay + 0.96,
       );
 
       timeline.to(
@@ -389,7 +390,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           duration: 0.66,
           ease: "sine.out",
         },
-        0.38,
+        delay + 0.38,
       );
 
       timeline.to(
@@ -401,11 +402,11 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           duration: 0.28,
           ease: "sine.inOut",
         },
-        1,
+        delay + 1,
       );
 
       // 2) short beat while the name stays hidden beneath water
-      timeline.to({}, { duration: 0.22 }, 1.2);
+      timeline.to({}, { duration: 0.22 }, delay + 1.2);
 
       // 3) wave retreats in two fluid phases; reveal happens with the retreat
       timeline.to(
@@ -495,17 +496,17 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       );
 
       // GUIDE: small hold before view-transition capture
-      timeline.to({}, { duration: 0.28 }, 3.02);
+      timeline.to({}, { duration: 0.28 }, delay + 3.02);
 
       // Cross-fade: beach sand → deep ocean (matches main site background)
       timeline.to(
         scope,
         {
-          backgroundColor: "#0a1628",
+          backgroundColor: "#0f2847",
           duration: 0.8,
           ease: "power2.inOut",
         },
-        3.3,
+        delay + 3.3,
       );
     },
     [finishSplash],
@@ -553,11 +554,9 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   return (
     <div
       ref={scopeRef}
+      data-splash-screen
       className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center overflow-hidden`}
-      style={{
-        backgroundColor: "#f7eed8",
-        ...(isAnimationReady ? undefined : { visibility: "hidden" }),
-      }}
+      style={{ backgroundColor: "#f7eed8", opacity: 0 }}
       role="presentation"
       aria-hidden="true"
     >
