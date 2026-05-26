@@ -13,7 +13,7 @@ type ProductCardProps = {
 
 export function ProductCard({ product, labels }: ProductCardProps) {
   return (
-    <article className="group border-ink/10 hover:border-accent/35 flex flex-col overflow-hidden border bg-surface transition-colors">
+    <article className="group border-ink/10 hover:border-accent/35 relative flex flex-col overflow-hidden border bg-surface shadow-card transition-colors [opacity:1]">
       <Link href={`/shop/${product.slug}`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden md:aspect-4/5">
           <Image

@@ -15,7 +15,7 @@ export function GalleryGrid({ artworks }: GalleryGridProps) {
           key={artwork.id}
           href={`/artwork/${artwork.slug}?vt=${artwork.slug}`}
           transitionTypes={["artwork-open"]}
-          className="group border-ink/10 hover:border-accent/35 overflow-hidden border bg-surface transition-colors"
+          className="group border-ink/10 hover:border-accent/35 relative overflow-hidden border bg-surface shadow-card transition-colors [opacity:1]"
         >
           <ViewTransition
             name={`artwork-image-${artwork.slug}`}
