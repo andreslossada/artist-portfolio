@@ -135,6 +135,14 @@ html[data-splash="active"] .aurora-overlay {
   visibility: hidden;
 }
 
+html[data-splash="active"] body {
+  background-color: #f7eed8;
+}
+
+html[data-splash="active"] .landing-page > main {
+  visibility: hidden;
+}
+
 .site-header {
   view-transition-name: none;
 }

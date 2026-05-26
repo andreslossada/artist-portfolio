@@ -38,8 +38,16 @@ export default async function RootLayout({
     <html
       lang={locale}
       data-theme="dark"
+      data-splash="active"
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `html[data-splash="active"] body { background-color: #f7eed8 !important; } html[data-splash="active"] .landing-page > main { visibility: hidden !important; }`,
+          }}
+        />
+      </head>
       <body className="bg-canvas text-ink relative flex min-h-full flex-col">
         <AuroraBackground className="min-h-screen items-stretch justify-start">
           {children}
