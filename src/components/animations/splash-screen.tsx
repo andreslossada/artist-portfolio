@@ -496,6 +496,17 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
       // GUIDE: small hold before view-transition capture
       timeline.to({}, { duration: 0.28 }, 3.02);
+
+      // Cross-fade: beach sand → deep ocean (matches main site background)
+      timeline.to(
+        scope,
+        {
+          backgroundColor: "#0a1628",
+          duration: 0.8,
+          ease: "power2.inOut",
+        },
+        3.3,
+      );
     },
     [finishSplash],
   );
@@ -512,39 +523,41 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
     };
   }, [finishSplash]);
 
-  const shellClassName = "bg-[#0a1628]";
-  const titleClassName = "text-[#e7eef8]";
-  const reflectionClassName = "text-[#e7eef8]/40";
+  const titleClassName = "text-[#444444]";
+  const reflectionClassName = "text-[#444444]/60";
 
   const waveMainStops = [
-    "rgba(255,255,255,0.22)",
-    "rgba(255,255,255,0.18)",
-    "rgba(255,255,255,0.14)",
-    "rgba(255,255,255,0.10)",
-    "rgba(255,255,255,0.08)",
+    "rgba(255,255,255,0.88)",
+    "rgba(196,233,251,0.72)",
+    "rgba(64,158,206,0.76)",
+    "rgba(36,116,175,0.78)",
+    "rgba(36,116,175,0.72)",
   ];
 
   const waveSoftStops = [
-    "rgba(255,255,255,0.18)",
-    "rgba(255,255,255,0.14)",
-    "rgba(255,255,255,0.10)",
-    "rgba(255,255,255,0.08)",
-    "rgba(255,255,255,0.06)",
+    "rgba(255,255,255,0.74)",
+    "rgba(217,244,255,0.56)",
+    "rgba(111,194,229,0.5)",
+    "rgba(77,166,208,0.52)",
+    "rgba(77,166,208,0.4)",
   ];
 
   const washBodyStops = [
-    "rgba(255,255,255,0.14)",
-    "rgba(255,255,255,0.10)",
-    "rgba(255,255,255,0.08)",
-    "rgba(255,255,255,0.06)",
-    "rgba(255,255,255,0.04)",
+    "rgba(241,251,255,0.78)",
+    "rgba(194,234,250,0.4)",
+    "rgba(148,210,236,0.34)",
+    "rgba(106,182,218,0.26)",
+    "rgba(106,182,218,0.14)",
   ];
 
   return (
     <div
       ref={scopeRef}
-      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center overflow-hidden ${shellClassName}`}
-      style={isAnimationReady ? undefined : { visibility: "hidden" }}
+      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center overflow-hidden`}
+      style={{
+        backgroundColor: "#f7eed8",
+        ...(isAnimationReady ? undefined : { visibility: "hidden" }),
+      }}
       role="presentation"
       aria-hidden="true"
     >
