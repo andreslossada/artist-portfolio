@@ -4,10 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
 import { irinaWordmarkFont } from "@/lib/wordmark-font";
 import { ShellIcon } from "@/components/ui/shell-icon";
-import type { Theme } from "@/lib/theme";
 
 type SplashScreenProps = {
-  theme: Theme;
   onComplete: () => void;
 };
 
@@ -216,7 +214,7 @@ function createRandomWaveGeometry(): WaveGeometry {
   };
 }
 
-export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
+export function SplashScreen({ onComplete }: SplashScreenProps) {
   const [isAnimationReady, setIsAnimationReady] = useState(false);
   const hasCompletedRef = useRef(false);
   const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -514,61 +512,33 @@ export function SplashScreen({ theme, onComplete }: SplashScreenProps) {
     };
   }, [finishSplash]);
 
-  const shellClassName = theme === "dark" ? "bg-[#0d131b]" : "bg-[#f7eed8bf]";
-  const titleClassName = theme === "dark" ? "text-[#f0f0f0]" : "text-[#444444]";
-  const reflectionClassName =
-    theme === "dark" ? "text-[#f0f0f0]/40" : "text-[#444444]/60";
+  const shellClassName = "bg-[#0a1628]";
+  const titleClassName = "text-[#e7eef8]";
+  const reflectionClassName = "text-[#e7eef8]/40";
 
-  const waveMainStops =
-    theme === "dark"
-      ? [
-          "rgba(255,255,255,0.22)",
-          "rgba(255,255,255,0.18)",
-          "rgba(255,255,255,0.14)",
-          "rgba(255,255,255,0.10)",
-          "rgba(255,255,255,0.08)",
-        ]
-      : [
-          "rgba(255,255,255,0.88)",
-          "rgba(196,233,251,0.72)",
-          "rgba(64,158,206,0.76)",
-          "rgba(36,116,175,0.78)",
-          "rgba(36,116,175,0.72)",
-        ];
+  const waveMainStops = [
+    "rgba(255,255,255,0.22)",
+    "rgba(255,255,255,0.18)",
+    "rgba(255,255,255,0.14)",
+    "rgba(255,255,255,0.10)",
+    "rgba(255,255,255,0.08)",
+  ];
 
-  const waveSoftStops =
-    theme === "dark"
-      ? [
-          "rgba(255,255,255,0.18)",
-          "rgba(255,255,255,0.14)",
-          "rgba(255,255,255,0.10)",
-          "rgba(255,255,255,0.08)",
-          "rgba(255,255,255,0.06)",
-        ]
-      : [
-          "rgba(255,255,255,0.74)",
-          "rgba(217,244,255,0.56)",
-          "rgba(111,194,229,0.5)",
-          "rgba(77,166,208,0.52)",
-          "rgba(77,166,208,0.4)",
-        ];
+  const waveSoftStops = [
+    "rgba(255,255,255,0.18)",
+    "rgba(255,255,255,0.14)",
+    "rgba(255,255,255,0.10)",
+    "rgba(255,255,255,0.08)",
+    "rgba(255,255,255,0.06)",
+  ];
 
-  const washBodyStops =
-    theme === "dark"
-      ? [
-          "rgba(255,255,255,0.14)",
-          "rgba(255,255,255,0.10)",
-          "rgba(255,255,255,0.08)",
-          "rgba(255,255,255,0.06)",
-          "rgba(255,255,255,0.04)",
-        ]
-      : [
-          "rgba(241,251,255,0.78)",
-          "rgba(194,234,250,0.4)",
-          "rgba(148,210,236,0.34)",
-          "rgba(106,182,218,0.26)",
-          "rgba(106,182,218,0.14)",
-        ];
+  const washBodyStops = [
+    "rgba(255,255,255,0.14)",
+    "rgba(255,255,255,0.10)",
+    "rgba(255,255,255,0.08)",
+    "rgba(255,255,255,0.06)",
+    "rgba(255,255,255,0.04)",
+  ];
 
   return (
     <div
