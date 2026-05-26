@@ -7,22 +7,15 @@ import { HeaderCartLink } from "@/components/ui/header-cart-link";
 import { HeaderNavLink } from "@/components/ui/header-nav-link";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { MobileMenu } from "@/components/ui/mobile-menu";
-import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { ViewModeSwitch } from "@/components/ui/view-mode-switch";
 import type { Locale } from "@/lib/i18n";
-import type { Theme } from "@/lib/theme";
 import { irinaWordmarkFont } from "@/lib/wordmark-font";
 
 type SiteHeaderShellProps = {
   locale: Locale;
-  theme: Theme;
   languageLabels: {
     spanish: string;
     english: string;
-  };
-  themeLabels: {
-    light: string;
-    dark: string;
   };
   navLabels: {
     shop?: string;
@@ -37,9 +30,7 @@ type SiteHeaderShellProps = {
 
 export function SiteHeaderShell({
   locale,
-  theme,
   languageLabels,
-  themeLabels,
   navLabels,
   showCart = true,
   headerClassName = "border-b border-accent/15 bg-transparent",
@@ -83,11 +74,6 @@ export function SiteHeaderShell({
               labels={languageLabels}
               className="mr-1 md:mr-2"
             />
-            <ThemeSwitcher
-              theme={theme}
-              labels={themeLabels}
-              className="mr-1 md:mr-2"
-            />
             <HeaderNavLink href="/about">{navLabels.about}</HeaderNavLink>
             {navLabels.shop ? (
               <HeaderNavLink href="/shop">{navLabels.shop}</HeaderNavLink>
@@ -100,9 +86,7 @@ export function SiteHeaderShell({
           <div className="flex items-center justify-end md:hidden">
             <MobileMenu
               locale={locale}
-              theme={theme}
               languageLabels={languageLabels}
-              themeLabels={themeLabels}
               navLabels={navLabels}
               showCart={showCart}
             />

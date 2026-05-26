@@ -7,20 +7,13 @@ import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/cart-store";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
-import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import type { Locale } from "@/lib/i18n";
-import type { Theme } from "@/lib/theme";
 
 type MobileMenuProps = {
   locale: Locale;
-  theme: Theme;
   languageLabels: {
     spanish: string;
     english: string;
-  };
-  themeLabels: {
-    light: string;
-    dark: string;
   };
   navLabels: {
     shop?: string;
@@ -33,9 +26,7 @@ type MobileMenuProps = {
 
 export function MobileMenu({
   locale,
-  theme,
   languageLabels,
-  themeLabels,
   navLabels,
   showCart = true,
 }: MobileMenuProps) {
@@ -137,13 +128,6 @@ export function MobileMenu({
                 <LanguageSwitcher
                   locale={locale}
                   labels={languageLabels}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted">Tema</span>
-                <ThemeSwitcher
-                  theme={theme}
-                  labels={themeLabels}
                 />
               </div>
             </div>
