@@ -508,6 +508,26 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         },
         delay + 3.3,
       );
+
+      // Title transitions to white as background becomes ocean
+      const titleEl = scope.querySelector<HTMLElement>("[data-splash-title]");
+      const reflectionEl = scope.querySelector<HTMLElement>(
+        "[data-splash-title-reflection]",
+      );
+      if (titleEl) {
+        timeline.to(
+          titleEl,
+          { color: "#ffffff", duration: 0.8, ease: "power2.inOut" },
+          delay + 3.3,
+        );
+      }
+      if (reflectionEl) {
+        timeline.to(
+          reflectionEl,
+          { color: "rgba(255,255,255,0.6)", duration: 0.8, ease: "power2.inOut" },
+          delay + 3.3,
+        );
+      }
     },
     [finishSplash],
   );
@@ -523,8 +543,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       }
     };
   }, [finishSplash]);
-
   const titleClassName = "text-[#444444]";
+
   const reflectionClassName = "text-[#444444]/60";
 
   const waveMainStops = [
