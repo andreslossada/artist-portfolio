@@ -42,13 +42,16 @@ export default async function RootLayout({
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
       <head>
-        <style
+        <script
           dangerouslySetInnerHTML={{
-            __html: `html[data-splash="active"] body { background-color: #f7eed8 !important; } html[data-splash="active"] .landing-page > main { visibility: hidden !important; }`,
+            __html: `document.documentElement.style.backgroundColor='#f7eed8';`,
           }}
         />
       </head>
-      <body className="bg-canvas text-ink relative flex min-h-full flex-col">
+      <body
+        className="bg-canvas text-ink relative flex min-h-full flex-col"
+        style={{ backgroundColor: "#f7eed8" }}
+      >
         <AuroraBackground className="min-h-screen items-stretch justify-start">
           {children}
         </AuroraBackground>
