@@ -15,19 +15,17 @@ import {
   useState,
 } from "react";
 import { SplashScreen } from "@/components/animations/splash-screen";
-import type { Theme } from "@/lib/theme";
 import type { Artwork } from "@/types/content";
 
 const sliderLoopCopies = 5;
 const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 10;
 const mouseDragScrollFactor = 0.7;
-const shownSplashThemes = new Set<Theme>();
+const shownSplashThemes = new Set<string>();
 const parallaxImageScale = 1.7;
 const parallaxMaxShiftPercent = 30;
 
 type CreativePortfolioLandingProps = {
-  theme: Theme;
   artworks: Artwork[];
 };
 
@@ -60,7 +58,6 @@ const getSingleLoopWidth = (
 };
 
 export function CreativePortfolioLanding({
-  theme,
   artworks,
 }: CreativePortfolioLandingProps) {
   const progressSegments = Math.min(12, Math.max(1, artworks.length));
@@ -85,7 +82,7 @@ export function CreativePortfolioLanding({
     null,
   );
   const [showSplash, setShowSplash] = useState(
-    () => !shownSplashThemes.has(theme),
+    () => !shownSplashThemes.has("dark"),
   );
   const [isRailReady, setIsRailReady] = useState(false);
   const prevShowSplashRef = useRef(showSplash);
@@ -107,11 +104,11 @@ export function CreativePortfolioLanding({
   const reducedMotionRef = useRef(false);
   const handleSplashComplete = useCallback(() => {
     startTransition(() => {
-      shownSplashThemes.add(theme);
+      shownSplashThemes.add("dark");
       setShowSplash(false);
       setIsRailReady(false);
     });
-  }, [theme]);
+  }, []);
 
   const populateParallaxCache = useCallback(() => {
     const rail = railRef.current;
@@ -763,7 +760,7 @@ export function CreativePortfolioLanding({
       className="landing-page text-ink h-screen overflow-hidden"
     >
       {showSplash ? (
-        <SplashScreen theme={theme} onComplete={handleSplashComplete} />
+        <SplashScreen onComplete={handleSplashComplete} />
       ) : null}
 
       <main className="mx-auto flex h-screen w-full max-w-425 flex-col overflow-hidden px-5 pt-22 md:px-10 md:pt-[8.7rem]">

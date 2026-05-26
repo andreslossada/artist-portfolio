@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Lora, Manrope } from "next/font/google";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
-import { getTheme } from "@/lib/theme";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import "./globals.css";
 
@@ -34,12 +33,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocale();
-  const theme = await getTheme();
 
   return (
     <html
       lang={locale}
-      data-theme={theme}
+      data-theme="dark"
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
       <body className="bg-canvas text-ink relative flex min-h-full flex-col">
