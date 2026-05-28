@@ -15,7 +15,7 @@ export function GalleryGrid({ artworks }: GalleryGridProps) {
           key={artwork.id}
           href={`/artwork/${artwork.slug}?vt=${artwork.slug}`}
           transitionTypes={["artwork-open"]}
-          className="group border-ink/10 hover:border-accent/35 relative overflow-hidden border bg-surface shadow-card transition-colors [opacity:1]"
+          className="group border-ink/10 hover:border-accent/35 relative overflow-hidden border bg-surface shadow-card transition-colors opacity-100"
         >
           <ViewTransition
             name={`artwork-image-${artwork.slug}`}
@@ -32,13 +32,13 @@ export function GalleryGrid({ artworks }: GalleryGridProps) {
             </div>
           </ViewTransition>
           <div className="space-y-1 p-4">
-            <h2 className="font-display text-2xl">{artwork.title}</h2>
-            <p className="text-muted text-sm">
+            <h2 className="font-display text-2xl" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>{artwork.title}</h2>
+            <p className="text-muted text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
               {artwork.year} · {artwork.medium}
             </p>
-            <p className="text-muted text-sm">{artwork.dimensions}</p>
-            <p className="text-muted pt-1 text-sm">{artwork.description}</p>
-            <p className="text-accent pt-2 text-sm font-semibold">
+            <p className="text-muted text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>{artwork.dimensions}</p>
+            <p className="text-muted pt-1 text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>{artwork.description}</p>
+            <p className="text-accent pt-2 text-sm font-semibold" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>
               ${artwork.price.toFixed(2)} USD
             </p>
           </div>
