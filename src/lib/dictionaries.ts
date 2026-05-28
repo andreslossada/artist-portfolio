@@ -57,6 +57,7 @@ const dictionaries = {
       categoryPrints: "Ediciones",
       addToCart: "Agregar al carrito",
       viewCart: "Ver carrito",
+      unavailable: "No disponible",
       empty: "No hay productos en esta categoría todavía.",
       backToShop: "Volver a tienda",
     },
@@ -98,7 +99,7 @@ const dictionaries = {
     },
     contactPage: {
       eyebrow: "Contacto",
-      title: "¿Trabajamos juntos?",
+      title: "Escríbeme",
       description:
         "El estudio responde consultas sobre obra disponible, comisiones, colaboraciones curatoriales y prensa. Tiempo estimado de respuesta: 24-48 horas hábiles.",
       channels: {
@@ -221,6 +222,7 @@ const dictionaries = {
       categoryPrints: "Prints",
       addToCart: "Add to cart",
       viewCart: "View cart",
+      unavailable: "Unavailable",
       empty: "No products in this category yet.",
       backToShop: "Back to shop",
     },
@@ -257,7 +259,7 @@ const dictionaries = {
     },
     contactPage: {
       eyebrow: "Contact",
-      title: "Let's work together",
+      title: "Write to me",
       description:
         "The studio responds to inquiries about available works, commissions, curatorial collaborations, and press. Estimated response time: 24-48 business hours.",
       channels: {

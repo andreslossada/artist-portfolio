@@ -26,6 +26,7 @@ export type Product = {
   imageUrl: string;
   stripePriceId: string;
   category: ProductCategory;
+  available: boolean;
 };
 
 export type CartItemKind = "artwork" | "product";

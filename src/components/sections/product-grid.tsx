@@ -7,6 +7,7 @@ type ProductGridProps = {
   labels: {
     addToCart: string;
     viewCart: string;
+    unavailable: string;
   };
 };
 

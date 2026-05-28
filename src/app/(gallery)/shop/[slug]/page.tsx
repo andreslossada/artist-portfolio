@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductCartCta } from "@/components/ui/product-cart-cta";
+import { UnavailableBadge } from "@/components/ui/unavailable-badge";
 import { getProducts, getProductBySlug } from "@/lib/artworks";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
@@ -44,9 +45,12 @@ export default async function ProductDetailPage({
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-cover"
+            className={`object-cover ${product.available ? "" : "opacity-60"}`}
             sizes="(max-width: 768px) 100vw, 22rem"
           />
+          {!product.available && (
+            <UnavailableBadge label={dict.shopPage.unavailable} />
+          )}
         </div>
 
         <div className="flex h-full flex-col">
@@ -76,7 +80,9 @@ export default async function ProductDetailPage({
                 <ProductCartCta
                   labels={{
                     addToCart: dict.shopPage.addToCart,
+                    unavailable: dict.shopPage.unavailable,
                   }}
+                  available={product.available}
                 />
               ) : null}
               <Link

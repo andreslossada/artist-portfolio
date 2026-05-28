@@ -91,6 +91,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         labels={{
           addToCart: dict.shopPage.addToCart,
           viewCart: dict.shopPage.viewCart,
+          unavailable: dict.shopPage.unavailable,
         }}
       />
     </main>
