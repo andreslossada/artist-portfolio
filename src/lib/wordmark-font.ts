@@ -1,7 +1,7 @@
-import { Cormorant_Garamond } from "next/font/google";
+import { Bodoni_Moda } from "next/font/google";
 
-export const irinaWordmarkFont = Cormorant_Garamond({
+export const irinaWordmarkFont = Bodoni_Moda({
   subsets: ["latin"],
-  weight: ["500", "600"],
-  style: ["italic"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
 });
