@@ -498,11 +498,11 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       // GUIDE: small hold before view-transition capture
       timeline.to({}, { duration: 0.28 }, delay + 3.02);
 
-      // Cross-fade: beach sand → deep ocean (matches main site background)
+      // Cross-fade: beach sand → tropical ocean (matches main site background)
       timeline.to(
         scope,
         {
-          backgroundColor: "#0f2847",
+          backgroundColor: "#1a7a6e",
           duration: 0.8,
           ease: "power2.inOut",
         },
@@ -548,27 +548,27 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
   const reflectionClassName = "text-[#444444]/60";
 
   const waveMainStops = [
-    "rgba(255,255,255,0.88)",
-    "rgba(196,233,251,0.72)",
-    "rgba(64,158,206,0.76)",
-    "rgba(36,116,175,0.78)",
-    "rgba(36,116,175,0.72)",
+    "rgba(255,255,255,0.95)",
+    "rgba(200,240,230,0.80)",
+    "rgba(100,210,180,0.75)",
+    "rgba(26,154,130,0.80)",
+    "rgba(26,154,130,0.70)",
   ];
 
   const waveSoftStops = [
-    "rgba(255,255,255,0.74)",
-    "rgba(217,244,255,0.56)",
-    "rgba(111,194,229,0.5)",
-    "rgba(77,166,208,0.52)",
-    "rgba(77,166,208,0.4)",
+    "rgba(255,255,255,0.82)",
+    "rgba(220,248,235,0.65)",
+    "rgba(150,225,200,0.55)",
+    "rgba(80,190,160,0.50)",
+    "rgba(80,190,160,0.38)",
   ];
 
   const washBodyStops = [
-    "rgba(241,251,255,0.78)",
-    "rgba(194,234,250,0.4)",
-    "rgba(148,210,236,0.34)",
-    "rgba(106,182,218,0.26)",
-    "rgba(106,182,218,0.14)",
+    "rgba(255,254,240,0.85)",
+    "rgba(230,250,240,0.45)",
+    "rgba(180,235,215,0.38)",
+    "rgba(120,210,180,0.28)",
+    "rgba(120,210,180,0.15)",
   ];
 
   return (

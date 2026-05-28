@@ -22,33 +22,33 @@
   --page-transition-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --page-transition-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --color-canvas: #0f2847;
-  --color-canvas-soft: #163358;
-  --color-surface: #1a3a5f;
-  --color-ink: #e7eef8;
-  --color-muted: #8a9bb5;
-  --color-accent: #5ba3e6;
-  --color-accent-soft: #1a3050;
+  --color-canvas: #1a7a6e;
+  --color-canvas-soft: #2a9d8f;
+  --color-surface: #40b4a6;
+  --color-ink: #f0f7f4;
+  --color-muted: #b8e0d8;
+  --color-accent: #e9c46a;
+  --color-accent-soft: #1a5a52;
   --color-canvas-glow:
     radial-gradient(
       ellipse 55% 42% at 82% 4%,
-      rgba(0, 180, 210, 0.14) 0%,
-      rgba(0, 140, 180, 0.06) 32%,
+      rgba(233, 196, 106, 0.18) 0%,
+      rgba(200, 220, 180, 0.08) 32%,
       transparent 62%
     ),
     radial-gradient(
       ellipse 45% 38% at 50% 1%,
-      rgba(0, 160, 190, 0.08) 0%,
+      rgba(255, 248, 220, 0.12) 0%,
       transparent 52%
     ),
     radial-gradient(
       ellipse 90% 38% at 50% 96%,
-      rgba(8, 25, 45, 0.45) 0%,
+      rgba(26, 90, 82, 0.35) 0%,
       transparent 55%
     ),
     radial-gradient(
       ellipse 45% 32% at 12% 18%,
-      rgba(0, 100, 150, 0.05) 0%,
+      rgba(100, 200, 180, 0.08) 0%,
       transparent 50%
     );
 

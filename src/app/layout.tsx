@@ -43,13 +43,13 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){document.documentElement.style.backgroundColor='#0f2847';document.body&&(document.body.style.backgroundColor='#0f2847')})();`,
+            __html: `(function(){document.documentElement.style.backgroundColor='#1a7a6e';document.body&&(document.body.style.backgroundColor='#1a7a6e')})();`,
           }}
         />
       </head>
       <body
         className="text-ink relative flex min-h-full flex-col"
-        style={{ backgroundColor: "#0f2847" }}
+        style={{ backgroundColor: "#1a7a6e" }}
       >
         <AuroraBackground className="min-h-screen items-stretch justify-start">
           {children}
