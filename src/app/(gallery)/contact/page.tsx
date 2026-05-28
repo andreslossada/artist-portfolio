@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 import CopyEmailCard from "@/components/ui/copy-email-card";
+import CommissionStatus from "@/components/ui/commission-status";
+import FaqAccordion from "@/components/ui/faq-accordion";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -38,14 +40,25 @@ export default async function ContactPage() {
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
       <header className="max-w-3xl">
-        <p className="text-muted text-xs tracking-[0.3em] uppercase">
-          {dict.contactPage.eyebrow}
-        </p>
+        <div className="flex items-center gap-4">
+          <p className="text-muted text-xs tracking-[0.3em] uppercase">
+            {dict.contactPage.eyebrow}
+          </p>
+          <CommissionStatus
+            status="open"
+            openLabel={dict.contactPage.commissionStatus.open}
+            closedLabel={dict.contactPage.commissionStatus.closed}
+          />
+        </div>
         <h1 className="font-display mt-3 text-4xl leading-tight md:text-6xl">
           {dict.contactPage.title}
         </h1>
         <p className="text-muted mt-4 text-base leading-relaxed md:mt-6 md:text-lg">
           {dict.contactPage.description}
+        </p>
+        <p className="text-muted mt-3 text-sm">
+          <span className="font-semibold">{dict.contactPage.responseTime.label}:</span>{" "}
+          {dict.contactPage.responseTime.value}
         </p>
       </header>
 
@@ -80,6 +93,15 @@ export default async function ContactPage() {
             </a>
           );
         })}
+      </section>
+
+      <section className="mt-8 border-ink/10 border bg-surface p-5 md:mt-10 md:p-8">
+        <h2 className="font-display text-2xl leading-tight md:text-3xl">
+          {dict.contactPage.faqTitle}
+        </h2>
+        <div className="mt-4">
+          <FaqAccordion items={dict.contactPage.faqItems} />
+        </div>
       </section>
 
       <section className="border-ink/10 mt-8 border bg-surface p-5 md:mt-10 md:p-8">

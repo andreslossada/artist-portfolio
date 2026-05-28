@@ -98,7 +98,7 @@ const dictionaries = {
     },
     contactPage: {
       eyebrow: "Contacto",
-      title: "Hablemos de tu próximo proyecto",
+      title: "¿Trabajamos juntos?",
       description:
         "El estudio responde consultas sobre obra disponible, comisiones, colaboraciones curatoriales y prensa. Tiempo estimado de respuesta: 24-48 horas hábiles.",
       channels: {
@@ -106,11 +106,42 @@ const dictionaries = {
         whatsapp: "WhatsApp",
         instagram: "Instagram",
       },
+      commissionStatus: {
+        open: "Comisiones abiertas",
+        closed: "Comisiones cerradas",
+      },
+      responseTime: {
+        label: "Tiempo de respuesta",
+        value: "24-48 horas hábiles",
+      },
       acquisitionsTitle: "Adquisiciones",
       acquisitionsDescription:
         "Si te interesa adquirir una pieza o una edición limitada, puedes explorar la tienda y escribirnos para recibir ficha técnica completa, disponibilidad y opciones de entrega local.",
       goToShop: "Ir a tienda",
       viewArtwork: "Ver obra",
+      faqTitle: "Preguntas frecuentes",
+      faqItems: [
+        {
+          question: "¿Cuánto cuesta una comisión?",
+          answer:
+            "Los precios varían según el tamaño, complejidad y técnica solicitada. Puedes escribirnos para recibir una cotización personalizada.",
+        },
+        {
+          question: "¿Cuánto tiempo tarda una comisión?",
+          answer:
+            "El tiempo de entrega depende de la complejidad del proyecto y la cola de trabajo actual. Generalmente entre 2 y 6 semanas.",
+        },
+        {
+          question: "¿Qué necesito para solicitar una comisión?",
+          answer:
+            "Solo necesitas escribirnos con una descripción de tu idea: tema, tamaño aproximado, presupuesto y fecha desireda. Nosotros te guiamos desde ahí.",
+        },
+        {
+          question: "¿Puedo pedir modificaciones durante el proceso?",
+          answer:
+            "Sí, se incluye un número de revisiones en la fase de boceto. Cambios mayores pueden generar costo adicional.",
+        },
+      ],
       cart: {
         title: "Carrito de obra",
         empty: "Tu carrito está vacío.",
@@ -226,7 +257,7 @@ const dictionaries = {
     },
     contactPage: {
       eyebrow: "Contact",
-      title: "Let us talk about your next project",
+      title: "Let's work together",
       description:
         "The studio responds to inquiries about available works, commissions, curatorial collaborations, and press. Estimated response time: 24-48 business hours.",
       channels: {
@@ -234,11 +265,42 @@ const dictionaries = {
         whatsapp: "WhatsApp",
         instagram: "Instagram",
       },
+      commissionStatus: {
+        open: "Commissions open",
+        closed: "Commissions closed",
+      },
+      responseTime: {
+        label: "Response time",
+        value: "24-48 business hours",
+      },
       acquisitionsTitle: "Acquisitions",
       acquisitionsDescription:
         "If you are interested in acquiring a piece or a limited edition, you can explore the shop and contact us for a full technical sheet, availability, and local delivery options.",
       goToShop: "Go to shop",
       viewArtwork: "View artwork",
+      faqTitle: "Frequently asked questions",
+      faqItems: [
+        {
+          question: "How much does a commission cost?",
+          answer:
+            "Prices vary depending on size, complexity, and technique. You can write to us for a personalized quote.",
+        },
+        {
+          question: "How long does a commission take?",
+          answer:
+            "Delivery time depends on project complexity and current queue. Generally between 2 and 6 weeks.",
+        },
+        {
+          question: "What do I need to request a commission?",
+          answer:
+            "Just write to us with a description of your idea: theme, approximate size, budget, and desired date. We'll guide you from there.",
+        },
+        {
+          question: "Can I request changes during the process?",
+          answer:
+            "Yes, a number of revisions are included in the sketch phase. Major changes may incur additional cost.",
+        },
+      ],
       cart: {
         title: "Artwork cart",
         empty: "Your cart is empty.",
