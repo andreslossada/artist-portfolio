@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Menu, ShoppingCart, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCartStore } from "@/store/cart-store";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import type { Locale } from "@/lib/i18n";
@@ -18,23 +17,19 @@ type MobileMenuProps = {
   navLabels: {
     shop?: string;
     about: string;
-    cart: string;
     contact: string;
   };
-  showCart?: boolean;
 };
 
 export function MobileMenu({
   locale,
   languageLabels,
   navLabels,
-  showCart = true,
 }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const closeMenu = useCallback(() => setIsOpen(false), []);
 
-  // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeMenu();
@@ -58,7 +53,7 @@ export function MobileMenu({
         aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={isOpen}
         aria-controls="mobile-menu-panel"
-        className="focus-visible:ring-accent/40 focus-visible:ring-offset-canvas inline-flex h-8 w-8 items-center justify-center rounded-full border border-accent/25 bg-surface text-ink/80 transition-all duration-200 hover:border-accent/55 hover:bg-accent-soft/40 hover:text-accent focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none md:hidden"
+        className="focus-visible:ring-accent/40 focus-visible:ring-offset-canvas focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none inline-flex h-8 w-8 items-center justify-center rounded-full border border-accent/25 bg-surface text-ink/80 transition-all duration-200 hover:border-accent/55 hover:bg-accent-soft/40 hover:text-accent md:hidden"
       >
         {isOpen ? (
           <X className="h-4 w-4" aria-hidden="true" />
@@ -86,7 +81,7 @@ export function MobileMenu({
               type="button"
               onClick={closeMenu}
               aria-label="Cerrar menú"
-              className="focus-visible:ring-accent/40 focus-visible:ring-offset-canvas inline-flex h-8 w-8 items-center justify-center rounded-full border border-accent/25 bg-surface text-ink/80 transition-all duration-200 hover:border-accent/55 hover:bg-accent-soft/40 hover:text-accent focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              className="focus-visible:ring-accent/40 focus-visible:ring-offset-canvas focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none inline-flex h-8 w-8 items-center justify-center rounded-full border border-accent/25 bg-surface text-ink/80 transition-all duration-200 hover:border-accent/55 hover:bg-accent-soft/40 hover:text-accent"
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -112,11 +107,6 @@ export function MobileMenu({
                   {navLabels.contact}
                 </MobileNavLink>
               </li>
-              {showCart ? (
-                <li>
-                  <MobileCartLink label={navLabels.cart} onClick={closeMenu} />
-                </li>
-              ) : null}
             </ul>
           </nav>
 
@@ -138,12 +128,8 @@ export function MobileMenu({
   );
 }
 
-/* ──────────────────────────────────────────────────────────────── */
-/*  Mobile-specific link components                               */
-/* ──────────────────────────────────────────────────────────────── */
-
 type MobileNavLinkProps = {
-  href: "/about" | "/contact" | "/cart" | "/shop";
+  href: "/about" | "/contact" | "/shop";
   children: React.ReactNode;
   onClick?: () => void;
 };
@@ -165,43 +151,6 @@ function MobileNavLink({ href, children, onClick }: MobileNavLinkProps) {
       )}
     >
       {children}
-    </Link>
-  );
-}
-
-type MobileCartLinkProps = {
-  label: string;
-  onClick?: () => void;
-};
-
-function MobileCartLink({ label, onClick }: MobileCartLinkProps) {
-  const pathname = usePathname();
-  const count = useCartStore((state) => state.count());
-  const hasHydrated = useCartStore((state) => state._hasHydrated);
-  const isActive = pathname === "/cart";
-
-  return (
-    <Link
-      href="/cart"
-      onClick={onClick}
-      aria-label={label}
-      aria-current={isActive ? "page" : undefined}
-      className={cn(
-        "flex items-center gap-3 py-3 text-lg font-medium tracking-wide transition-colors duration-200",
-        isActive
-          ? "text-accent"
-          : "text-ink/70 hover:text-accent",
-      )}
-    >
-      <span className="relative inline-flex">
-        <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-        {hasHydrated && count > 0 ? (
-          <span className="border-accent/30 bg-surface absolute -top-1.5 -right-2.5 min-w-4 border px-1 text-center text-[0.55em] leading-4">
-            {count}
-          </span>
-        ) : null}
-      </span>
-      {label}
     </Link>
   );
 }

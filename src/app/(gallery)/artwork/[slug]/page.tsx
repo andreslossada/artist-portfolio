@@ -97,10 +97,8 @@ export default async function ArtworkDetailPage({
             <div className="flex flex-wrap gap-3">
               {commerceEnabled ? (
                 <ArtworkCartCta
-                  artwork={artwork}
                   labels={{
                     addToCart: dict.artworkPage.addToCart,
-                    viewCart: dict.artworkPage.viewCart,
                   }}
                 />
               ) : null}

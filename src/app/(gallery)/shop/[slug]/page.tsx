@@ -74,10 +74,8 @@ export default async function ProductDetailPage({
             <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
               {commerceEnabled ? (
                 <ProductCartCta
-                  product={product}
                   labels={{
                     addToCart: dict.shopPage.addToCart,
-                    viewCart: dict.shopPage.viewCart,
                   }}
                 />
               ) : null}

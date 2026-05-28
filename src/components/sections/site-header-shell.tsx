@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { ShellIcon } from "@/components/ui/shell-icon";
-import { HeaderCartLink } from "@/components/ui/header-cart-link";
 import { HeaderNavLink } from "@/components/ui/header-nav-link";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { MobileMenu } from "@/components/ui/mobile-menu";
@@ -20,10 +19,8 @@ type SiteHeaderShellProps = {
   navLabels: {
     shop?: string;
     about: string;
-    cart: string;
     contact: string;
   };
-  showCart?: boolean;
   headerClassName?: string;
   hideWordmark?: boolean;
 };
@@ -32,7 +29,6 @@ export function SiteHeaderShell({
   locale,
   languageLabels,
   navLabels,
-  showCart = true,
   headerClassName = "border-b border-accent/15 bg-transparent",
   hideWordmark = false,
 }: SiteHeaderShellProps) {
@@ -79,7 +75,6 @@ export function SiteHeaderShell({
               <HeaderNavLink href="/shop">{navLabels.shop}</HeaderNavLink>
             ) : null}
             <HeaderNavLink href="/contact">{navLabels.contact}</HeaderNavLink>
-            {showCart ? <HeaderCartLink label={navLabels.cart} /> : null}
           </nav>
 
           {/* Mobile menu */}
@@ -88,7 +83,6 @@ export function SiteHeaderShell({
               locale={locale}
               languageLabels={languageLabels}
               navLabels={navLabels}
-              showCart={showCart}
             />
           </div>
         </div>

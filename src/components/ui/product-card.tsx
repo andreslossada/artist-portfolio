@@ -40,7 +40,7 @@ export function ProductCard({ product, labels }: ProductCardProps) {
           <p className="text-accent text-lg font-semibold">
             ${product.price.toFixed(2)} USD
           </p>
-          <ProductCartCta product={product} labels={labels} />
+          <ProductCartCta labels={labels} />
         </div>
       </div>
     </article>

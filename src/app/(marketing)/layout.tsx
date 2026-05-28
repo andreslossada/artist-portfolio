@@ -26,7 +26,6 @@ export default async function MarketingLayout({
           navLabels={{
             shop: dict.landing.shop,
             about: dict.landing.about,
-            cart: dict.landing.cart,
             contact: dict.landing.contact,
           }}
           headerClassName="border-b border-accent/15 bg-transparent"
