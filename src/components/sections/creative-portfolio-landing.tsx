@@ -106,8 +106,8 @@ export function CreativePortfolioLanding({
     startTransition(() => {
       shownSplashThemes.add("dark");
       setShowSplash(false);
-      setIsRailReady(false);
     });
+    setIsRailReady(true);
   }, []);
 
   const populateParallaxCache = useCallback(() => {
@@ -186,14 +186,8 @@ export function CreativePortfolioLanding({
       cache = parallaxCacheRef.current;
     }
     if (cache.wraps.length > 0 && !reducedMotionRef.current) {
-      const {
-        wraps,
-        cards,
-        imgs,
-        railLeft,
-        railWidth,
-        railContentOffsetLeft,
-      } = cache;
+      const { wraps, cards, imgs, railLeft, railWidth, railContentOffsetLeft } =
+        cache;
       const railCenterX = railLeft + railWidth / 2;
 
       for (let i = 0; i < wraps.length; i++) {
@@ -217,10 +211,7 @@ export function CreativePortfolioLanding({
 
         const normalizedOffset = Math.max(
           -1,
-          Math.min(
-            1,
-            (visibleCenterX - railCenterX) / (railWidth / 2),
-          ),
+          Math.min(1, (visibleCenterX - railCenterX) / (railWidth / 2)),
         );
 
         wrap.style.willChange = "transform";
@@ -249,9 +240,14 @@ export function CreativePortfolioLanding({
     }
 
     const loopOffset =
-      ((rail.scrollLeft % singleLoopWidth) + singleLoopWidth) %
-      singleLoopWidth;
-    rail.scrollLeft = singleLoopWidth * centerLoopCopyIndex + loopOffset;
+      ((rail.scrollLeft % singleLoopWidth) + singleLoopWidth) % singleLoopWidth;
+    const targetScroll = singleLoopWidth * centerLoopCopyIndex + loopOffset;
+    const lenis = lenisRef.current;
+    if (lenis) {
+      lenis.scrollTo(targetScroll, { immediate: true, force: true });
+    } else {
+      rail.scrollTo({ left: targetScroll, behavior: "instant" });
+    }
     syncRailLoopState();
   }, [artworks.length, syncRailLoopState]);
 
@@ -483,14 +479,7 @@ export function CreativePortfolioLanding({
   }, [showSplash, populateParallaxCache]);
 
   useLayoutEffect(() => {
-    const prevShowSplash = prevShowSplashRef.current;
     prevShowSplashRef.current = showSplash;
-
-    if (prevShowSplash && !showSplash) {
-      startTransition(() => {
-        setIsRailReady(false);
-      });
-    }
 
     if (showSplash) {
       return;
@@ -505,21 +494,48 @@ export function CreativePortfolioLanding({
 
     let animationStarted = false;
     let transitionTimeout: ReturnType<typeof setTimeout> | null = null;
+    const gsapCleanupRef = { current: null as (() => void) | null };
 
     const startAnimations = () => {
       if (animationStarted) return;
       animationStarted = true;
 
+      const reCenterRail = () => {
+        const r = railRef.current;
+        if (!r) return;
+        const singleLoopWidth = getSingleLoopWidth(
+          r,
+          artworks.length,
+          railContentRef.current,
+        );
+        if (singleLoopWidth <= 0) return;
+        const loopOffset =
+          ((r.scrollLeft % singleLoopWidth) + singleLoopWidth) %
+          singleLoopWidth;
+        const targetScroll = singleLoopWidth * centerLoopCopyIndex + loopOffset;
+        const lenis = lenisRef.current;
+        if (lenis) {
+          lenis.scrollTo(targetScroll, { immediate: true, force: true });
+        } else {
+          r.scrollTo({ left: targetScroll, behavior: "instant" });
+        }
+      };
+      reCenterRail();
+
       startTransition(() => {
         setIsRailReady(true);
       });
+
+      let contextCancelled = false;
 
       const ctx = gsap.context(() => {
         const cards = Array.from(
           railContent.querySelectorAll<HTMLElement>("[data-slider-card]"),
         );
         const cardCurtains = cards
-          .map((card) => card.querySelector<HTMLElement>("[data-slider-curtain]"))
+          .map((card) =>
+            card.querySelector<HTMLElement>("[data-slider-curtain]"),
+          )
           .filter((curtain): curtain is HTMLElement => curtain !== null);
         const maxAnimatedCards = 5;
 
@@ -648,10 +664,10 @@ export function CreativePortfolioLanding({
                 centerMedia,
                 {
                   clipPath: "inset(0% 0% 0% 0%)",
-                  duration: 0.8,
+                  duration: 0.7,
                   ease: "power2.out",
                 },
-                0.7,
+                0.1,
               );
             }
 
@@ -705,9 +721,7 @@ export function CreativePortfolioLanding({
           playIntro();
         };
 
-        window.requestAnimationFrame(() => {
-          window.requestAnimationFrame(setupAnimation);
-        });
+        setupAnimation();
 
         fallbackTimerId = setTimeout(() => {
           if (!timeline) {
@@ -722,6 +736,7 @@ export function CreativePortfolioLanding({
         }, 2000);
 
         return () => {
+          contextCancelled = true;
           if (fallbackTimerId) {
             clearTimeout(fallbackTimerId);
           }
@@ -730,7 +745,8 @@ export function CreativePortfolioLanding({
         };
       }, railContent);
 
-      return () => {
+      gsapCleanupRef.current = () => {
+        contextCancelled = true;
         ctx.revert();
       };
     };
@@ -744,13 +760,14 @@ export function CreativePortfolioLanding({
     } else {
       transitionTimeout = setTimeout(() => {
         startAnimations();
-      }, 450);
+      }, 0);
     }
 
     return () => {
       if (transitionTimeout) {
         clearTimeout(transitionTimeout);
       }
+      gsapCleanupRef.current?.();
     };
   }, [showSplash]);
 
@@ -759,9 +776,7 @@ export function CreativePortfolioLanding({
       ref={pageRef}
       className="landing-page text-ink h-screen overflow-hidden"
     >
-      {showSplash ? (
-        <SplashScreen onComplete={handleSplashComplete} />
-      ) : null}
+      {showSplash ? <SplashScreen onComplete={handleSplashComplete} /> : null}
 
       <main className="mx-auto flex h-screen w-full max-w-425 flex-col overflow-hidden px-5 pt-22 md:px-10 md:pt-[8.7rem]">
         <section
@@ -774,7 +789,7 @@ export function CreativePortfolioLanding({
           >
             <div
               ref={railContentRef}
-              className={`flex h-full w-full gap-3 md:gap-4 ${showSplash || !isRailReady ? "invisible" : ""}`}
+              className={`flex h-full w-full gap-3 md:gap-4 ${!isRailReady ? "invisible" : ""}`}
             >
               {loopedLandingGalleryItems.map((item) => (
                 <article
@@ -798,19 +813,19 @@ export function CreativePortfolioLanding({
                         className="relative h-full w-full overflow-hidden"
                       >
                         <div data-parallax-wrap className="h-full w-full">
-                        <Image
-                          src={item.imageUrl}
-                          alt={`${item.title} - ${item.category}`}
-                          fill
-                          draggable={false}
-                          sizes="(max-width: 768px) 62vw, 22rem"
-                          className="object-cover contrast-105 saturate-105 transition-[scale] duration-300 ease-in-out group-hover:scale-[1.72]"
-                          style={{ scale: `${parallaxImageScale}` }}
-                          priority={
-                            item.copyIndex === centerLoopCopyIndex &&
-                            item.index < 5
-                          }
-                        />
+                          <Image
+                            src={item.imageUrl}
+                            alt={`${item.title} - ${item.category}`}
+                            fill
+                            draggable={false}
+                            sizes="(max-width: 768px) 62vw, 22rem"
+                            className="object-cover contrast-105 saturate-105 transition-[scale] duration-300 ease-in-out group-hover:scale-[1.72]"
+                            style={{ scale: `${parallaxImageScale}` }}
+                            priority={
+                              item.copyIndex === centerLoopCopyIndex &&
+                              item.index < 5
+                            }
+                          />
                         </div>
                         <div
                           data-slider-curtain

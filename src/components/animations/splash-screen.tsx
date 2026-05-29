@@ -4,13 +4,11 @@ import { useCallback, useEffect, useRef } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
 import { irinaWordmarkFont } from "@/lib/wordmark-font";
 import { ShellIcon } from "@/components/ui/shell-icon";
+import { AuroraBackground } from "@/components/ui/aurora-background";
 
 type SplashScreenProps = {
   onComplete: () => void;
 };
-
-const SPLASH_EXIT_DELAY_MS = 40;
-const SPLASH_MAX_DURATION_MS = 5200;
 
 type ArcPathOptions = {
   baseline: number;
@@ -216,27 +214,14 @@ function createRandomWaveGeometry(): WaveGeometry {
 
 export function SplashScreen({ onComplete }: SplashScreenProps) {
   const hasCompletedRef = useRef(false);
-  const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const finishSplash = useCallback(() => {
     if (hasCompletedRef.current) {
       return;
     }
-
     hasCompletedRef.current = true;
-
-    fadeTimeoutRef.current = setTimeout(() => {
-      onComplete();
-    }, SPLASH_EXIT_DELAY_MS);
+    onComplete();
   }, [onComplete]);
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-splash", "active");
-
-    return () => {
-      document.documentElement.removeAttribute("data-splash");
-    };
-  }, []);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -247,6 +232,14 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       finishSplash();
     }
   }, [finishSplash]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-splash", "active");
+
+    return () => {
+      document.documentElement.removeAttribute("data-splash");
+    };
+  }, []);
 
   const scopeRef = useGsapContext<HTMLDivElement>(
     (scope, gsap) => {
@@ -269,6 +262,13 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       const shellIcon = scope.querySelector<HTMLElement>("[data-splash-shell]");
       const titleReflection = scope.querySelector<HTMLElement>(
         "[data-splash-title-reflection]",
+      );
+      const bgLayer = scope.querySelector<HTMLElement>("[data-splash-bg]");
+      const auroraLayer = scope.querySelector<HTMLElement>(
+        "[data-splash-aurora]",
+      );
+      const bubbleContainer = scope.querySelector<HTMLDivElement>(
+        "[data-splash-bubbles]",
       );
       const waveGeometry = createRandomWaveGeometry();
 
@@ -295,7 +295,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       gsap.set(waveBands, {
         yPercent: (index) => (index === 0 ? 92 : 96),
         xPercent: (index) => (index === 0 ? -5 : 4),
-        opacity: (index) => (index === 0 ? 0.98 : 0.68),
+        opacity: (index) => (index === 0 ? 1.0 : 0.85),
         scaleY: (index) => (index === 0 ? 1.03 : 1.08),
       });
       gsap.set(wash, {
@@ -328,10 +328,82 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
       const timeline = gsap.timeline({
         defaults: { ease: "sine.inOut" },
-        onComplete: finishSplash,
+        onComplete: () => {
+          if (bubbleContainer) bubbleContainer.remove();
+          finishSplash();
+        },
       });
+
       const delay = 0.5;
       const retreatStart = delay + 1.26;
+      const bubbleRiseStart = 3.5;
+
+      // Generate 480 bubbles distributed across entire screen
+      if (bubbleContainer) {
+        const BUBBLE_COUNT = 220;
+
+        for (let i = 0; i < BUBBLE_COUNT; i++) {
+          const bubble = document.createElement("div");
+          const size = 140 + Math.random() * 140;
+          const leftPercent = Math.random() * 100;
+          const startYPercent = 100 + Math.random() * 30;
+          const riseDuration = 0.2 + Math.random() * 0.5;
+          const delayOffset = Math.random() * 0.5;
+          const xSpread = (Math.random() - 0.5) * 40;
+          const targetOpacity = 1.0;
+          const yMovePx = -(window.innerHeight * 1.6 + Math.random() * 400);
+          const absStart = bubbleRiseStart + delayOffset;
+
+          gsap.set(bubble, {
+            position: "absolute",
+            borderRadius: "50%",
+            width: size,
+            height: size,
+            left: `${leftPercent}%`,
+            top: `${startYPercent}%`,
+            opacity: 0,
+            backgroundColor: "#ffffff",
+            scale: 0.5 + Math.random() * 1.0,
+          });
+
+          bubbleContainer.appendChild(bubble);
+
+          // Quick fade in
+          timeline.to(
+            bubble,
+            {
+              opacity: targetOpacity,
+              duration: 0.3,
+              ease: "power2.out",
+            },
+            absStart,
+          );
+
+          // Rise
+          timeline.to(
+            bubble,
+            {
+              y: yMovePx,
+              x: xSpread + (Math.random() - 0.5) * 30,
+              duration: riseDuration,
+              ease: "sine.inOut",
+            },
+            absStart,
+          );
+
+          // Fade out at end of rise
+          timeline.to(
+            bubble,
+            {
+              opacity: 0,
+              scale: 0.2,
+              duration: 0.4,
+              ease: "power2.in",
+            },
+            absStart + riseDuration - 0.4,
+          );
+        }
+      }
 
       // Reveal splash content after initial delay
       timeline.set(scope, { opacity: 1 }, delay);
@@ -362,7 +434,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         waveBands,
         {
           yPercent: (index) => (index === 0 ? -5 : -1),
-          opacity: (index) => (index === 0 ? 1 : 0.74),
+          opacity: (index) => (index === 0 ? 1 : 0.90),
           duration: 0.9,
           stagger: 0.045,
           ease: "power2.out",
@@ -385,7 +457,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         wash,
         {
           yPercent: 10,
-          opacity: 0.5,
+          opacity: 0.80,
           scaleY: 1.06,
           duration: 0.66,
           ease: "sine.out",
@@ -397,7 +469,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         wash,
         {
           yPercent: 6,
-          opacity: 0.62,
+          opacity: 0.88,
           scaleY: 1,
           duration: 0.28,
           ease: "sine.inOut",
@@ -414,7 +486,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         {
           yPercent: (index) => (index === 0 ? 44 : 50),
           xPercent: (index) => (index === 0 ? 2.6 : -2.8),
-          opacity: (index) => (index === 0 ? 0.94 : 0.6),
+          opacity: (index) => (index === 0 ? 1.0 : 0.85),
           scaleY: (index) => (index === 0 ? 1.06 : 1.11),
           duration: 0.52,
           stagger: 0.04,
@@ -428,7 +500,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         {
           yPercent: (index) => (index === 0 ? 114 : 120),
           xPercent: (index) => (index === 0 ? 3.8 : -3.8),
-          opacity: (index) => (index === 0 ? 0.9 : 0.56),
+          opacity: (index) => (index === 0 ? 0.95 : 0.80),
           scaleY: (index) => (index === 0 ? 1.02 : 1.06),
           duration: 0.88,
           stagger: 0.03,
@@ -441,7 +513,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         wash,
         {
           yPercent: 28,
-          opacity: 0.48,
+          opacity: 0.72,
           scaleY: 1.02,
           duration: 0.46,
           ease: "sine.in",
@@ -495,91 +567,111 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         retreatStart + 0.14,
       );
 
-      // GUIDE: small hold before view-transition capture
-      timeline.to({}, { duration: 0.28 }, delay + 3.02);
+      const bubbleCoverStart = bubbleRiseStart + 0.2;
 
-      // Cross-fade: beach sand → tropical ocean (matches main site background)
+      // Transition bg from sand to teal when bubbles cover the screen
+      if (bgLayer) {
+        timeline.to(
+          bgLayer,
+          { backgroundColor: "#1a7a6e", duration: 0.8, ease: "power2.inOut" },
+          bubbleCoverStart,
+        );
+      }
+      // Fade in aurora overlay at the same time
+      if (auroraLayer) {
+        timeline.to(
+          auroraLayer,
+          { opacity: 1, duration: 1.0, ease: "power2.inOut" },
+          bubbleCoverStart,
+        );
+      }
+
+      // Title and shell fade out when bubbles cover the screen
       timeline.to(
-        scope,
+        title,
         {
-          backgroundColor: "#1a7a6e",
-          duration: 0.8,
-          ease: "power2.inOut",
+          opacity: 0,
+          duration: 0.5,
+          ease: "power2.out",
         },
-        delay + 3.3,
+        bubbleCoverStart,
       );
 
-      // Title transitions to white as background becomes ocean
-      const titleEl = scope.querySelector<HTMLElement>("[data-splash-title]");
-      const reflectionEl = scope.querySelector<HTMLElement>(
-        "[data-splash-title-reflection]",
+      timeline.to(
+        shellIcon,
+        {
+          opacity: 0,
+          duration: 0.5,
+          ease: "power2.out",
+        },
+        bubbleCoverStart,
       );
-      if (titleEl) {
-        timeline.to(
-          titleEl,
-          { color: "#ffffff", duration: 0.8, ease: "power2.inOut" },
-          delay + 3.3,
-        );
-      }
-      if (reflectionEl) {
-        timeline.to(
-          reflectionEl,
-          { color: "rgba(255,255,255,0.6)", duration: 0.8, ease: "power2.inOut" },
-          delay + 3.3,
-        );
-      }
+
+      timeline.to(
+        titleReflection,
+        {
+          opacity: 0,
+          duration: 0.5,
+          ease: "power2.out",
+        },
+        bubbleCoverStart,
+      );
+
+      // Unmount splash before bubbles finish
+      timeline.to({}, { duration: 0, onComplete: finishSplash }, 4.5);
     },
     [finishSplash],
   );
-
-  useEffect(() => {
-    const failSafeTimeout = setTimeout(finishSplash, SPLASH_MAX_DURATION_MS);
-
-    return () => {
-      window.clearTimeout(failSafeTimeout);
-
-      if (fadeTimeoutRef.current) {
-        window.clearTimeout(fadeTimeoutRef.current);
-      }
-    };
-  }, [finishSplash]);
   const titleClassName = "text-[#444444]";
 
   const reflectionClassName = "text-[#444444]/60";
 
   const waveMainStops = [
-    "rgba(255,255,255,0.95)",
-    "rgba(200,240,230,0.80)",
-    "rgba(100,210,180,0.75)",
-    "rgba(26,154,130,0.80)",
-    "rgba(26,154,130,0.70)",
+    "rgba(200,245,235,0.98)",
+    "rgba(150,230,210,0.90)",
+    "rgba(80,210,180,0.88)",
+    "rgba(26,154,130,0.92)",
+    "rgba(26,154,130,0.85)",
   ];
 
   const waveSoftStops = [
-    "rgba(255,255,255,0.82)",
-    "rgba(220,248,235,0.65)",
-    "rgba(150,225,200,0.55)",
-    "rgba(80,190,160,0.50)",
-    "rgba(80,190,160,0.38)",
+    "rgba(180,240,225,0.90)",
+    "rgba(160,230,210,0.80)",
+    "rgba(100,210,180,0.75)",
+    "rgba(60,180,155,0.70)",
+    "rgba(60,180,155,0.55)",
   ];
 
   const washBodyStops = [
-    "rgba(255,254,240,0.85)",
-    "rgba(230,250,240,0.45)",
-    "rgba(180,235,215,0.38)",
-    "rgba(120,210,180,0.28)",
-    "rgba(120,210,180,0.15)",
+    "rgba(210,245,230,0.92)",
+    "rgba(180,235,215,0.65)",
+    "rgba(130,220,195,0.55)",
+    "rgba(80,190,165,0.45)",
+    "rgba(80,190,165,0.28)",
   ];
 
   return (
     <div
       ref={scopeRef}
       data-splash-screen
-      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center overflow-hidden`}
-      style={{ backgroundColor: "#f7eed8", opacity: 0 }}
+      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center overflow-hidden opacity-0`}
       role="presentation"
       aria-hidden="true"
     >
+      <div
+        data-splash-bg
+        className="absolute inset-0"
+        style={{ backgroundColor: "#f7eed8" }}
+      />
+
+      <div
+        data-splash-aurora
+        className="pointer-events-none absolute inset-0 opacity-0"
+      >
+        <AuroraBackground className="absolute inset-0 bg-transparent">
+          {null}
+        </AuroraBackground>
+      </div>
       <svg
         data-wave-band
         viewBox="0 0 1440 900"
@@ -667,7 +759,16 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         </defs>
       </svg>
 
-      <div className="absolute inset-x-0 top-[34%] flex justify-center px-6">
+      <div
+        data-splash-bubbles
+        className="pointer-events-none absolute inset-0 z-[20] overflow-hidden"
+        aria-hidden="true"
+      />
+
+      <div
+        className="absolute inset-x-0 top-[34%] flex justify-center px-6"
+        style={{ zIndex: 15 }}
+      >
         <div className="relative flex flex-col items-center">
           <div className="relative overflow-visible px-4 py-5">
             <div className="relative z-10 flex items-center gap-[0.15em]">
@@ -680,14 +781,14 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
               <span className="relative">
                 <span
                   data-splash-title
-                  className={`${irinaWordmarkFont.className} block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] italic ${titleClassName}`}
+                  className={`${irinaWordmarkFont.className} block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] ${titleClassName}`}
                 >
                   Irina
                 </span>
 
                 <span
                   data-splash-title-reflection
-                  className={`${irinaWordmarkFont.className} pointer-events-none absolute inset-0 text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] italic select-none ${reflectionClassName}`}
+                  className={`${irinaWordmarkFont.className} pointer-events-none absolute inset-0 text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] select-none ${reflectionClassName}`}
                   style={{
                     maskImage:
                       "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,1) 100%)",

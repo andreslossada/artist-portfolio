@@ -135,12 +135,35 @@ html[data-splash="active"] .aurora-overlay {
   visibility: hidden;
 }
 
+html[data-splash="active"] [data-splash-screen] .aurora-overlay {
+  visibility: visible;
+}
+
 html[data-splash="active"] [data-aurora-bg] {
   background-color: #f7eed8 !important;
 }
 
+html[data-splash="active"] [data-splash-screen] [data-aurora-bg] {
+  background-color: transparent !important;
+}
+
 html[data-splash="active"] .landing-page > main {
   visibility: hidden;
+}
+
+.contact-card {
+  view-transition-name: none;
+  opacity: 1 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+::view-transition-group(.contact-page) {
+  animation: none;
+}
+
+::view-transition-old(.contact-page),
+::view-transition-new(.contact-page) {
+  animation: none;
 }
 
 .site-header {

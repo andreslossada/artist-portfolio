@@ -39,18 +39,9 @@ export default async function RootLayout({
       lang={locale}
       data-theme="dark"
       className={`${display.variable} ${sans.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){document.documentElement.style.backgroundColor='#1a7a6e';document.body&&(document.body.style.backgroundColor='#1a7a6e')})();`,
-          }}
-        />
-      </head>
-      <body
-        className="text-ink relative flex min-h-full flex-col"
-        style={{ backgroundColor: "#1a7a6e" }}
-      >
+      <body className="text-ink relative flex min-h-full flex-col">
         <AuroraBackground className="min-h-screen items-stretch justify-start">
           {children}
         </AuroraBackground>
