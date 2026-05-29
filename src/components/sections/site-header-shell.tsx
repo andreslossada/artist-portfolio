@@ -39,7 +39,7 @@ export function SiteHeaderShell({
             <Link
               href="/"
               transitionTypes={["landing-nav"]}
-              className={`${irinaWordmarkFont.className} hover:text-accent inline-flex h-8 items-center gap-2 text-[2rem] leading-none font-medium tracking-[-0.02em] italic transition-colors md:h-10`}
+              className={`${irinaWordmarkFont.className} hover:text-accent inline-flex h-8 items-center gap-2 text-[2rem] leading-none font-medium tracking-[-0.02em] transition-colors md:h-10`}
             >
               <span className="block h-6 w-6 md:h-7 md:w-7">
                 <ShellIcon size="100%" aria-hidden="true" />
