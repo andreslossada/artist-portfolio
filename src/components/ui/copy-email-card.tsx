@@ -23,12 +23,12 @@ export default function CopyEmailCard({ label, email }: CopyEmailCardProps) {
   return (
     <button
       onClick={handleCopy}
-      className="contact-card group relative overflow-hidden border border-ink/10 bg-accent p-5 text-left text-white shadow-card transition-all duration-300 ease-out hover:border-accent/80 active:scale-[0.98] md:p-6"
+      className="contact-card group relative cursor-pointer overflow-hidden border border-ink/10 bg-accent p-5 text-left shadow-card transition-transform duration-300 ease-out hover:border-accent/80 active:scale-[0.98] md:p-6"
     >
-      <p className="text-xs tracking-[0.2em] uppercase text-white/85">
+      <p className="text-xs tracking-[0.2em] uppercase text-accent-soft/80">
         {label}
       </p>
-      <div className="font-display relative mt-2 inline-flex items-center gap-2 whitespace-nowrap text-sm leading-tight tracking-tight md:mt-3 md:text-base lg:text-lg">
+      <div className="font-display relative mt-2 inline-flex items-center gap-2 whitespace-nowrap text-sm leading-tight tracking-tight text-canvas md:mt-3 md:text-base lg:text-lg">
         <span
           className={`transition-opacity duration-300 ${copied ? "opacity-0" : "opacity-100"}`}
         >
@@ -39,7 +39,7 @@ export default function CopyEmailCard({ label, email }: CopyEmailCardProps) {
           aria-hidden={!copied}
         >
           <svg
-            className="h-6 w-6 text-white"
+            className="h-6 w-6 text-canvas"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

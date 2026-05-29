@@ -38,7 +38,7 @@ export default async function ContactPage() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10">
+    <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 md:px-10" style={{ viewTransitionName: "contact-page" }}>
       <header className="max-w-3xl">
         <div className="flex items-center gap-4">
           <p className="text-muted text-xs tracking-[0.3em] uppercase">
@@ -82,7 +82,7 @@ export default async function ContactPage() {
               href={channel.href}
               target={channel.href.startsWith("http") ? "_blank" : undefined}
               rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
-              className="contact-card border-ink/10 shadow-card hover:border-accent/30 bg-surface border p-5 transition-all duration-300 ease-out active:scale-[0.98] md:p-6 md:hover:scale-[1.02]"
+              className="contact-card border-ink/10 shadow-card hover:border-accent/30 hover:-translate-y-1 bg-surface border p-5 transition-transform duration-300 ease-out active:translate-y-0 md:p-6"
             >
               <p className="text-muted text-xs tracking-[0.2em] uppercase">
                 {channel.label}
