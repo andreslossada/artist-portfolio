@@ -307,11 +307,13 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       gsap.set(title, {
         opacity: 0,
         y: 0,
+        willChange: "clip-path, filter",
         filter: "blur(8px)",
         clipPath: "inset(0% 0% 100% 0%)",
       });
       gsap.set(shellIcon, {
         opacity: 0,
+        willChange: "clip-path",
         clipPath: "inset(0% 0% 100% 0%)",
       });
       gsap.set(titleReflection, {
@@ -320,6 +322,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         y: -184,
         scaleX: 1.03,
         scaleY: 3.05,
+        willChange: "clip-path, filter",
         filter: "blur(10px)",
         letterSpacing: "0.12em",
         clipPath: "inset(0% 0% 100% 0%)",
@@ -338,9 +341,11 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       const retreatStart = delay + 1.26;
       const bubbleRiseStart = 3.5;
 
-      // Generate 480 bubbles distributed across entire screen
+      // Generate bubbles distributed across entire screen
       if (bubbleContainer) {
-        const BUBBLE_COUNT = 220;
+        const BUBBLE_COUNT = 100;
+        const viewportHeight = window.innerHeight;
+        const fragment = document.createDocumentFragment();
 
         for (let i = 0; i < BUBBLE_COUNT; i++) {
           const bubble = document.createElement("div");
@@ -351,7 +356,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           const delayOffset = Math.random() * 0.5;
           const xSpread = (Math.random() - 0.5) * 40;
           const targetOpacity = 1.0;
-          const yMovePx = -(window.innerHeight * 1.6 + Math.random() * 400);
+          const yMovePx = -(viewportHeight * 1.6 + Math.random() * 400);
           const absStart = bubbleRiseStart + delayOffset;
 
           gsap.set(bubble, {
@@ -366,7 +371,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             scale: 0.5 + Math.random() * 1.0,
           });
 
-          bubbleContainer.appendChild(bubble);
+          fragment.appendChild(bubble);
 
           // Quick fade in
           timeline.to(
@@ -403,6 +408,8 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             absStart + riseDuration - 0.4,
           );
         }
+
+        bubbleContainer.appendChild(fragment);
       }
 
       // Reveal splash content after initial delay
@@ -415,14 +422,17 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             Math.min(index, waveGeometry.swayProfiles.length - 1)
           ];
 
+        const swayX = swayProfile.xPercent * (0.82 + Math.random() * 0.32);
+        const swayScaleX = swayProfile.scaleX * (0.996 + Math.random() * 0.016);
+        const swayDuration = swayProfile.duration * (0.88 + Math.random() * 0.28);
+
         gsap.to(band, {
-          xPercent: () => swayProfile.xPercent * (0.82 + Math.random() * 0.32),
-          scaleX: () => swayProfile.scaleX * (0.996 + Math.random() * 0.016),
-          duration: () => swayProfile.duration * (0.88 + Math.random() * 0.28),
+          xPercent: swayX,
+          scaleX: swayScaleX,
+          duration: swayDuration,
           delay: index * 0.12,
           repeat: -1,
           yoyo: true,
-          repeatRefresh: true,
           yoyoEase: true,
           ease: "sine.inOut",
         });
@@ -738,7 +748,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       <svg
         data-splash-wash
         viewBox="0 0 1440 900"
-        preserveAspectRatio="none"
+        preserveAspectRatio="xMidYMid slice"
         className="pointer-events-none absolute inset-x-0 top-[20%] h-[100%] w-full motion-safe:will-change-transform"
         aria-hidden="true"
       >
@@ -776,7 +786,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
                 data-splash-shell
                 className="flex shrink-0 items-center text-[clamp(3.6rem,13vw,9rem)]"
               >
-                <ShellIcon size="0.65em" />
+                <ShellIcon size="1.3em" />
               </span>
               <span className="relative">
                 <span

@@ -1,21 +1,14 @@
 import type { Artwork, Product } from "@/types/content";
 
 const artworkImageFiles = [
-  "20260408_222545.jpg",
-  "20260408_222557.jpg",
-  "20260408_222605.jpg",
-  "20260408_222612.jpg",
-  "20260408_222639.jpg",
-  "20260408_222716.jpg",
-  "20260408_222724.jpg",
-  "20260408_222739.jpg",
-  "20260408_222750.jpg",
-  "IMG_20240630_101759_357.jpg",
-  "IMG_20250618_152651_189.jpg",
-  "IMG_20250621_131642_427.jpg",
-  "IMG_20250622_111728_398.jpg",
-  "IMG_20250622_111739_597.jpg",
-  "IMG_20250622_111834_071.jpg",
+  "20260408_222545.webp",
+  "20260408_222557.webp",
+  "20260408_222605.webp",
+  "20260408_222612.webp",
+  "20260408_222639.webp",
+  "20260408_222716.webp",
+  "20260408_222724.webp",
+  "20260408_222739.webp",
 ] as const;
 
 const artworkTitlePool = [
@@ -64,7 +57,7 @@ const pickByHash = <T>(pool: readonly T[], seed: string, salt: string): T => {
 
 const toArtworkSlug = (fileName: string, index: number) => {
   const normalized = fileName
-    .replace(/\.jpg$/i, "")
+    .replace(/\.(jpe?g|png|webp)$/i, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");

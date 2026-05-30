@@ -17,13 +17,13 @@ import {
 import { SplashScreen } from "@/components/animations/splash-screen";
 import type { Artwork } from "@/types/content";
 
-const sliderLoopCopies = 5;
+const sliderLoopCopies = 3;
 const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 10;
 const mouseDragScrollFactor = 0.7;
 const shownSplashThemes = new Set<string>();
-const parallaxImageScale = 1.7;
-const parallaxMaxShiftPercent = 30;
+const parallaxImageScale = 1.3;
+const parallaxMaxShiftPercent = 12;
 
 type CreativePortfolioLandingProps = {
   artworks: Artwork[];
@@ -86,20 +86,22 @@ export function CreativePortfolioLanding({
   );
   const [isRailReady, setIsRailReady] = useState(false);
   const prevShowSplashRef = useRef(showSplash);
+  const loopWidthRef = useRef(0);
+  const prevSegmentRef = useRef(0);
+  const parallaxFrameRef = useRef(0);
+  const wrappingRef = useRef(false);
   const parallaxCacheRef = useRef<{
     wraps: HTMLElement[];
-    cards: HTMLElement[];
     imgs: (HTMLImageElement | null)[];
+    cardGeometries: { offsetLeft: number; offsetWidth: number }[];
     railLeft: number;
     railWidth: number;
-    railContentOffsetLeft: number;
   }>({
     wraps: [],
-    cards: [],
     imgs: [],
+    cardGeometries: [],
     railLeft: 0,
     railWidth: 0,
-    railContentOffsetLeft: 0,
   });
   const reducedMotionRef = useRef(false);
   const handleSplashComplete = useCallback(() => {
@@ -121,13 +123,23 @@ export function CreativePortfolioLanding({
     const cards = [
       ...railContent.querySelectorAll<HTMLElement>("[data-slider-card]"),
     ];
+    const imgs = wraps.map(
+      (w) => w.querySelector<HTMLImageElement>("img"),
+    );
+    const railContentOffsetLeft = railContent.offsetLeft;
+    const cardGeometries = cards.map((card) => ({
+      offsetLeft: card.offsetLeft - railContentOffsetLeft,
+      offsetWidth: card.offsetWidth,
+    }));
+    for (const img of imgs) {
+      if (img) img.style.scale = String(parallaxImageScale);
+    }
     parallaxCacheRef.current = {
       wraps,
-      cards,
-      imgs: wraps.map((w) => w.querySelector<HTMLImageElement>("img")),
+      imgs,
+      cardGeometries,
       railLeft: rect.left,
       railWidth: rect.width,
-      railContentOffsetLeft: railContent.offsetLeft,
     };
   }, []);
 
@@ -144,33 +156,34 @@ export function CreativePortfolioLanding({
       return;
     }
 
-    const singleLoopWidth = getSingleLoopWidth(
-      rail,
-      artworks.length,
-      railContentRef.current,
-    );
+    let singleLoopWidth = loopWidthRef.current;
+    if (singleLoopWidth <= 0) {
+      singleLoopWidth = getSingleLoopWidth(
+        rail,
+        artworks.length,
+        railContentRef.current,
+      );
+      loopWidthRef.current = singleLoopWidth;
+    }
 
     if (singleLoopWidth <= 0) {
       setActiveSegment(0);
       return;
     }
 
-    const minBoundary = singleLoopWidth * (centerLoopCopyIndex - 0.5);
-    const maxBoundary = singleLoopWidth * (centerLoopCopyIndex + 0.5);
     const railScrollLeft = rail.scrollLeft;
-    let effectiveScrollLeft = railScrollLeft;
-    let didWrap = false;
+    const loopOrigin = singleLoopWidth * centerLoopCopyIndex;
+    const offsetFromOrigin = railScrollLeft - loopOrigin;
+    const normalizedOffset =
+      ((offsetFromOrigin % singleLoopWidth) + singleLoopWidth) %
+      singleLoopWidth;
+    const effectiveScrollLeft = loopOrigin + normalizedOffset;
+    const didWrap = effectiveScrollLeft !== railScrollLeft;
 
-    if (railScrollLeft < minBoundary) {
-      effectiveScrollLeft = railScrollLeft + singleLoopWidth;
-      didWrap = true;
-    } else if (railScrollLeft > maxBoundary) {
-      effectiveScrollLeft = railScrollLeft - singleLoopWidth;
-      didWrap = true;
-    }
-
-    if (didWrap && lenis) {
+    if (didWrap && lenis && !wrappingRef.current) {
+      wrappingRef.current = true;
       lenis.scrollTo(effectiveScrollLeft, { immediate: true });
+      wrappingRef.current = false;
     }
 
     const loopOffset =
@@ -178,7 +191,10 @@ export function CreativePortfolioLanding({
       singleLoopWidth;
     const progress = loopOffset / singleLoopWidth;
     const nextSegment = Math.round(progress * (progressSegments - 1));
-    setActiveSegment(nextSegment);
+    if (nextSegment !== prevSegmentRef.current) {
+      prevSegmentRef.current = nextSegment;
+      setActiveSegment(nextSegment);
+    }
 
     let cache = parallaxCacheRef.current;
     if (cache.wraps.length === 0 && !reducedMotionRef.current) {
@@ -186,40 +202,45 @@ export function CreativePortfolioLanding({
       cache = parallaxCacheRef.current;
     }
     if (cache.wraps.length > 0 && !reducedMotionRef.current) {
-      const { wraps, cards, imgs, railLeft, railWidth, railContentOffsetLeft } =
-        cache;
-      const railCenterX = railLeft + railWidth / 2;
+      parallaxFrameRef.current = (parallaxFrameRef.current + 1) % 2;
+      if (parallaxFrameRef.current === 0) {
+        const { wraps, cardGeometries, railLeft, railWidth } = cache;
+        const railCenterX = railLeft + railWidth / 2;
 
-      for (let i = 0; i < wraps.length; i++) {
-        const wrap = wraps[i];
-        const img = imgs[i];
-        const card = cards[i];
-        if (!card) continue;
+        for (let i = 0; i < wraps.length; i++) {
+          const geo = cardGeometries[i];
+          if (!geo) continue;
+          const wrap = wraps[i];
 
-        const cardOffset = card.offsetLeft - railContentOffsetLeft;
-        const visibleCenterX =
-          railLeft + cardOffset + card.offsetWidth / 2 - effectiveScrollLeft;
+          const visibleCenterX =
+            railLeft + geo.offsetLeft - effectiveScrollLeft + geo.offsetWidth / 2;
 
-        if (
-          visibleCenterX + card.offsetWidth / 2 < railLeft ||
-          visibleCenterX - card.offsetWidth / 2 > railLeft + railWidth
-        ) {
-          wrap.style.transform = "";
-          wrap.style.willChange = "";
-          continue;
+          if (
+            visibleCenterX + geo.offsetWidth / 2 < railLeft ||
+            visibleCenterX - geo.offsetWidth / 2 > railLeft + railWidth
+          ) {
+            wrap.style.transform = "";
+            wrap.style.willChange = "";
+            continue;
+          }
+
+          wrap.style.willChange = "transform";
+
+          const normalizedOffset = Math.max(
+            -1,
+            Math.min(1, (visibleCenterX - railCenterX) / (railWidth / 2)),
+          );
+
+          wrap.style.transform = `translate3d(${normalizedOffset * parallaxMaxShiftPercent}%, 0, 0)`;
         }
-
-        const normalizedOffset = Math.max(
-          -1,
-          Math.min(1, (visibleCenterX - railCenterX) / (railWidth / 2)),
-        );
-
-        wrap.style.willChange = "transform";
-        wrap.style.transform = `translateX(${normalizedOffset * parallaxMaxShiftPercent}%)`;
-        if (img) img.style.scale = String(parallaxImageScale);
       }
     }
   }, [artworks.length, progressSegments, populateParallaxCache]);
+
+  const syncRailLoopStateRef = useRef(syncRailLoopState);
+  useEffect(() => {
+    syncRailLoopStateRef.current = syncRailLoopState;
+  });
 
   const initializeRailScroll = useCallback(() => {
     const rail = railRef.current;
@@ -227,6 +248,8 @@ export function CreativePortfolioLanding({
     if (!rail) {
       return;
     }
+
+    loopWidthRef.current = 0;
 
     const singleLoopWidth = getSingleLoopWidth(
       rail,
@@ -279,10 +302,10 @@ export function CreativePortfolioLanding({
       orientation: "horizontal",
       gestureOrientation: "both",
       smoothWheel: true,
-      syncTouch: true,
-      lerp: 0.05,
+      syncTouch: false,
+      lerp: 0.08,
       syncTouchLerp: 0.065,
-      wheelMultiplier: 0.55,
+      wheelMultiplier: 0.7,
       touchMultiplier: 0.9,
       autoRaf: true,
       overscroll: false,
@@ -291,15 +314,16 @@ export function CreativePortfolioLanding({
     });
     lenisRef.current = lenis;
 
-    lenis.on("scroll", syncRailLoopState);
-    syncRailLoopState();
+    const onScroll = () => syncRailLoopStateRef.current();
+    lenis.on("scroll", onScroll);
+    onScroll();
 
     return () => {
-      lenis.off("scroll", syncRailLoopState);
+      lenis.off("scroll", onScroll);
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, [syncRailLoopState]);
+  }, []);
 
   useEffect(() => {
     const rail = railRef.current;
@@ -322,6 +346,11 @@ export function CreativePortfolioLanding({
     const startDragging = (event: PointerEvent) => {
       if (event.pointerType === "mouse" && event.button !== 0) {
         return;
+      }
+
+      const lenis = lenisRef.current;
+      if (lenis) {
+        lenis.scrollTo(rail.scrollLeft, { immediate: true, force: true });
       }
 
       isPointerDown = true;
@@ -369,13 +398,7 @@ export function CreativePortfolioLanding({
         velocityTracker.shift();
       }
 
-      const lenis = lenisRef.current;
-      if (lenis) {
-        lenis.scrollTo(targetScroll, { immediate: false, force: true });
-      } else {
-        rail.scrollLeft = targetScroll;
-      }
-      syncRailLoopState();
+      rail.scrollLeft = targetScroll;
     };
 
     const stopDragging = (event: PointerEvent) => {
@@ -399,12 +422,33 @@ export function CreativePortfolioLanding({
         const dt = last.time - first.time;
         if (dt > 0) {
           const pxPerMs = (last.x - first.x) / dt;
-          const momentum =
+          const rawMomentum =
             activePointerType === "mouse"
               ? pxPerMs * mouseDragScrollFactor
               : pxPerMs;
-          const momentumTarget = lastDragTarget - momentum * 120;
-          lenis.scrollTo(momentumTarget, { immediate: false, force: true });
+          const cappedMomentum =
+            rawMomentum > 0
+              ? Math.min(rawMomentum, 4)
+              : Math.max(rawMomentum, -4);
+          const momentumTarget = lastDragTarget - cappedMomentum * 40;
+          const singleLoopWidth = loopWidthRef.current;
+          if (singleLoopWidth > 0) {
+            const loopOrigin = singleLoopWidth * centerLoopCopyIndex;
+            const offset = momentumTarget - loopOrigin;
+            const normalizedOffset =
+              ((offset % singleLoopWidth) + singleLoopWidth) %
+              singleLoopWidth;
+            const normalizedTarget = loopOrigin + normalizedOffset;
+            lenis.scrollTo(normalizedTarget, {
+              immediate: false,
+              force: true,
+            });
+          } else {
+            lenis.scrollTo(momentumTarget, {
+              immediate: false,
+              force: true,
+            });
+          }
         }
       }
 
@@ -526,12 +570,17 @@ export function CreativePortfolioLanding({
         setIsRailReady(true);
       });
 
-      let contextCancelled = false;
-
       const ctx = gsap.context(() => {
-        const cards = Array.from(
+        const allCards = Array.from(
           railContent.querySelectorAll<HTMLElement>("[data-slider-card]"),
         );
+        const cards = allCards.filter((card) => {
+          const copyIndexAttr = card.getAttribute("data-copy-index");
+          return (
+            copyIndexAttr === null ||
+            Number(copyIndexAttr) === centerLoopCopyIndex
+          );
+        });
         const cardCurtains = cards
           .map((card) =>
             card.querySelector<HTMLElement>("[data-slider-curtain]"),
@@ -736,7 +785,6 @@ export function CreativePortfolioLanding({
         }, 2000);
 
         return () => {
-          contextCancelled = true;
           if (fallbackTimerId) {
             clearTimeout(fallbackTimerId);
           }
@@ -746,7 +794,6 @@ export function CreativePortfolioLanding({
       }, railContent);
 
       gsapCleanupRef.current = () => {
-        contextCancelled = true;
         ctx.revert();
       };
     };
@@ -795,6 +842,7 @@ export function CreativePortfolioLanding({
                 <article
                   key={item.loopKey}
                   data-slider-card
+                  data-copy-index={item.copyIndex}
                   className="group bg-canvas-soft relative aspect-3/4 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
                   onMouseEnter={() => setHoveredArtworkTitle(item.title)}
                   onMouseLeave={() => setHoveredArtworkTitle(null)}
@@ -824,6 +872,12 @@ export function CreativePortfolioLanding({
                             priority={
                               item.copyIndex === centerLoopCopyIndex &&
                               item.index < 5
+                            }
+                            loading={
+                              item.copyIndex === centerLoopCopyIndex &&
+                              item.index < 5
+                                ? undefined
+                                : "lazy"
                             }
                           />
                         </div>
