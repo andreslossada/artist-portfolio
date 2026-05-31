@@ -22,8 +22,8 @@ const centerLoopCopyIndex = Math.floor(sliderLoopCopies / 2);
 const dragActivationThreshold = 10;
 const mouseDragScrollFactor = 0.7;
 const shownSplashThemes = new Set<string>();
-const parallaxImageScale = 1.3;
-const parallaxMaxShiftPercent = 12;
+const parallaxImageScale = 2.2;
+const parallaxMaxShiftPercent = 50;
 
 type CreativePortfolioLandingProps = {
   artworks: Artwork[];
@@ -123,9 +123,7 @@ export function CreativePortfolioLanding({
     const cards = [
       ...railContent.querySelectorAll<HTMLElement>("[data-slider-card]"),
     ];
-    const imgs = wraps.map(
-      (w) => w.querySelector<HTMLImageElement>("img"),
-    );
+    const imgs = wraps.map((w) => w.querySelector<HTMLImageElement>("img"));
     const railContentOffsetLeft = railContent.offsetLeft;
     const cardGeometries = cards.map((card) => ({
       offsetLeft: card.offsetLeft - railContentOffsetLeft,
@@ -213,7 +211,10 @@ export function CreativePortfolioLanding({
           const wrap = wraps[i];
 
           const visibleCenterX =
-            railLeft + geo.offsetLeft - effectiveScrollLeft + geo.offsetWidth / 2;
+            railLeft +
+            geo.offsetLeft -
+            effectiveScrollLeft +
+            geo.offsetWidth / 2;
 
           if (
             visibleCenterX + geo.offsetWidth / 2 < railLeft ||
@@ -436,8 +437,7 @@ export function CreativePortfolioLanding({
             const loopOrigin = singleLoopWidth * centerLoopCopyIndex;
             const offset = momentumTarget - loopOrigin;
             const normalizedOffset =
-              ((offset % singleLoopWidth) + singleLoopWidth) %
-              singleLoopWidth;
+              ((offset % singleLoopWidth) + singleLoopWidth) % singleLoopWidth;
             const normalizedTarget = loopOrigin + normalizedOffset;
             lenis.scrollTo(normalizedTarget, {
               immediate: false,
