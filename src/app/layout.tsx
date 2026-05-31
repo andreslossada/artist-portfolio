@@ -3,6 +3,7 @@ import { Lora, Manrope } from "next/font/google";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 import { AuroraBackground } from "@/components/ui/aurora-background";
+import { SwimmingFish } from "@/components/animations/swimming-fish";
 import "./globals.css";
 
 const display = Lora({
@@ -43,7 +44,8 @@ export default async function RootLayout({
     >
       <body className="text-ink relative flex min-h-full flex-col">
         <AuroraBackground className="min-h-screen items-stretch justify-start">
-          {children}
+          <SwimmingFish />
+          <div className="relative z-[1]">{children}</div>
         </AuroraBackground>
       </body>
     </html>
