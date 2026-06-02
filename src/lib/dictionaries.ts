@@ -17,7 +17,7 @@ const dictionaries = {
         "Contacta al estudio para adquisiciones, comisiones, exposiciones o prensa.",
       cartTitle: "Carrito | Estudio Irina",
       cartDescription:
-        "Revisa las obras seleccionadas y continúa el pago con Stripe.",
+        "Revisa las obras seleccionadas y contáctanos para adquirirlas.",
       shopTitle: "Tienda | Estudio Irina",
       shopDescription:
         "Camisas, stickers y ediciones limitadas del estudio.",
@@ -50,7 +50,7 @@ const dictionaries = {
       eyebrow: "Tienda",
       title: "Ediciones y publicaciones",
       fromArtworkHint: "Estás explorando opciones para adquirir piezas relacionadas.",
-      buyWithStripe: "Comprar con Stripe",
+      buy: "Comprar",
       categoryAll: "Todos",
       categoryShirts: "Camisas",
       categoryStickers: "Stickers",
@@ -147,7 +147,7 @@ const dictionaries = {
         title: "Carrito de obra",
         empty: "Tu carrito está vacío.",
         subtotal: "Subtotal",
-        checkout: "Pagar con Stripe",
+        checkout: "Comprar",
         clear: "Vaciar carrito",
         remove: "Quitar",
         loading: "Redirigiendo...",
@@ -182,7 +182,7 @@ const dictionaries = {
         "Contact the studio for acquisitions, commissions, exhibitions, or press.",
       cartTitle: "Cart | Estudio Irina",
       cartDescription:
-        "Review selected artworks and continue checkout with Stripe.",
+        "Review selected artworks and contact us to acquire them.",
       shopTitle: "Shop | Estudio Irina",
       shopDescription:
         "Shirts, stickers, and limited editions from the studio.",
@@ -215,7 +215,7 @@ const dictionaries = {
       eyebrow: "Shop",
       title: "Editions and publications",
       fromArtworkHint: "You are exploring options to acquire related pieces.",
-      buyWithStripe: "Buy with Stripe",
+      buy: "Buy",
       categoryAll: "All",
       categoryShirts: "Shirts",
       categoryStickers: "Stickers",
@@ -307,7 +307,7 @@ const dictionaries = {
         title: "Artwork cart",
         empty: "Your cart is empty.",
         subtotal: "Subtotal",
-        checkout: "Pay with Stripe",
+        checkout: "Buy",
         clear: "Clear cart",
         remove: "Remove",
         loading: "Redirecting...",

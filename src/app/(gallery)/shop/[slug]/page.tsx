@@ -6,7 +6,6 @@ import { UnavailableBadge } from "@/components/ui/unavailable-badge";
 import { getProducts, getProductBySlug } from "@/lib/artworks";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
-import { isCommerceEnabled } from "@/lib/runtime-mode";
 
 type ProductDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -34,8 +33,6 @@ export default async function ProductDetailPage({
   if (!product) {
     notFound();
   }
-
-  const commerceEnabled = isCommerceEnabled();
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-6 md:px-10 md:py-8">
@@ -76,15 +73,13 @@ export default async function ProductDetailPage({
 
           <div className="border-ink/10 mt-8 border-t pt-6 md:mt-auto md:pt-8">
             <div className="flex flex-col gap-3 md:flex-row md:flex-wrap">
-              {commerceEnabled ? (
-                <ProductCartCta
-                  labels={{
-                    addToCart: dict.shopPage.addToCart,
-                    unavailable: dict.shopPage.unavailable,
-                  }}
-                  available={product.available}
-                />
-              ) : null}
+              <ProductCartCta
+                labels={{
+                  addToCart: dict.shopPage.addToCart,
+                  unavailable: dict.shopPage.unavailable,
+                }}
+                available={product.available}
+              />
               <Link
                 href="/contact"
                 className="border-accent/35 text-accent hover:bg-accent-soft/55 flex h-12 items-center justify-center border px-5 text-sm font-semibold transition md:inline-flex md:h-11"

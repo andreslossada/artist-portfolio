@@ -11,8 +11,6 @@ export const artworksQuery = groq`*[_type == "artwork"] | order(_createdAt desc)
   description,
   excerpt,
   price,
-  stripePriceId,
-  forSale,
   image
 }`;
 
@@ -27,7 +25,5 @@ export const artworkBySlugQuery = groq`*[_type == "artwork" && slug.current == $
   description,
   excerpt,
   price,
-  stripePriceId,
-  forSale,
   image
 }`;

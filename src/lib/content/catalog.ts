@@ -69,9 +69,6 @@ export const artworks: Artwork[] = artworkImageFiles.map((fileName, index) => {
   const slug = toArtworkSlug(fileName, index);
   const title = `${pickByHash(artworkTitlePool, fileName, "title")} ${String(index + 1).padStart(2, "0")}`;
   const description = pickByHash(artworkDescriptionPool, fileName, "description");
-  const envKey = `STRIPE_PRICE_ID_ARTWORK_${String(index + 1).padStart(2, "0")}`;
-  const stripePriceId = process.env[envKey] ?? "";
-
   return {
     id: `g${index + 1}`,
     slug,
@@ -84,7 +81,6 @@ export const artworks: Artwork[] = artworkImageFiles.map((fileName, index) => {
     excerpt: description,
     price: pickByHash(artworkPricePool, fileName, "price"),
     category: pickByHash(artworkCategoryPool, fileName, "category"),
-    stripePriceId,
   };
 });
 
@@ -100,7 +96,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_mareas_ocre",
     category: "print",
     available: false,
   },
@@ -115,7 +110,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_catalogo_2026",
     category: "print",
     available: false,
   },
@@ -130,7 +124,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_camiseta_marea",
     category: "shirt",
     available: false,
   },
@@ -145,7 +138,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_camiseta_pulso",
     category: "shirt",
     available: false,
   },
@@ -160,7 +152,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1554568218-0f1715e72254?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_camiseta_bruma",
     category: "shirt",
     available: false,
   },
@@ -175,7 +166,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_camiseta_suspendida",
     category: "shirt",
     available: false,
   },
@@ -190,7 +180,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1484239398315-f1681ef72fe6?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_sticker_marea",
     category: "sticker",
     available: false,
   },
@@ -205,7 +194,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1761897756298-b854bc9ed2ee?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_sticker_pulso",
     category: "sticker",
     available: false,
   },
@@ -220,7 +208,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1700779100884-824d4a9caece?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_sticker_bruma",
     category: "sticker",
     available: false,
   },
@@ -235,7 +222,6 @@ export const products: Product[] = [
     currency: "usd",
     imageUrl:
       "https://images.unsplash.com/photo-1621524440591-8f7cf4aa0949?auto=format&fit=crop&w=900&q=80",
-    stripePriceId: "price_placeholder_sticker_ecos",
     category: "sticker",
     available: false,
   },

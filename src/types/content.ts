@@ -10,7 +10,6 @@ export type Artwork = {
   excerpt: string;
   price: number;
   category: string;
-  stripePriceId: string;
 };
 
 export type ProductCategory = "shirt" | "sticker" | "print";
@@ -24,7 +23,6 @@ export type Product = {
   price: number;
   currency: "usd";
   imageUrl: string;
-  stripePriceId: string;
   category: ProductCategory;
   available: boolean;
 };

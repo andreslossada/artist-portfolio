@@ -21,8 +21,6 @@ type SanityArtwork = {
   description?: string;
   excerpt?: string;
   price?: number;
-  stripePriceId?: string;
-  forSale?: boolean;
   image?: SanityImageSource;
 };
 
@@ -45,7 +43,6 @@ function toArtwork(item: SanityArtwork): Artwork | null {
     excerpt: item.excerpt ?? item.description ?? "",
     imageUrl,
     price: item.price ?? 0,
-    stripePriceId: item.stripePriceId ?? "",
   };
 }
 
