@@ -37,7 +37,7 @@ export function LanguageSwitcher({
   return (
     <form
       action="/api/lang"
-      method="get"
+      method="post"
       className={cn("inline-flex h-8 items-stretch border border-accent/25 md:h-10", className)}
       aria-label="Language switcher"
     >

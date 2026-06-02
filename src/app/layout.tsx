@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Lora, Manrope } from "next/font/google";
+import Script from "next/script";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 import { AuroraBackground } from "@/components/ui/aurora-background";
@@ -43,6 +44,9 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="text-ink relative flex min-h-full flex-col">
+        <Script id="splash-init" strategy="beforeInteractive">
+          {`document.documentElement.setAttribute("data-splash","active")`}
+        </Script>
         <AuroraBackground className="min-h-screen items-stretch justify-start">
           <SwimmingFish />
           <div className="relative z-[1]">{children}</div>
