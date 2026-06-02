@@ -181,7 +181,7 @@ export function SwimmingFish({
         <div
           key={`${autoId}-${i}`}
           data-fish
-          className="absolute will-change-transform"
+          className="absolute will-change-transform opacity-0"
         >
           <FishSvg id={`${autoId}-${i}`} size={size} color={color} />
         </div>
