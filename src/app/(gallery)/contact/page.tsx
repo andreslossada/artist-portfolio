@@ -19,21 +19,30 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ContactPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
+  const contactEmail = process.env.CONTACT_EMAIL ?? "irinagaray17@gmail.com";
+  const contactPhone = process.env.CONTACT_PHONE ?? "+58 424-2616988";
+  const contactWhatsAppUrl =
+    process.env.CONTACT_WHATSAPP_URL ?? "https://wa.me/584242616988";
+  const contactInstagramHandle =
+    process.env.CONTACT_INSTAGRAM_HANDLE ?? "@r_a_t_girl";
+  const contactInstagramUrl =
+    process.env.CONTACT_INSTAGRAM_URL ?? "https://www.instagram.com/r_a_t_girl/";
+
   const contactChannels = [
     {
       label: dict.contactPage.channels.email,
-      value: "irinagaray17@gmail.com",
-      href: "mailto:irinagaray17@gmail.com",
+      value: contactEmail,
+      href: `mailto:${contactEmail}`,
     },
     {
       label: dict.contactPage.channels.whatsapp,
-      value: "+58 424-2616988",
-      href: "https://wa.me/584242616988",
+      value: contactPhone,
+      href: contactWhatsAppUrl,
     },
     {
       label: dict.contactPage.channels.instagram,
-      value: "@r_a_t_girl",
-      href: "https://www.instagram.com/r_a_t_girl/",
+      value: contactInstagramHandle,
+      href: contactInstagramUrl,
     },
   ];
 
@@ -81,7 +90,7 @@ export default async function ContactPage() {
               key={channel.label}
               href={channel.href}
               target={channel.href.startsWith("http") ? "_blank" : undefined}
-              rel={channel.href.startsWith("http") ? "noreferrer" : undefined}
+              rel={channel.href.startsWith("http") ? "noopener noreferrer" : undefined}
               className="contact-card border-ink/10 shadow-card hover:border-accent/30 hover:-translate-y-1 bg-surface border p-5 transition-transform duration-300 ease-out active:translate-y-0 md:p-6"
             >
               <p className="text-muted text-xs tracking-[0.2em] uppercase">
@@ -113,7 +122,7 @@ export default async function ContactPage() {
         </p>
         <div className="mt-5 flex flex-col gap-3 md:mt-6 md:flex-row md:flex-wrap">
           <Link
-            href="mailto:irinagaray17@gmail.com"
+            href={`mailto:${contactEmail}`}
             className="bg-accent px-5 py-3 text-center text-sm font-semibold !text-white visited:!text-white hover:!text-white transition hover:brightness-110 md:py-2"
           >
             {dict.contactPage.channels.email}
