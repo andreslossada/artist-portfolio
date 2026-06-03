@@ -12,6 +12,10 @@ export default defineConfig({
   basePath: "/studio",
   projectId,
   dataset,
+  auth: {
+    redirectOnSingle: true,
+    loginMethod: "dual",
+  },
   plugins: [structureTool()],
   schema: {
     types: schemaTypes,

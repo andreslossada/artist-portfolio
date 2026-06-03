@@ -12,6 +12,22 @@ const isSafeRedirectPath = (value: string, origin: string) => {
 
 export async function POST(request: Request) {
   const { searchParams, origin } = new URL(request.url);
+
+  const referer = request.headers.get("referer");
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
+  if (siteUrl && referer) {
+    try {
+      const refOrigin = new URL(referer).origin;
+      const siteOrigin = new URL(siteUrl).origin;
+      if (refOrigin !== siteOrigin && refOrigin !== origin) {
+        return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+      }
+    } catch {
+      return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+    }
+  }
+
   const locale = resolveLocale(searchParams.get("locale"));
   const redirectValue = searchParams.get("redirect") ?? "/";
   const redirectPath = isSafeRedirectPath(redirectValue, origin) ? redirectValue : "/";
@@ -22,6 +38,7 @@ export async function POST(request: Request) {
     value: locale,
     maxAge: 60 * 60 * 24 * 365,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
     path: "/",
   });
 

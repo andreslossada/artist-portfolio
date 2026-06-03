@@ -16,7 +16,7 @@ export function sanityServerReady() {
 export function getSanityServerClient() {
   if (!hasServerConfig) {
     throw new Error(
-      "Missing Sanity server config (projectId, dataset, or SANITY_API_WRITE_TOKEN)",
+      "Unable to initialize content service. Please check server configuration.",
     );
   }
 
