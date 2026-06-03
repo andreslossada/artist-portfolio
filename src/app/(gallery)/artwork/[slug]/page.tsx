@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -15,6 +16,31 @@ type ArtworkDetailPageProps = {
 export async function generateStaticParams() {
   const artworks = await getArtworks();
   return artworks.map((artwork) => ({ slug: artwork.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
+  const { slug } = await params;
+  const artwork = await getArtworkBySlug(slug);
+
+  if (!artwork) {
+    return { title: dict.metadata.siteTitle };
+  }
+
+  return {
+    title: `${artwork.title} | ${dict.metadata.siteTitle}`,
+    description: artwork.excerpt || artwork.description,
+    openGraph: {
+      title: artwork.title,
+      description: artwork.excerpt || artwork.description,
+      images: [{ url: artwork.imageUrl }],
+    },
+  };
 }
 
 export default async function ArtworkDetailPage({
@@ -59,35 +85,35 @@ export default async function ArtworkDetailPage({
           <p className="text-muted text-xs tracking-[0.3em] uppercase">
             {dict.artworkPage.detailEyebrow}
           </p>
-          <h1 className="font-display mt-4 text-5xl leading-[0.95] text-ink md:text-6xl" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
+          <h1 className="font-display text-shadow mt-4 text-5xl leading-[0.95] text-ink md:text-6xl">
             {artwork.title}
           </h1>
-          <p className="text-muted mt-6 max-w-xl text-base leading-relaxed md:text-lg" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.12)' }}>
+          <p className="text-muted text-shadow-muted mt-6 max-w-xl text-base leading-relaxed md:text-lg">
             {artwork.description}
           </p>
 
-          <p className="text-accent mt-7 text-3xl font-semibold" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>
+          <p className="text-accent text-shadow-md mt-7 text-3xl font-semibold">
             ${artwork.price.toFixed(2)} USD
           </p>
 
           <dl className="border-ink/10 mt-8 grid grid-cols-[7rem_1fr] gap-x-4 gap-y-3 border-t pt-6 text-sm">
             <div className="contents">
-              <dt className="text-muted tracking-[0.12em] uppercase" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+              <dt className="text-muted text-shadow-sm tracking-[0.12em] uppercase">
                 {dict.artworkPage.technique}
               </dt>
-              <dd className="text-ink" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>{artwork.medium}</dd>
+              <dd className="text-ink text-shadow">{artwork.medium}</dd>
             </div>
             <div className="contents">
-              <dt className="text-muted tracking-[0.12em] uppercase" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+              <dt className="text-muted text-shadow-sm tracking-[0.12em] uppercase">
                 {dict.artworkPage.dimension}
               </dt>
-              <dd className="text-ink" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>{artwork.dimensions}</dd>
+              <dd className="text-ink text-shadow">{artwork.dimensions}</dd>
             </div>
             <div className="contents">
-              <dt className="text-muted tracking-[0.12em] uppercase" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+              <dt className="text-muted text-shadow-sm tracking-[0.12em] uppercase">
                 {dict.artworkPage.year}
               </dt>
-              <dd className="text-ink" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>{artwork.year}</dd>
+              <dd className="text-ink text-shadow">{artwork.year}</dd>
             </div>
           </dl>
 

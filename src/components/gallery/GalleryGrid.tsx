@@ -32,13 +32,13 @@ export function GalleryGrid({ artworks }: GalleryGridProps) {
             </div>
           </ViewTransition>
           <div className="space-y-1 p-4">
-            <h2 className="font-display text-2xl" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>{artwork.title}</h2>
-            <p className="text-muted text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+            <h2 className="font-display text-shadow text-2xl">{artwork.title}</h2>
+            <p className="text-muted text-shadow-sm text-sm">
               {artwork.year} · {artwork.medium}
             </p>
-            <p className="text-muted text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>{artwork.dimensions}</p>
-            <p className="text-muted pt-1 text-sm" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>{artwork.description}</p>
-            <p className="text-accent pt-2 text-sm font-semibold" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>
+            <p className="text-muted text-shadow-sm text-sm">{artwork.dimensions}</p>
+            <p className="text-muted text-shadow-sm pt-1 text-sm">{artwork.description}</p>
+            <p className="text-accent text-shadow-md pt-2 text-sm font-semibold">
               ${artwork.price.toFixed(2)} USD
             </p>
           </div>

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -14,6 +15,31 @@ type ProductDetailPageProps = {
 export async function generateStaticParams() {
   const products = await getProducts();
   return products.map((product) => ({ slug: product.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+
+  if (!product) {
+    return { title: dict.metadata.shopTitle };
+  }
+
+  return {
+    title: `${product.name} | ${dict.metadata.shopTitle}`,
+    description: product.excerpt || product.description,
+    openGraph: {
+      title: product.name,
+      description: product.excerpt || product.description,
+      images: [{ url: product.imageUrl }],
+    },
+  };
 }
 
 const categoryLabels: Record<string, string> = {

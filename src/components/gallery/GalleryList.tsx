@@ -34,15 +34,15 @@ export function GalleryList({ artworks }: GalleryListProps) {
 
           <div className="flex min-w-0 items-center justify-between gap-4 p-4 md:p-5">
             <div className="min-w-0 space-y-1">
-              <h2 className="font-display truncate text-2xl leading-tight md:text-3xl" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
+              <h2 className="font-display text-shadow truncate text-2xl leading-tight md:text-3xl">
                 {artwork.title}
               </h2>
-              <p className="text-muted truncate text-sm md:text-base" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+              <p className="text-muted text-shadow-sm truncate text-sm md:text-base">
                 {artwork.year} · {artwork.medium} · {artwork.dimensions}
               </p>
             </div>
 
-            <p className="text-accent shrink-0 text-sm font-semibold md:text-base" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>
+            <p className="text-accent text-shadow-md shrink-0 text-sm font-semibold md:text-base">
               ${artwork.price.toFixed(2)} USD
             </p>
           </div>

@@ -126,6 +126,22 @@ body::before {
   }
 }
 
+@utility text-shadow-sm {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+@utility text-shadow {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+@utility text-shadow-muted {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+@utility text-shadow-md {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
 html[data-splash="active"] .site-header {
   visibility: hidden;
 }
@@ -258,5 +274,11 @@ html[data-splash="active"] .landing-page > main {
   ::view-transition-group(*) {
     animation-duration: 0s !important;
     animation-delay: 0s !important;
+  }
+}
+
+@supports not (height: 100dvh) {
+  .h-dvh {
+    height: 100vh;
   }
 }
