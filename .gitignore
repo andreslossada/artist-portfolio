@@ -1,3 +1,10 @@
+# Windows bash redirect artifact
+nul
+
+# Dev server logs
+dev.log
+nohup.out
+
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
