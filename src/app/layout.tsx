@@ -45,7 +45,7 @@ export default async function RootLayout({
     >
       <body className="text-ink relative flex min-h-full flex-col">
         <Script id="splash-init" strategy="beforeInteractive">
-          {`document.documentElement.setAttribute("data-splash","active")`}
+          {`if(!location.pathname.startsWith("/studio"))document.documentElement.setAttribute("data-splash","active")`}
         </Script>
         <AuroraBackground className="min-h-screen items-stretch justify-start">
           <SwimmingFish />

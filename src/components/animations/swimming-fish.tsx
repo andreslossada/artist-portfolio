@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useRef } from "react";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { registerGsapPlugins } from "@/core/gsap/registrar";
@@ -90,10 +91,12 @@ export function SwimmingFish({
 }: SwimmingFishProps) {
   const autoId = useId();
   const scopeRef = useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
 
   useGSAP(
     () => {
       if (!scopeRef.current) return;
+      if (pathname?.startsWith("/studio")) return;
 
       const prefersReducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
@@ -170,6 +173,8 @@ export function SwimmingFish({
       ],
     },
   );
+
+  if (pathname?.startsWith("/studio")) return null;
 
   return (
     <div
