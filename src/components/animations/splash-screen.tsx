@@ -319,7 +319,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       gsap.set(titleReflection, {
         opacity: 0,
         x: 0,
-        y: -184,
+        y: -(window.innerHeight * 0.18),
         scaleX: 1.03,
         scaleY: 3.05,
         willChange: "clip-path, filter",
@@ -343,13 +343,16 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
       // Generate bubbles distributed across entire screen
       if (bubbleContainer) {
-        const BUBBLE_COUNT = 100;
         const viewportHeight = window.innerHeight;
+        const isNarrow = viewportHeight < 768;
+        const BUBBLE_COUNT = isNarrow ? 40 : 100;
         const fragment = document.createDocumentFragment();
 
         for (let i = 0; i < BUBBLE_COUNT; i++) {
           const bubble = document.createElement("div");
-          const size = 140 + Math.random() * 140;
+          const size = isNarrow
+            ? 80 + Math.random() * 100
+            : 140 + Math.random() * 140;
           const leftPercent = Math.random() * 100;
           const startYPercent = 100 + Math.random() * 30;
           const riseDuration = 0.2 + Math.random() * 0.5;
@@ -664,7 +667,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
     <div
       ref={scopeRef}
       data-splash-screen
-      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center overflow-hidden opacity-0`}
+      className={`fixed inset-0 z-[9999] flex h-dvh w-screen items-center justify-center overflow-hidden opacity-0`}
       role="presentation"
       aria-hidden="true"
     >
@@ -776,7 +779,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       />
 
       <div
-        className="absolute inset-x-0 top-[34%] flex justify-center px-6"
+        className="absolute inset-x-0 top-[28%] flex justify-center px-4 md:top-[34%] md:px-6"
         style={{ zIndex: 15 }}
       >
         <div className="relative flex flex-col items-center">

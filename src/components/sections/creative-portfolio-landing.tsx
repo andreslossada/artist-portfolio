@@ -81,6 +81,10 @@ export function CreativePortfolioLanding({
   const [hoveredArtworkTitle, setHoveredArtworkTitle] = useState<string | null>(
     null,
   );
+  const displayTitle =
+    hoveredArtworkTitle ??
+    artworks[Math.min(activeSegment, artworks.length - 1)]?.title ??
+    null;
   const [showSplash, setShowSplash] = useState(
     () => !shownSplashThemes.has("dark"),
   );
@@ -301,7 +305,7 @@ export function CreativePortfolioLanding({
       content: railContent,
       eventsTarget: page,
       orientation: "horizontal",
-      gestureOrientation: "both",
+      gestureOrientation: "horizontal",
       smoothWheel: true,
       syncTouch: false,
       lerp: 0.08,
@@ -821,11 +825,11 @@ export function CreativePortfolioLanding({
   return (
     <div
       ref={pageRef}
-      className="landing-page text-ink h-screen overflow-hidden"
+      className="landing-page text-ink h-dvh overflow-hidden"
     >
       {showSplash ? <SplashScreen onComplete={handleSplashComplete} /> : null}
 
-      <main className="mx-auto flex h-screen w-full max-w-425 flex-col overflow-hidden px-5 pt-22 md:px-10 md:pt-[8.7rem]">
+      <main className="mx-auto flex h-full w-full max-w-425 flex-col overflow-hidden px-5 pt-22 md:px-10 md:pt-[8.7rem]">
         <section
           id="projects"
           className="-mx-5 flex min-h-0 flex-1 items-center overflow-hidden md:-mx-10"
@@ -843,7 +847,7 @@ export function CreativePortfolioLanding({
                   key={item.loopKey}
                   data-slider-card
                   data-copy-index={item.copyIndex}
-                  className="group bg-canvas-soft relative aspect-3/4 h-full min-w-56 shrink-0 basis-[62vw] overflow-hidden md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
+                  className="group bg-canvas-soft relative aspect-3/4 h-full min-w-44 shrink-0 basis-[75vw] overflow-hidden md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
                   onMouseEnter={() => setHoveredArtworkTitle(item.title)}
                   onMouseLeave={() => setHoveredArtworkTitle(null)}
                 >
@@ -866,16 +870,16 @@ export function CreativePortfolioLanding({
                             alt={`${item.title} - ${item.category}`}
                             fill
                             draggable={false}
-                            sizes="(max-width: 768px) 62vw, 22rem"
+                            sizes="(max-width: 768px) 75vw, 22rem"
                             className="object-cover contrast-105 saturate-105 transition-[scale] duration-300 ease-in-out group-hover:scale-[1.72]"
                             style={{ scale: `${parallaxImageScale}` }}
                             priority={
                               item.copyIndex === centerLoopCopyIndex &&
-                              item.index < 5
+                              item.index < 2
                             }
                             loading={
                               item.copyIndex === centerLoopCopyIndex &&
-                              item.index < 5
+                              item.index < 2
                                 ? undefined
                                 : "lazy"
                             }
@@ -900,19 +904,19 @@ export function CreativePortfolioLanding({
           ) : null}
         </section>
 
-        <footer className="flex flex-col items-center gap-4 py-1 md:gap-5 md:pb-6">
+        <footer className="flex flex-col items-center gap-4 py-1 pb-6 md:gap-5 md:pb-6">
           <div id="about" aria-hidden="true" className="h-0 overflow-hidden" />
 
           <div
             id="contact"
             className="flex h-16 w-full items-end justify-center overflow-hidden pb-1 md:pb-2"
           >
-            {hoveredArtworkTitle ? (
+            {displayTitle ? (
               <p
-                key={hoveredArtworkTitle}
+                key={displayTitle}
                 className="max-w-[88vw] text-center text-[1.2rem] leading-[1.08] font-black tracking-[-0.025em] text-balance motion-safe:animate-[landing-title-fade-in_220ms_ease-out] md:max-w-[48rem] md:text-[1.9rem]"
               >
-                {hoveredArtworkTitle}
+                {displayTitle}
               </p>
             ) : null}
           </div>
