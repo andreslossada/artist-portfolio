@@ -124,12 +124,6 @@ export default async function ArtworkDetailPage({
                   addToCart: dict.artworkPage.addToCart,
                 }}
               />
-              <Link
-                href={`/contact?fromArtwork=${artwork.slug}`}
-                className="border-accent/35 text-accent hover:bg-accent-soft/55 inline-flex h-11 items-center justify-center border px-5 text-sm font-semibold transition"
-              >
-                {dict.artworkPage.shopCta}
-              </Link>
             </div>
           </div>
         </div>

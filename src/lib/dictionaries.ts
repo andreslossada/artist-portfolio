@@ -162,7 +162,7 @@ const dictionaries = {
       dimension: "Dimensión",
       year: "Año",
       shopCta: "Adquirir prints o catálogo",
-      addToCart: "Agregar al carrito",
+      addToCart: "Comprar",
       viewCart: "Ver carrito",
     },
   },
