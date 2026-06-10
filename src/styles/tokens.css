@@ -1,11 +1,15 @@
-:root {
-  --color-canvas: #ffffff;
-  --color-canvas-soft: #eef4fb;
-  --color-ink: #111111;
-  --color-muted: #5d6470;
-  --color-accent: #2b5fa8;
-  --color-accent-soft: #dbe8f8;
-
-  --radius-card: 0;
-  --shadow-card: 0 20px 45px rgba(23, 46, 80, 0.12);
+@theme inline {
+  --color-canvas: var(--color-canvas);
+  --color-canvas-soft: var(--color-canvas-soft);
+  --color-surface: var(--color-surface);
+  --color-ink: var(--color-ink);
+  --color-muted: var(--color-muted);
+  --color-accent: var(--color-accent);
+  --color-accent-soft: var(--color-accent-soft);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --radius-card: var(--radius-card);
+  --shadow-card: var(--shadow-card);
+  --max-width-425: 106.25rem;
+  --animate-aurora: aurora 60s linear infinite;
 }
