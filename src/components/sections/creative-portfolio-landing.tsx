@@ -305,7 +305,7 @@ export function CreativePortfolioLanding({
       content: railContent,
       eventsTarget: page,
       orientation: "horizontal",
-      gestureOrientation: "horizontal",
+      gestureOrientation: "both",
       smoothWheel: true,
       syncTouch: false,
       lerp: 0.08,
@@ -327,6 +327,57 @@ export function CreativePortfolioLanding({
       lenis.off("scroll", onScroll);
       lenis.destroy();
       lenisRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const page = pageRef.current;
+    const rail = railRef.current;
+
+    if (!page || !rail) {
+      return;
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const tag = target.tagName.toLowerCase();
+
+      if (
+        tag === "input" ||
+        tag === "textarea" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      const lenis = lenisRef.current;
+      if (!lenis) {
+        return;
+      }
+
+      const scrollAmount = rail.clientWidth * 0.3;
+
+      switch (e.key) {
+        case "ArrowLeft":
+          e.preventDefault();
+          lenis.scrollTo(Math.max(0, rail.scrollLeft - scrollAmount));
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          lenis.scrollTo(
+            Math.min(
+              rail.scrollWidth - rail.clientWidth,
+              rail.scrollLeft + scrollAmount,
+            ),
+          );
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
