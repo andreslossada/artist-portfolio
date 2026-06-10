@@ -52,7 +52,7 @@ export default async function AboutPage() {
           <figure className="h-full w-full">
             <div className="overflow-hidden">
               <Image
-                src="/arte/irinaperfil.png"
+                src="/arte/irinaperfil.webp"
                 alt="Irina"
                 width={896}
                 height={1181}
