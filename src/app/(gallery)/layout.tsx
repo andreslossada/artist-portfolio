@@ -10,10 +10,8 @@ export default function GalleryLayout({
   return (
     <>
       <SiteHeader />
-      <PageTransition>
-        {children}
-        <SiteFooter />
-      </PageTransition>
+      <PageTransition>{children}</PageTransition>
+      <SiteFooter />
     </>
   );
 }
