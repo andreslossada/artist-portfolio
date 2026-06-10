@@ -24,8 +24,30 @@ export async function generateMetadata(): Promise<Metadata> {
   const dict = getDictionary(locale);
 
   return {
-    title: dict.metadata.siteTitle,
+    metadataBase: new URL(
+      process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+    ),
+    title: {
+      default: dict.metadata.siteTitle,
+      template: `%s | ${dict.metadata.siteTitle.split("|")[1]?.trim() ?? "Estudio Irina"}`,
+    },
     description: dict.metadata.siteDescription,
+    openGraph: {
+      title: dict.metadata.siteTitle,
+      description: dict.metadata.siteDescription,
+      type: "website",
+      locale: locale === "es" ? "es_CO" : "en_US",
+      siteName: "Estudio Irina",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: dict.metadata.siteTitle,
+      description: dict.metadata.siteDescription,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 
