@@ -30,7 +30,7 @@ const dictionaries = {
       contact: "Contacto",
     },
     footer: {
-      copyright: "Portfolio artístico 2026. Todos los derechos reservados.",
+      copyright: "Estudio Irina",
     },
     landing: {
       list: "Galería",
@@ -195,7 +195,7 @@ const dictionaries = {
       contact: "Contact",
     },
     footer: {
-      copyright: "Art portfolio 2026. All rights reserved.",
+      copyright: "Estudio Irina",
     },
     landing: {
       list: "List",
