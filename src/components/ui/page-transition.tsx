@@ -11,38 +11,40 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ViewTransition
-      default="page-shell"
-      enter={{
-        default: "page-shell",
-        "artwork-open": "none",
-        "header-nav": "page-shell",
-        "landing-nav": "none",
-        "splash-wordmark": "none",
-      }}
-      exit={{
-        default: "page-shell",
-        "artwork-open": "none",
-        "header-nav": "page-shell",
-        "landing-nav": "none",
-        "splash-wordmark": "none",
-      }}
-      share={{
-        default: "page-shell",
-        "artwork-open": "none",
-        "header-nav": "page-shell",
-        "landing-nav": "none",
-        "splash-wordmark": "none",
-      }}
-      update={{
-        default: "page-shell",
-        "artwork-open": "none",
-        "header-nav": "page-shell",
-        "landing-nav": "none",
-        "splash-wordmark": "none",
-      }}
-    >
-      {children}
-    </ViewTransition>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <ViewTransition
+        default="page-shell"
+        enter={{
+          default: "page-shell",
+          "artwork-open": "none",
+          "header-nav": "page-shell",
+          "landing-nav": "none",
+          "splash-wordmark": "none",
+        }}
+        exit={{
+          default: "page-shell",
+          "artwork-open": "none",
+          "header-nav": "page-shell",
+          "landing-nav": "none",
+          "splash-wordmark": "none",
+        }}
+        share={{
+          default: "page-shell",
+          "artwork-open": "none",
+          "header-nav": "page-shell",
+          "landing-nav": "none",
+          "splash-wordmark": "none",
+        }}
+        update={{
+          default: "page-shell",
+          "artwork-open": "none",
+          "header-nav": "page-shell",
+          "landing-nav": "none",
+          "splash-wordmark": "none",
+        }}
+      >
+        {children}
+      </ViewTransition>
+    </div>
   );
 }

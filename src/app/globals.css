@@ -71,6 +71,7 @@ body {
 
 html {
   background-color: var(--color-canvas);
+  transition: background-color 2s ease;
 }
 
 html::-webkit-scrollbar,
@@ -86,6 +87,7 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans), sans-serif;
   line-height: 1.5;
+  transition: background-color 2s ease;
 }
 
 body::before {
@@ -97,7 +99,7 @@ body::before {
   background-image: var(--color-canvas-glow);
   background-repeat: no-repeat;
   background-size: cover;
-  opacity: 1;
+  opacity: 0;
 }
 
 .landing-page {
@@ -140,7 +142,7 @@ html[data-splash="active"] [data-splash-screen] .aurora-overlay {
 }
 
 html[data-splash="active"] [data-aurora-bg] {
-  background-color: #f7eed8 !important;
+  background-color: var(--splash-sand, #f7eed8) !important;
 }
 
 html[data-splash="active"] [data-splash-screen] [data-aurora-bg] {
@@ -250,6 +252,29 @@ html[data-splash="active"] .landing-page > main {
 
   to {
     transform: translateY(0);
+  }
+}
+
+@keyframes landing-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-card-enter {
+  animation: landing-card-enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: var(--card-enter-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-card-enter {
+    animation: none;
   }
 }
 

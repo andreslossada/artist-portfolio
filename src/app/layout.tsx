@@ -3,8 +3,8 @@ import { Lora, Manrope } from "next/font/google";
 import Script from "next/script";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
-import { AuroraBackground } from "@/components/ui/aurora-background";
-import { SwimmingFish } from "@/components/animations/swimming-fish";
+import { TimeOfDayWallpaper } from "@/components/ui/time-of-day-wallpaper";
+import { TimeSlider } from "@/components/ui/time-slider";
 import "./globals.css";
 
 const display = Lora({
@@ -67,12 +67,12 @@ export default async function RootLayout({
     >
       <body className="text-ink relative flex min-h-full flex-col">
         <Script id="splash-init" strategy="beforeInteractive">
-          {`if(location.pathname==="/"||location.pathname==="")document.documentElement.setAttribute("data-splash","active")`}
+          {`(function(){var urlHour=null;try{var p=new URLSearchParams(location.search);var h=p.get("hour");if(h!=null)urlHour=parseFloat(h)}catch(e){}var hour=urlHour!=null?urlHour:(new Date()).getHours()+(new Date()).getMinutes()/60;var sand;if(hour<5.5)sand="#0a111a";else if(hour<7.5)sand="#1a2535";else if(hour<12)sand="#d4c9a8";else if(hour<15)sand="#f5ecd8";else if(hour<17.5)sand="#eadcc0";else if(hour<19.5)sand="#d4b896";else sand="#4a3a2a";if(location.pathname==="/"||location.pathname===""){document.documentElement.setAttribute("data-splash","active");document.documentElement.style.setProperty("--splash-sand",sand)}})()`}
         </Script>
-        <AuroraBackground className="min-h-screen items-stretch justify-start">
-          <SwimmingFish />
-          <div className="relative z-[1]">{children}</div>
-        </AuroraBackground>
+        <TimeOfDayWallpaper className="min-h-screen items-stretch justify-start">
+          {children}
+        </TimeOfDayWallpaper>
+        <TimeSlider />
       </body>
     </html>
   );

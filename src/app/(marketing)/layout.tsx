@@ -1,5 +1,6 @@
 import { PageTransition } from "@/components/ui/page-transition";
 import { SiteHeaderShell } from "@/components/sections/site-header-shell";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { getDictionary } from "@/lib/dictionaries";
 import { getLocale } from "@/lib/i18n";
 
@@ -12,7 +13,7 @@ export default async function MarketingLayout({
   const dict = getDictionary(locale);
 
   return (
-    <>
+    <ErrorBoundary>
       <div className="fixed inset-x-0 top-0 z-30">
         <SiteHeaderShell
           locale={locale}
@@ -28,6 +29,6 @@ export default async function MarketingLayout({
       <PageTransition>
         {children}
       </PageTransition>
-    </>
+    </ErrorBoundary>
   );
 }
