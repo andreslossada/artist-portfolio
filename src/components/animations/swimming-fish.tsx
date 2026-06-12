@@ -170,7 +170,9 @@ export function SwimmingFish({
         depthMax,
         opacity,
         size,
+        pathname,
       ],
+      revertOnUpdate: true,
     },
   );
 
