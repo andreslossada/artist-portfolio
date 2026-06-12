@@ -27,6 +27,7 @@ const parallaxMaxShiftPercent = 50;
 
 type CreativePortfolioLandingProps = {
   artworks: Artwork[];
+  hourOverride?: number;
 };
 
 const getSingleLoopWidth = (
@@ -59,6 +60,7 @@ const getSingleLoopWidth = (
 
 export function CreativePortfolioLanding({
   artworks,
+  hourOverride,
 }: CreativePortfolioLandingProps) {
   const progressSegments = Math.min(12, Math.max(1, artworks.length));
   const loopedLandingGalleryItems = useMemo(
@@ -108,12 +110,12 @@ export function CreativePortfolioLanding({
     railWidth: 0,
   });
   const reducedMotionRef = useRef(false);
+  const isMobileRef = useRef(false);
   const handleSplashComplete = useCallback(() => {
     startTransition(() => {
       shownSplashThemes.add("dark");
       setShowSplash(false);
     });
-    setIsRailReady(true);
   }, []);
 
   const populateParallaxCache = useCallback(() => {
@@ -134,7 +136,8 @@ export function CreativePortfolioLanding({
       offsetWidth: card.offsetWidth,
     }));
     for (const img of imgs) {
-      if (img) img.style.scale = String(parallaxImageScale);
+      if (img && !isMobileRef.current)
+        img.style.scale = String(parallaxImageScale);
     }
     parallaxCacheRef.current = {
       wraps,
@@ -182,9 +185,13 @@ export function CreativePortfolioLanding({
     const effectiveScrollLeft = loopOrigin + normalizedOffset;
     const didWrap = effectiveScrollLeft !== railScrollLeft;
 
-    if (didWrap && lenis && !wrappingRef.current) {
+    if (didWrap && !wrappingRef.current) {
       wrappingRef.current = true;
-      lenis.scrollTo(effectiveScrollLeft, { immediate: true });
+      if (lenis) {
+        lenis.scrollTo(effectiveScrollLeft, { immediate: true });
+      } else {
+        rail.scrollLeft = effectiveScrollLeft;
+      }
       wrappingRef.current = false;
     }
 
@@ -199,11 +206,19 @@ export function CreativePortfolioLanding({
     }
 
     let cache = parallaxCacheRef.current;
-    if (cache.wraps.length === 0 && !reducedMotionRef.current) {
+    if (
+      cache.wraps.length === 0 &&
+      !reducedMotionRef.current &&
+      !isMobileRef.current
+    ) {
       populateParallaxCache();
       cache = parallaxCacheRef.current;
     }
-    if (cache.wraps.length > 0 && !reducedMotionRef.current) {
+    if (
+      cache.wraps.length > 0 &&
+      !reducedMotionRef.current &&
+      !isMobileRef.current
+    ) {
       parallaxFrameRef.current = (parallaxFrameRef.current + 1) % 2;
       if (parallaxFrameRef.current === 0) {
         const { wraps, cardGeometries, railLeft, railWidth } = cache;
@@ -245,7 +260,7 @@ export function CreativePortfolioLanding({
   const syncRailLoopStateRef = useRef(syncRailLoopState);
   useEffect(() => {
     syncRailLoopStateRef.current = syncRailLoopState;
-  });
+  }, [syncRailLoopState]);
 
   const initializeRailScroll = useCallback(() => {
     const rail = railRef.current;
@@ -292,12 +307,62 @@ export function CreativePortfolioLanding({
   }, [initializeRailScroll]);
 
   useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    reducedMotionRef.current = mq.matches;
+    const onChange = (e: MediaQueryListEvent) => {
+      reducedMotionRef.current = e.matches;
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    isMobileRef.current = mq.matches;
+    if (mq.matches) {
+      railRef.current?.querySelectorAll("img").forEach((img) => {
+        img.style.scale = "1";
+      });
+    }
+    const onChange = (e: MediaQueryListEvent) => {
+      isMobileRef.current = e.matches;
+      if (e.matches) {
+        railRef.current?.querySelectorAll("img").forEach((img) => {
+          img.style.scale = "1";
+        });
+      }
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (showSplash) return;
+    if (!isMobileRef.current) {
+      populateParallaxCache();
+      window.addEventListener("resize", populateParallaxCache);
+    }
+    return () => {
+      window.removeEventListener("resize", populateParallaxCache);
+    };
+  }, [showSplash, populateParallaxCache]);
+
+  useEffect(() => {
     const page = pageRef.current;
     const rail = railRef.current;
     const railContent = railContentRef.current;
 
     if (!page || !rail || !railContent) {
       return;
+    }
+
+    if (isMobileRef.current) {
+      const onScroll = () => syncRailLoopStateRef.current();
+      rail.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+      return () => {
+        rail.removeEventListener("scroll", onScroll);
+      };
     }
 
     const lenis = new Lenis({
@@ -307,7 +372,7 @@ export function CreativePortfolioLanding({
       orientation: "horizontal",
       gestureOrientation: "both",
       smoothWheel: true,
-      syncTouch: false,
+      syncTouch: true,
       lerp: 0.08,
       syncTouchLerp: 0.065,
       wheelMultiplier: 0.7,
@@ -325,8 +390,18 @@ export function CreativePortfolioLanding({
 
     return () => {
       lenis.off("scroll", onScroll);
-      lenis.destroy();
       lenisRef.current = null;
+      try {
+        const rafId = (lenis as unknown as Record<string, unknown>)._rafId;
+        if (typeof rafId === "number") cancelAnimationFrame(rafId);
+      } catch {
+        // RAF cancellation is best-effort
+      }
+      try {
+        lenis.destroy();
+      } catch {
+        // Destroy may throw during HMR when DOM is replaced
+      }
     };
   }, []);
 
@@ -339,14 +414,11 @@ export function CreativePortfolioLanding({
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isMobileRef.current) return;
       const target = e.target as HTMLElement;
       const tag = target.tagName.toLowerCase();
 
-      if (
-        tag === "input" ||
-        tag === "textarea" ||
-        target.isContentEditable
-      ) {
+      if (tag === "input" || tag === "textarea" || target.isContentEditable) {
         return;
       }
 
@@ -400,6 +472,7 @@ export function CreativePortfolioLanding({
     let lastDragTarget = 0;
 
     const startDragging = (event: PointerEvent) => {
+      if (event.pointerType === "touch") return;
       if (event.pointerType === "mouse" && event.button !== 0) {
         return;
       }
@@ -558,25 +631,6 @@ export function CreativePortfolioLanding({
     };
   }, [syncRailLoopState]);
 
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    reducedMotionRef.current = mq.matches;
-    const onChange = (e: MediaQueryListEvent) => {
-      reducedMotionRef.current = e.matches;
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  useEffect(() => {
-    if (showSplash) return;
-    populateParallaxCache();
-    window.addEventListener("resize", populateParallaxCache);
-    return () => {
-      window.removeEventListener("resize", populateParallaxCache);
-    };
-  }, [showSplash, populateParallaxCache]);
-
   useLayoutEffect(() => {
     prevShowSplashRef.current = showSplash;
 
@@ -657,6 +711,32 @@ export function CreativePortfolioLanding({
           gsap.set(cardCurtains, {
             clearProps: "yPercent,opacity,transform,willChange",
           });
+          return;
+        }
+
+        if (window.matchMedia("(max-width: 767px)").matches) {
+          for (const curtain of cardCurtains) {
+            curtain.style.cssText = "";
+          }
+
+          const railRect = rail.getBoundingClientRect();
+          const visibleCards = cards
+            .filter((card) => {
+              const r = card.getBoundingClientRect();
+              return (
+                r.right > railRect.left - 60 && r.left < railRect.right + 60
+              );
+            })
+            .sort(
+              (a, b) =>
+                a.getBoundingClientRect().left - b.getBoundingClientRect().left,
+            );
+
+          visibleCards.forEach((card, index) => {
+            card.style.setProperty("--card-enter-delay", `${index * 80}ms`);
+            card.classList.add("landing-card-enter");
+          });
+
           return;
         }
 
@@ -771,7 +851,7 @@ export function CreativePortfolioLanding({
                   duration: 0.7,
                   ease: "power2.out",
                 },
-                0.1,
+                0.8,
               );
             }
 
@@ -869,36 +949,42 @@ export function CreativePortfolioLanding({
       if (transitionTimeout) {
         clearTimeout(transitionTimeout);
       }
-      gsapCleanupRef.current?.();
+      try {
+        gsapCleanupRef.current?.();
+      } catch {
+        // GSAP revert may throw during HMR when DOM is replaced
+      }
     };
-  }, [showSplash]);
+  }, [showSplash, artworks.length]);
 
   return (
-    <div
-      ref={pageRef}
-      className="landing-page text-ink h-dvh overflow-hidden"
-    >
-      {showSplash ? <SplashScreen onComplete={handleSplashComplete} /> : null}
+    <div ref={pageRef} className="landing-page text-ink h-dvh overflow-hidden">
+      {showSplash ? (
+        <SplashScreen
+          onComplete={handleSplashComplete}
+          hourOverride={hourOverride}
+        />
+      ) : null}
 
-      <main className="mx-auto flex h-full w-full max-w-425 flex-col overflow-hidden px-5 pt-22 md:px-10 md:pt-[8.7rem]">
+      <main className="mx-auto flex h-full w-full max-w-425 flex-col overflow-hidden px-5 pt-18 md:px-10 md:pt-[8.7rem]">
         <section
           id="projects"
           className="-mx-5 flex min-h-0 flex-1 items-center overflow-hidden md:-mx-10"
         >
           <div
             ref={railRef}
-            className="flex h-full w-full cursor-grab touch-none overflow-x-auto overflow-y-hidden py-3 select-none [-ms-overflow-style:none] [scrollbar-width:none] md:py-4 [&::-webkit-scrollbar]:hidden"
+            className="flex h-full w-full cursor-grab [scrollbar-width:none] overflow-x-auto overflow-y-hidden py-2 select-none [-ms-overflow-style:none] md:touch-none md:py-4 [&::-webkit-scrollbar]:hidden"
           >
             <div
               ref={railContentRef}
-              className={`flex h-full w-full gap-3 md:gap-4 ${!isRailReady ? "invisible" : ""}`}
+              className={`flex h-full w-full gap-4 md:gap-4 ${!isRailReady ? "invisible" : ""}`}
             >
               {loopedLandingGalleryItems.map((item) => (
                 <article
                   key={item.loopKey}
                   data-slider-card
                   data-copy-index={item.copyIndex}
-                  className="group bg-canvas-soft relative aspect-3/4 h-full min-w-44 shrink-0 basis-[75vw] overflow-hidden md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
+                  className="group bg-canvas-soft relative aspect-3/4 max-h-[70dvh] min-w-44 shrink-0 basis-[62vw] overflow-hidden md:min-w-0 md:basis-[calc((100%-4rem)/5)]"
                   onMouseEnter={() => setHoveredArtworkTitle(item.title)}
                   onMouseLeave={() => setHoveredArtworkTitle(null)}
                 >
@@ -923,7 +1009,7 @@ export function CreativePortfolioLanding({
                             draggable={false}
                             sizes="(max-width: 768px) 75vw, 22rem"
                             className="object-cover contrast-105 saturate-105 transition-[scale] duration-300 ease-in-out group-hover:scale-[1.72]"
-                            style={{ scale: `${parallaxImageScale}` }}
+                            style={{ scale: "1" }}
                             priority={
                               item.copyIndex === centerLoopCopyIndex &&
                               item.index < 2
@@ -955,7 +1041,7 @@ export function CreativePortfolioLanding({
           ) : null}
         </section>
 
-        <footer className="flex flex-col items-center gap-4 py-1 pb-6 md:gap-5 md:pb-6">
+        <footer className="flex flex-col items-center gap-4 py-1 pb-4 md:gap-5 md:pb-6">
           <div id="about" aria-hidden="true" className="h-0 overflow-hidden" />
 
           <div
@@ -965,7 +1051,7 @@ export function CreativePortfolioLanding({
             {displayTitle ? (
               <p
                 key={displayTitle}
-                className="max-w-[88vw] text-center text-[1.2rem] leading-[1.08] font-black tracking-[-0.025em] text-balance motion-safe:animate-[landing-title-fade-in_220ms_ease-out] md:max-w-[48rem] md:text-[1.9rem]"
+                className="max-w-[88vw] text-center text-[1.4rem] leading-[1.08] font-black tracking-[-0.025em] text-balance motion-safe:animate-[landing-title-fade-in_220ms_ease-out] md:max-w-[48rem] md:text-[1.9rem]"
               >
                 {displayTitle}
               </p>
@@ -977,7 +1063,7 @@ export function CreativePortfolioLanding({
               {Array.from({ length: progressSegments }).map((_, index) => (
                 <span
                   key={index}
-                  className={`h-[2px] w-7 md:w-14 ${index <= activeSegment ? "bg-accent" : "bg-accent/28"}`}
+                  className={`h-[3px] w-8 md:w-14 ${index <= activeSegment ? "bg-accent" : "bg-accent/28"}`}
                 />
               ))}
             </div>

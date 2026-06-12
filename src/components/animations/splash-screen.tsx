@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
 import { irinaWordmarkFont } from "@/lib/wordmark-font";
 import { ShellIcon } from "@/components/ui/shell-icon";
-import { AuroraBackground } from "@/components/ui/aurora-background";
+import { getTimeColors, getCurrentHour } from "@/lib/time-of-day";
 
 type SplashScreenProps = {
   onComplete: () => void;
+  hourOverride?: number;
 };
 
 type ArcPathOptions = {
@@ -212,7 +213,7 @@ function createRandomWaveGeometry(): WaveGeometry {
   };
 }
 
-export function SplashScreen({ onComplete }: SplashScreenProps) {
+export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
   const hasCompletedRef = useRef(false);
 
   const finishSplash = useCallback(() => {
@@ -233,13 +234,23 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
     }
   }, [finishSplash]);
 
+  const timeColors = useMemo(() => {
+    const hour = hourOverride ?? getCurrentHour();
+    return getTimeColors(hour);
+  }, [hourOverride]);
+
   useEffect(() => {
     document.documentElement.setAttribute("data-splash", "active");
+    document.documentElement.style.setProperty(
+      "--splash-sand",
+      timeColors.sandColor,
+    );
 
     return () => {
       document.documentElement.removeAttribute("data-splash");
+      document.documentElement.style.removeProperty("--splash-sand");
     };
-  }, []);
+  }, [timeColors.sandColor]);
 
   const scopeRef = useGsapContext<HTMLDivElement>(
     (scope, gsap) => {
@@ -345,7 +356,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
       if (bubbleContainer) {
         const viewportHeight = window.innerHeight;
         const isNarrow = viewportHeight < 768;
-        const BUBBLE_COUNT = isNarrow ? 40 : 100;
+        const BUBBLE_COUNT = isNarrow ? 20 : 40;
         const fragment = document.createDocumentFragment();
 
         for (let i = 0; i < BUBBLE_COUNT; i++) {
@@ -582,11 +593,11 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
       const bubbleCoverStart = bubbleRiseStart + 0.2;
 
-      // Transition bg from sand to teal when bubbles cover the screen
+      // Transition bg from sand to current time-of-day color when bubbles cover the screen
       if (bgLayer) {
         timeline.to(
           bgLayer,
-          { backgroundColor: "#1a7a6e", duration: 0.8, ease: "power2.inOut" },
+          { backgroundColor: timeColors.canvas, duration: 0.8, ease: "power2.inOut" },
           bubbleCoverStart,
         );
       }
@@ -630,60 +641,78 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         bubbleCoverStart,
       );
 
-      // Unmount splash before bubbles finish
-      timeline.to({}, { duration: 0, onComplete: finishSplash }, 4.5);
+      // Remove splash CSS overrides early so page bg has time to transition
+      // (TimeOfDayWallpaper has a 2s CSS transition on background-color)
+      timeline.call(
+        () => {
+          document.documentElement.removeAttribute("data-splash");
+          document.documentElement.style.removeProperty("--splash-sand");
+        },
+        undefined,
+        2.5,
+      );
+
+      // Fade out splash to reveal the page behind it
+      timeline.to(
+        scope,
+        { opacity: 0, duration: 0.4, ease: "power2.out" },
+        4.3,
+      );
+
+      // Unmount splash after fade completes
+      timeline.to({}, { duration: 0, onComplete: finishSplash }, 4.75);
     },
-    [finishSplash],
+    [finishSplash, timeColors],
   );
   const titleClassName = "text-[#444444]";
 
   const reflectionClassName = "text-[#444444]/60";
 
-  const waveMainStops = [
-    "rgba(200,245,235,0.98)",
-    "rgba(150,230,210,0.90)",
-    "rgba(80,210,180,0.88)",
-    "rgba(26,154,130,0.92)",
-    "rgba(26,154,130,0.85)",
-  ];
+  const waveMainStops = timeColors.waveMainStops;
 
-  const waveSoftStops = [
-    "rgba(180,240,225,0.90)",
-    "rgba(160,230,210,0.80)",
-    "rgba(100,210,180,0.75)",
-    "rgba(60,180,155,0.70)",
-    "rgba(60,180,155,0.55)",
-  ];
+  const waveSoftStops = timeColors.waveSoftStops;
 
-  const washBodyStops = [
-    "rgba(210,245,230,0.92)",
-    "rgba(180,235,215,0.65)",
-    "rgba(130,220,195,0.55)",
-    "rgba(80,190,165,0.45)",
-    "rgba(80,190,165,0.28)",
-  ];
+  const washBodyStops = timeColors.waveWashStops;
 
   return (
     <div
       ref={scopeRef}
       data-splash-screen
-      className={`fixed inset-0 z-[9999] flex h-dvh w-screen items-center justify-center overflow-hidden opacity-0`}
+      className={`fixed inset-0 z-[9999] flex h-dvh w-screen items-center justify-center overflow-hidden`}
       role="presentation"
       aria-hidden="true"
     >
       <div
         data-splash-bg
         className="absolute inset-0"
-        style={{ backgroundColor: "#f7eed8" }}
+        style={{ backgroundColor: timeColors.sandColor }}
       />
 
       <div
         data-splash-aurora
         className="pointer-events-none absolute inset-0 opacity-0"
       >
-        <AuroraBackground className="absolute inset-0 bg-transparent">
-          {null}
-        </AuroraBackground>
+        <div
+          data-aurora-bg
+          className="aurora-overlay pointer-events-none absolute inset-0 overflow-hidden bg-transparent"
+          style={
+            {
+              "--aurora": `repeating-linear-gradient(100deg,${timeColors.seagreen600}_10%,${timeColors.sand500}_15%,${timeColors.seagreen500}_20%,${timeColors.sand400}_25%,${timeColors.seagreen400}_30%)`,
+              "--seagreen-500": timeColors.seagreen500,
+              "--seagreen-400": timeColors.seagreen400,
+              "--seagreen-600": timeColors.seagreen600,
+              "--sand-500": timeColors.sand500,
+              "--sand-400": timeColors.sand400,
+              "--black": timeColors.seagreen600,
+              "--white": timeColors.sand400,
+              "--transparent": "transparent",
+            } as React.CSSProperties
+          }
+        >
+          <div
+            className="after:motion-safe:animate-aurora pointer-events-none absolute -inset-[10px] [background-image:var(--aurora)] [background-size:200%] [background-position:50%_50%] opacity-40 blur-[4px] invert-[0.15] [--aurora:repeating-linear-gradient(100deg,var(--seagreen-600)_10%,var(--sand-500)_15%,var(--seagreen-500)_20%,var(--sand-400)_25%,var(--seagreen-400)_30%)] after:absolute after:inset-0 after:[background-image:var(--aurora)] after:[background-size:150%] after:[background-attachment:fixed] after:opacity-60 after:content-[''] [mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,var(--transparent)_70%)]"
+          />
+        </div>
       </div>
       <svg
         data-wave-band
@@ -692,7 +721,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         // GUIDE: To hide lateral edges while animating xPercent,
         // make the layer wider than viewport and shift it left.
         // TUNE HERE: left / width control side bleed.
-        className="pointer-events-none absolute top-[-14%] left-[-14%] h-[132%] w-[128%] motion-safe:will-change-transform"
+        className="pointer-events-none absolute top-[-14%] left-[-14%] h-[132%] w-[128%] motion-safe:will-change-transform opacity-0"
         style={{
           maskImage:
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.96) 88%, rgba(0,0,0,0.68) 95%, rgba(0,0,0,0) 100%)",
@@ -722,7 +751,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         data-wave-band
         viewBox="0 0 1440 900"
         preserveAspectRatio="xMidYMid slice"
-        className="pointer-events-none absolute top-[-16%] left-[-12%] h-[108%] w-[124%] mix-blend-screen motion-safe:will-change-transform"
+        className="pointer-events-none absolute top-[-16%] left-[-12%] h-[108%] w-[124%] mix-blend-screen motion-safe:will-change-transform opacity-0"
         style={{
           maskImage:
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.96) 88%, rgba(0,0,0,0.68) 95%, rgba(0,0,0,0) 100%)",
@@ -752,7 +781,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
         data-splash-wash
         viewBox="0 0 1440 900"
         preserveAspectRatio="xMidYMid slice"
-        className="pointer-events-none absolute inset-x-0 top-[20%] h-[100%] w-full motion-safe:will-change-transform"
+        className="pointer-events-none absolute inset-x-0 top-[20%] h-[100%] w-full motion-safe:will-change-transform opacity-0"
         aria-hidden="true"
       >
         <path
@@ -787,21 +816,21 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
             <div className="relative z-10 flex items-center gap-[0.15em]">
               <span
                 data-splash-shell
-                className="flex shrink-0 items-center text-[clamp(3.6rem,13vw,9rem)]"
+                className="flex shrink-0 items-center text-[19vw] md:text-[clamp(3.6rem,13vw,9rem)] opacity-0"
               >
                 <ShellIcon size="1.3em" />
               </span>
               <span className="relative">
                 <span
                   data-splash-title
-                  className={`${irinaWordmarkFont.className} block text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] ${titleClassName}`}
+                  className={`${irinaWordmarkFont.className} block text-[19vw] md:text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] opacity-0 ${titleClassName}`}
                 >
                   Irina
                 </span>
 
                 <span
                   data-splash-title-reflection
-                  className={`${irinaWordmarkFont.className} pointer-events-none absolute inset-0 text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] select-none ${reflectionClassName}`}
+                  className={`${irinaWordmarkFont.className} pointer-events-none absolute inset-0 text-[19vw] md:text-[clamp(3.6rem,13vw,9rem)] font-medium tracking-[-0.02em] select-none opacity-0 ${reflectionClassName}`}
                   style={{
                     maskImage:
                       "linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.62) 68%, rgba(0,0,0,1) 100%)",
