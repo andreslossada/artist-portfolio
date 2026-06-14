@@ -278,9 +278,6 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
       const auroraLayer = scope.querySelector<HTMLElement>(
         "[data-splash-aurora]",
       );
-      const bubbleContainer = scope.querySelector<HTMLDivElement>(
-        "[data-splash-bubbles]",
-      );
       const waveGeometry = createRandomWaveGeometry();
 
       if (mainFillPath) {
@@ -343,88 +340,12 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
       const timeline = gsap.timeline({
         defaults: { ease: "sine.inOut" },
         onComplete: () => {
-          if (bubbleContainer) bubbleContainer.remove();
           finishSplash();
         },
       });
 
       const delay = 0.5;
       const retreatStart = delay + 1.26;
-      const bubbleRiseStart = 3.5;
-
-      // Generate bubbles distributed across entire screen
-      if (bubbleContainer) {
-        const viewportHeight = window.innerHeight;
-        const isNarrow = viewportHeight < 768;
-        const BUBBLE_COUNT = isNarrow ? 20 : 40;
-        const fragment = document.createDocumentFragment();
-
-        for (let i = 0; i < BUBBLE_COUNT; i++) {
-          const bubble = document.createElement("div");
-          const size = isNarrow
-            ? 80 + Math.random() * 100
-            : 140 + Math.random() * 140;
-          const leftPercent = Math.random() * 100;
-          const startYPercent = 100 + Math.random() * 30;
-          const riseDuration = 0.2 + Math.random() * 0.5;
-          const delayOffset = Math.random() * 0.5;
-          const xSpread = (Math.random() - 0.5) * 40;
-          const targetOpacity = 1.0;
-          const yMovePx = -(viewportHeight * 1.6 + Math.random() * 400);
-          const absStart = bubbleRiseStart + delayOffset;
-
-          gsap.set(bubble, {
-            position: "absolute",
-            borderRadius: "50%",
-            width: size,
-            height: size,
-            left: `${leftPercent}%`,
-            top: `${startYPercent}%`,
-            opacity: 0,
-            backgroundColor: "#ffffff",
-            scale: 0.5 + Math.random() * 1.0,
-          });
-
-          fragment.appendChild(bubble);
-
-          // Quick fade in
-          timeline.to(
-            bubble,
-            {
-              opacity: targetOpacity,
-              duration: 0.3,
-              ease: "power2.out",
-            },
-            absStart,
-          );
-
-          // Rise
-          timeline.to(
-            bubble,
-            {
-              y: yMovePx,
-              x: xSpread + (Math.random() - 0.5) * 30,
-              duration: riseDuration,
-              ease: "sine.inOut",
-            },
-            absStart,
-          );
-
-          // Fade out at end of rise
-          timeline.to(
-            bubble,
-            {
-              opacity: 0,
-              scale: 0.2,
-              duration: 0.4,
-              ease: "power2.in",
-            },
-            absStart + riseDuration - 0.4,
-          );
-        }
-
-        bubbleContainer.appendChild(fragment);
-      }
 
       // Reveal splash content after initial delay
       timeline.set(scope, { opacity: 1 }, delay);
@@ -457,8 +378,8 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
       timeline.to(
         waveBands,
         {
-          yPercent: (index) => (index === 0 ? -5 : -1),
-          opacity: (index) => (index === 0 ? 1 : 0.90),
+          yPercent: (index) => (index === 0 ? -5 : -8),
+          opacity: (index) => (index === 0 ? 1 : 0.92),
           duration: 0.9,
           stagger: 0.045,
           ease: "power2.out",
@@ -469,7 +390,7 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
       timeline.to(
         waveBands,
         {
-          yPercent: (index) => (index === 0 ? -2 : 1.5),
+          yPercent: (index) => (index === 0 ? -2 : -3),
           duration: 0.42,
           stagger: 0.035,
           ease: "sine.in",
@@ -566,7 +487,7 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
           duration: 0.84,
           ease: "sine.out",
         },
-        retreatStart + 0.08,
+        retreatStart - 0.12,
       );
 
       timeline.to(
@@ -577,7 +498,7 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
           duration: 0.84,
           ease: "sine.out",
         },
-        retreatStart + 0.08,
+        retreatStart - 0.12,
       );
 
       timeline.to(
@@ -588,79 +509,115 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
           duration: 0.88,
           ease: "sine.out",
         },
-        retreatStart + 0.14,
+        retreatStart + 0.06,
       );
 
-      const bubbleCoverStart = bubbleRiseStart + 0.2;
+      // 4) second wave surges back up to cover the screen and transition out
+      const secondSurgeStart = delay + 3.0;
 
-      // Transition bg from sand to current time-of-day color when bubbles cover the screen
+      // Wave bands surge back up from below
+      timeline.to(
+        waveBands,
+        {
+          yPercent: (index) => (index === 0 ? -42 : -46),
+          xPercent: (index) => (index === 0 ? -2.4 : 2.2),
+          opacity: (index) => (index === 0 ? 1 : 0.88),
+          scaleY: (index) => (index === 0 ? 1.04 : 1.1),
+          duration: 1.7,
+          stagger: 0.08,
+          ease: "power2.inOut",
+        },
+        secondSurgeStart,
+      );
+
+      // Wash surges back up
+      timeline.to(
+        wash,
+        {
+          yPercent: -38,
+          opacity: 0.72,
+          scaleY: 1.12,
+          duration: 1.7,
+          ease: "power2.inOut",
+        },
+        secondSurgeStart,
+      );
+
+      // Transition bg from sand to current time-of-day color once the wave is near the top
       if (bgLayer) {
         timeline.to(
           bgLayer,
-          { backgroundColor: timeColors.canvas, duration: 0.8, ease: "power2.inOut" },
-          bubbleCoverStart,
-        );
-      }
-      // Fade in aurora overlay at the same time
-      if (auroraLayer) {
-        timeline.to(
-          auroraLayer,
-          { opacity: 1, duration: 1.0, ease: "power2.inOut" },
-          bubbleCoverStart,
+          {
+            backgroundColor: timeColors.canvas,
+            duration: 0.45,
+            ease: "power2.inOut",
+          },
+          secondSurgeStart + 1.28,
         );
       }
 
-      // Title and shell fade out when bubbles cover the screen
+      // Fade in aurora overlay only once the wave has covered the screen
+      if (auroraLayer) {
+        timeline.to(
+          auroraLayer,
+          { opacity: 1, duration: 0.75, ease: "power2.inOut" },
+          secondSurgeStart + 1.28,
+        );
+      }
+
+      // Title and shell disappear from bottom up as the second wave rises
       timeline.to(
         title,
         {
-          opacity: 0,
+          clipPath: "inset(0% 0% 100% 0%)",
+          filter: "blur(6px)",
           duration: 0.5,
-          ease: "power2.out",
+          ease: "power2.in",
         },
-        bubbleCoverStart,
+        secondSurgeStart + 0.55,
       );
 
       timeline.to(
         shellIcon,
         {
-          opacity: 0,
+          clipPath: "inset(0% 0% 100% 0%)",
           duration: 0.5,
-          ease: "power2.out",
+          ease: "power2.in",
         },
-        bubbleCoverStart,
+        secondSurgeStart + 0.55,
       );
 
       timeline.to(
         titleReflection,
         {
+          clipPath: "inset(0% 0% 100% 0%)",
           opacity: 0,
           duration: 0.5,
-          ease: "power2.out",
+          ease: "power2.in",
         },
-        bubbleCoverStart,
+        secondSurgeStart + 0.55,
       );
 
-      // Remove splash CSS overrides early so page bg has time to transition
-      // (TimeOfDayWallpaper has a 2s CSS transition on background-color)
+      // Remove splash CSS overrides early so the page bg has time to transition
+      // (hidden behind the opaque splash until the wave covers the screen)
       timeline.call(
         () => {
           document.documentElement.removeAttribute("data-splash");
           document.documentElement.style.removeProperty("--splash-sand");
         },
         undefined,
-        2.5,
+        secondSurgeStart,
       );
 
       // Fade out splash to reveal the page behind it
       timeline.to(
         scope,
         { opacity: 0, duration: 0.4, ease: "power2.out" },
-        4.3,
+        4.7,
       );
 
       // Unmount splash after fade completes
-      timeline.to({}, { duration: 0, onComplete: finishSplash }, 4.75);
+      timeline.to({}, { duration: 0, onComplete: finishSplash }, 5.2);
     },
     [finishSplash, timeColors],
   );
@@ -721,7 +678,7 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
         // GUIDE: To hide lateral edges while animating xPercent,
         // make the layer wider than viewport and shift it left.
         // TUNE HERE: left / width control side bleed.
-        className="pointer-events-none absolute top-[-14%] left-[-14%] h-[132%] w-[128%] motion-safe:will-change-transform opacity-0"
+        className="pointer-events-none absolute top-[-14%] left-[-14%] h-[200%] w-[128%] motion-safe:will-change-transform opacity-0"
         style={{
           maskImage:
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.96) 88%, rgba(0,0,0,0.68) 95%, rgba(0,0,0,0) 100%)",
@@ -751,7 +708,7 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
         data-wave-band
         viewBox="0 0 1440 900"
         preserveAspectRatio="xMidYMid slice"
-        className="pointer-events-none absolute top-[-16%] left-[-12%] h-[108%] w-[124%] mix-blend-screen motion-safe:will-change-transform opacity-0"
+        className="pointer-events-none absolute top-[-16%] left-[-12%] h-[165%] w-[124%] mix-blend-screen motion-safe:will-change-transform opacity-0"
         style={{
           maskImage:
             "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 78%, rgba(0,0,0,0.96) 88%, rgba(0,0,0,0.68) 95%, rgba(0,0,0,0) 100%)",
@@ -781,7 +738,7 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
         data-splash-wash
         viewBox="0 0 1440 900"
         preserveAspectRatio="xMidYMid slice"
-        className="pointer-events-none absolute inset-x-0 top-[20%] h-[100%] w-full motion-safe:will-change-transform opacity-0"
+        className="pointer-events-none absolute inset-x-0 top-[20%] h-[155%] w-full motion-safe:will-change-transform opacity-0"
         aria-hidden="true"
       >
         <path
@@ -800,12 +757,6 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
           </linearGradient>
         </defs>
       </svg>
-
-      <div
-        data-splash-bubbles
-        className="pointer-events-none absolute inset-0 z-[20] overflow-hidden"
-        aria-hidden="true"
-      />
 
       <div
         className="absolute inset-x-0 top-[28%] flex justify-center px-4 md:top-[34%] md:px-6"
