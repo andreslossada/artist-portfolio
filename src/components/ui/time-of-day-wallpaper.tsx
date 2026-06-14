@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, { ReactNode, Suspense, useEffect, useMemo, useRef } from "react";
+import React, { ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SwimmingFish } from "@/components/animations/swimming-fish";
 import { getTimeColors, type TimeColors } from "@/lib/time-of-day";
@@ -43,6 +43,29 @@ function resolveHour(hourOverride?: number): number {
   return now.getHours() + now.getMinutes() / 60;
 }
 
+function useHour(hourOverride: number | undefined): number {
+  const [internalHour, setInternalHour] = useState(() => resolveHour());
+  useEffect(() => {
+    if (hourOverride !== undefined) return;
+    const update = () => setInternalHour(resolveHour());
+    update();
+    const id = setInterval(update, 60_000);
+    return () => clearInterval(id);
+  }, [hourOverride]);
+  return hourOverride !== undefined ? hourOverride : internalHour;
+}
+
+function setCssVarsOnHtml(colors: TimeColors) {
+  const html = document.documentElement;
+  html.style.setProperty("--color-canvas", colors.canvas);
+  html.style.setProperty("--color-canvas-soft", colors.canvasSoft);
+  html.style.setProperty("--color-surface", colors.surface);
+  html.style.setProperty("--color-ink", colors.ink);
+  html.style.setProperty("--color-muted", colors.muted);
+  html.style.setProperty("--color-accent", colors.accent);
+  html.style.setProperty("--color-accent-soft", colors.accentSoft);
+}
+
 function TimeOfDayWallpaperBase({
   className,
   children,
@@ -50,57 +73,16 @@ function TimeOfDayWallpaperBase({
   hourOverride,
   ...props
 }: TimeOfDayWallpaperBaseProps) {
-  const htmlRef = useRef<HTMLElement | null>(null);
-
-  const colors = useMemo(
-    () => getTimeColors(resolveHour(hourOverride)),
-    [hourOverride],
-  );
+  const hour = useHour(hourOverride);
+  const colors = useMemo(() => getTimeColors(hour), [hour]);
 
   useEffect(() => {
-    htmlRef.current = document.documentElement;
-
-    const prevCanvas = htmlRef.current.style.getPropertyValue(
-      "--color-canvas",
-    );
-    htmlRef.current.style.setProperty("--color-canvas", colors.canvas);
-    htmlRef.current.style.setProperty("--color-canvas-soft", colors.canvasSoft);
-    htmlRef.current.style.setProperty("--color-surface", colors.surface);
-    htmlRef.current.style.setProperty("--color-ink", colors.ink);
-    htmlRef.current.style.setProperty("--color-muted", colors.muted);
-    htmlRef.current.style.setProperty("--color-accent", colors.accent);
-    htmlRef.current.style.setProperty(
-      "--color-accent-soft",
-      colors.accentSoft,
-    );
-
-    return () => {
-      if (htmlRef.current) {
-        htmlRef.current.style.setProperty("--color-canvas", prevCanvas ?? "");
-      }
-    };
+    setCssVarsOnHtml(colors);
   }, [colors]);
 
   const auroraGradient = useMemo(() => buildAuroraGradient(colors), [colors]);
 
-  useEffect(() => {
-    if (hourOverride !== undefined) return;
-    const interval = setInterval(() => {
-      const now = new Date();
-      const hour = now.getHours() + now.getMinutes() / 60;
-      const fresh = getTimeColors(hour);
-      if (htmlRef.current) {
-        htmlRef.current.style.setProperty("--color-canvas", fresh.canvas);
-        htmlRef.current.style.setProperty("--color-canvas-soft", fresh.canvasSoft);
-        htmlRef.current.style.setProperty("--color-surface", fresh.surface);
-        htmlRef.current.style.setProperty("--color-ink", fresh.ink);
-        htmlRef.current.style.setProperty("--color-muted", fresh.muted);
-        htmlRef.current.style.setProperty("--color-accent", fresh.accent);
-        htmlRef.current.style.setProperty("--color-accent-soft", fresh.accentSoft);
-      }
-    }, 60000);
-    return () => clearInterval(interval);
-  }, [hourOverride]);
+  const bgColor = colors.canvas;
 
   return (
     <div
@@ -108,8 +90,12 @@ function TimeOfDayWallpaperBase({
         "relative flex flex-col items-center justify-center transition-colors duration-[2000ms] ease-in-out",
         className,
       )}
-      style={{ backgroundColor: colors.canvas, color: colors.ink }}
+      style={{
+        ...(bgColor ? { backgroundColor: bgColor } : {}),
+        color: colors.ink,
+      }}
       data-aurora-bg
+      suppressHydrationWarning
       {...props}
     >
       <div
