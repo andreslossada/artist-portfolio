@@ -12,6 +12,9 @@ This is a Next.js 16 + React 19 artist portfolio with GSAP animations, Sanity CM
 - Spanish/English i18n with cookie-based locale
 - Cookie name: `lang` (values: `es` or `en`)
 
+### Time-of-Day Color Palette
+The entire site's color scheme shifts with real-world time. `getTimeColors(hour)` in `src/lib/time-of-day.ts` computes 25+ CSS-compatible color values from 7 time stops (midnight/dawn/morning/noon/afternoon/sunset/evening) via cosine-eased interpolation. `<TimeOfDayWallpaper>` injects them as `--color-canvas`, `--color-ink`, etc. on `<html>`. Use `var(--color-*)` in CSS or Tailwind tokens (`bg-canvas`, `text-ink`, etc.). See `@AGENTS.md` for full details including how to add new colors and dev tools (`TimeSlider`, `?hour=` param).
+
 ### Mock Content
 When `NEXT_PUBLIC_CONTENT_SOURCE=mock` (default when Sanity is unconfigured):
 - Artworks loaded from `src/lib/content/catalog.ts`
