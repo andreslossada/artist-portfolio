@@ -19,8 +19,7 @@ const dictionaries = {
       cartDescription:
         "Revisa las obras seleccionadas y contáctanos para adquirirlas.",
       shopTitle: "Tienda | Estudio Irina",
-      shopDescription:
-        "Camisas, stickers y ediciones limitadas del estudio.",
+      shopDescription: "Camisas, stickers y ediciones limitadas del estudio.",
     },
     header: {
       home: "Inicio",
@@ -49,7 +48,8 @@ const dictionaries = {
     shopPage: {
       eyebrow: "Tienda",
       title: "Ediciones y publicaciones",
-      fromArtworkHint: "Estás explorando opciones para adquirir piezas relacionadas.",
+      fromArtworkHint:
+        "Estás explorando opciones para adquirir piezas relacionadas.",
       buy: "Comprar",
       categoryAll: "Todos",
       categoryShirts: "Camisas",
@@ -66,12 +66,7 @@ const dictionaries = {
       title: "Un universo marino entre sueño y calma",
       description:
         "La obra de Irina es un viaje visual profundamente inspirado en la energía de la playa y el océano. Su estilo destaca por el uso de pinceladas texturizadas y fluidas que imitan el movimiento del agua, combinando tonos fríos y relajantes con destellos cálidos y vibrantes. A través de figuras etéreas, sirenas y elementos marinos, su arte captura la magia del mar, invitando al espectador a sumergirse en un mundo tranquilo y lleno de fantasía.",
-      visualTags: [
-        "Onírico",
-        "Inmersivo",
-        "Textura fluida",
-        "Magia marina",
-      ],
+      visualTags: ["Onírico", "Inmersivo", "Textura fluida", "Magia marina"],
       imagePlaceholderTitle: "Retrato de la artista",
       imagePlaceholderHint: "Irina en su estudio.",
       processPillars: [
@@ -101,7 +96,7 @@ const dictionaries = {
       eyebrow: "Contacto",
       title: "Escríbeme",
       description:
-        "El estudio responde consultas sobre obra disponible, comisiones, colaboraciones curatoriales y prensa. Tiempo estimado de respuesta: 24-48 horas hábiles.",
+        "El estudio responde consultas sobre obra disponible, comisiones, colaboraciones curatoriales y prensa. ",
       channels: {
         email: "Correo",
         whatsapp: "WhatsApp",
@@ -261,7 +256,7 @@ const dictionaries = {
       eyebrow: "Contact",
       title: "Write to me",
       description:
-        "The studio responds to inquiries about available works, commissions, curatorial collaborations, and press. Estimated response time: 24-48 business hours.",
+        "The studio responds to inquiries about available works, commissions, curatorial collaborations, and press. ",
       channels: {
         email: "Email",
         whatsapp: "WhatsApp",
