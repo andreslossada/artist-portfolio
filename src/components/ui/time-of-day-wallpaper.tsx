@@ -91,6 +91,12 @@ function TimeOfDayWallpaperBase({
       const fresh = getTimeColors(hour);
       if (htmlRef.current) {
         htmlRef.current.style.setProperty("--color-canvas", fresh.canvas);
+        htmlRef.current.style.setProperty("--color-canvas-soft", fresh.canvasSoft);
+        htmlRef.current.style.setProperty("--color-surface", fresh.surface);
+        htmlRef.current.style.setProperty("--color-ink", fresh.ink);
+        htmlRef.current.style.setProperty("--color-muted", fresh.muted);
+        htmlRef.current.style.setProperty("--color-accent", fresh.accent);
+        htmlRef.current.style.setProperty("--color-accent-soft", fresh.accentSoft);
       }
     }, 60000);
     return () => clearInterval(interval);
