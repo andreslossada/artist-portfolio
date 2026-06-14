@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useGsapContext } from "@/hooks/use-gsap-context";
 import { irinaWordmarkFont } from "@/lib/wordmark-font";
 import { ShellIcon } from "@/components/ui/shell-icon";
-import { getTimeColors, getCurrentHour } from "@/lib/time-of-day";
+import { getTimeColors } from "@/lib/time-of-day";
+import { useHour } from "@/lib/use-hour";
 
 type SplashScreenProps = {
   onComplete: () => void;
@@ -234,10 +235,8 @@ export function SplashScreen({ onComplete, hourOverride }: SplashScreenProps) {
     }
   }, [finishSplash]);
 
-  const timeColors = useMemo(() => {
-    const hour = hourOverride ?? getCurrentHour();
-    return getTimeColors(hour);
-  }, [hourOverride]);
+  const hour = useHour(hourOverride);
+  const timeColors = useMemo(() => getTimeColors(hour), [hour]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-splash", "active");

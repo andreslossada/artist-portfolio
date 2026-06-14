@@ -1,6 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { getCurrentHour, getTimeColors } from "@/lib/time-of-day";
+import { getTimeColors } from "@/lib/time-of-day";
+import { useHour } from "@/lib/use-hour";
 import React, { ReactNode, useMemo } from "react";
 
 interface AuroraBackgroundProps extends React.HTMLProps<HTMLDivElement> {
@@ -14,9 +15,10 @@ export const AuroraBackground = ({
   showRadialGradient = true,
   ...props
 }: AuroraBackgroundProps) => {
+  const hour = useHour(undefined);
   const auroraOpacity = useMemo(
-    () => getTimeColors(getCurrentHour()).auroraOverlayOpacity,
-    [],
+    () => getTimeColors(hour).auroraOverlayOpacity,
+    [hour],
   );
 
   return (

@@ -1,10 +1,11 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, { ReactNode, Suspense, useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import React, { ReactNode, Suspense, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { SwimmingFish } from "@/components/animations/swimming-fish";
 import { getTimeColors, type TimeColors } from "@/lib/time-of-day";
+import { useHour } from "@/lib/use-hour";
 
 interface TimeOfDayWallpaperBaseProps
   extends React.HTMLProps<HTMLDivElement> {
@@ -35,30 +36,6 @@ function buildAuroraGradient(colors: TimeColors): string {
     `${colors.sand400} 25%,`,
     `${colors.seagreen400} 30%)`,
   ].join("");
-}
-
-function resolveHour(hourOverride?: number): number {
-  if (hourOverride !== undefined) return hourOverride;
-  const now = new Date();
-  return now.getHours() + now.getMinutes() / 60;
-}
-
-function useHour(hourOverride: number | undefined): number {
-  const subscribe = useCallback(
-    (onStoreChange: () => void) => {
-      if (hourOverride !== undefined) return () => {};
-      const id = setInterval(onStoreChange, 60_000);
-      return () => clearInterval(id);
-    },
-    [hourOverride],
-  );
-
-  const getSnapshot = useCallback(() => {
-    if (hourOverride !== undefined) return hourOverride;
-    return resolveHour();
-  }, [hourOverride]);
-
-  return useSyncExternalStore(subscribe, getSnapshot, () => 0);
 }
 
 function setCssVarsOnHtml(colors: TimeColors) {
