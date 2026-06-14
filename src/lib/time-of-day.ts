@@ -461,7 +461,7 @@ export function getTimeColors(hour: number): TimeColors {
     return a;
   };
 
-  const result = {
+  return {
     canvas: interpolate("canvas") as string,
     canvasSoft: interpolate("canvasSoft") as string,
     surface: interpolate("surface") as string,
@@ -469,26 +469,22 @@ export function getTimeColors(hour: number): TimeColors {
     muted: interpolate("muted") as string,
     accent: interpolate("accent") as string,
     accentSoft: interpolate("accentSoft") as string,
+    seagreen600: "#1a7a6e",
+    sand500: "#f5f5dc",
+    seagreen500: "#2d9d82",
+    sand400: "#fffacd",
+    seagreen400: "#7de8c0",
+    glowTopColor: interpolate("glowTopColor") as string,
+    glowTopOpacity: interpolate("glowTopOpacity") as number,
+    glowBottomColor: interpolate("glowBottomColor") as string,
+    glowBottomOpacity: interpolate("glowBottomOpacity") as number,
     fishColor: interpolate("fishColor") as string,
     fishOpacity: interpolate("fishOpacity") as number,
+    auroraOverlayOpacity: interpolate("auroraOverlayOpacity") as number,
     sandColor: interpolate("sandColor") as string,
     waveMainStops: interpolate("waveMainStops") as TimeColors["waveMainStops"],
     waveSoftStops: interpolate("waveSoftStops") as TimeColors["waveSoftStops"],
     waveWashStops: interpolate("waveWashStops") as TimeColors["waveWashStops"],
-  };
-
-  return {
-    ...result,
-    seagreen600: "#00a0d0",
-    sand500: "#faf0b0",
-    seagreen500: "#00d0f0",
-    sand400: "#fff8c0",
-    seagreen400: "#70f0ff",
-    glowTopColor: "rgba(255,252,240,0.38)",
-    glowTopOpacity: 0.38,
-    glowBottomColor: "rgba(220,240,225,0.22)",
-    glowBottomOpacity: 0.22,
-    auroraOverlayOpacity: interpolate("auroraOverlayOpacity") as number,
   };
 }
 
